@@ -1,0 +1,39 @@
+h1 {
+  text-align: center;
+}
+
+.modal {
+  position: fixed;
+  background-color: whitesmoke;
+  padding: 20px;
+  border: 1px solid gray;
+}
+
+.message {
+  background-color: #e9e9e9;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: grab;
+  position: absolute;
+}
+
+.message:active {
+  cursor: grabbing;
+}
+
+.whiteboard {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: #e9e9e9;
+}
+
+.messages_container {
+  position:relative;
+  height: 100%;
+  width: 100%;
+  background-color: white;
+  cursor: pointer;
+}
