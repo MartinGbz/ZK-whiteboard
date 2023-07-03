@@ -13,4 +13,6 @@ datasource db {
 model Message {
   userId        String      @id
   text   String
+  positionX Int
+  positionY Int
 }

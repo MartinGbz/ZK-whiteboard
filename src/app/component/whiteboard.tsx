@@ -8,32 +8,72 @@ const Whiteboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [messagePositions, setMessagePositions] = useState<{ [key: string]: { x: number, y: number } }>({});
-  const [messageInitalPosition, setMessageInitalPosition] = useState<{x: number, y: number}>({x: 0, y: 0});
+  const [messagePosition, setMessagePosition] = useState<{x: number, y: number}>({x: 0, y: 0});
+  const [newMessage, setNewMessage] = useState<Message | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [disableClick, setDisableClick] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Code asynchrone à exécuter une fois que le composant a fini de charger
+        const response = await fetch('/api/whiteboard', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await response.json();
+        setMessages(data);
+        console.log("messages");
+        console.log(messages);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+
+    const userId = localStorage.getItem('userId');
+    if(userId) {
+      setUserId(userId)
+    }
+
+  }, [messages]);
+
+  useEffect(() => {
+    // Focus the input when the modal opens
     if (isModalOpen && inputRef.current) {
       inputRef.current.focus();
     }
 
-    if(isModalOpen && modalRef.current && messageInitalPosition) {
-      modalRef.current.style.top = `${messageInitalPosition.y}px`;
-      modalRef.current.style.left = `${messageInitalPosition.x}px`;
+    // Reset the modal position when it opens
+    if(isModalOpen && modalRef.current && messagePosition) {
+      modalRef.current.style.top = `${messagePosition.y}px`;
+      modalRef.current.style.left = `${messagePosition.x}px`;
     }
-    console.log(messageInitalPosition)
-  }, [isModalOpen, messageInitalPosition]);
+  }, [isModalOpen, messagePosition]);
 
   const handleSave = async () => {
+
+    // sismo connect
+    // get the user id
+
     const newMessage: Message = {
-      userId: 'TODO', // Ajoute l'ID de l'utilisateur approprié ici
+      userId: 'TODO123',
       text: inputValue,
+      positionX: messagePosition.x,
+      positionY: messagePosition.y,
     };
-    addMessage(newMessage);
+
+    setNewMessage(newMessage);
+    setMessages([...messages, newMessage]);
     setInputValue('');
     setIsModalOpen(false);
+
     const response = await fetch('/api/whiteboard', {
       method: 'POST',
       body: JSON.stringify(newMessage),
@@ -45,20 +85,14 @@ const Whiteboard = () => {
     console.log(data);
   };
 
-  const addMessage = (message: Message) => {
-    setMessages([...messages, message]);
-    setMessagePositions({ ...messagePositions, [message.userId]: {x: messageInitalPosition.x, y: messageInitalPosition.y} });
-  };
-
   const handleMessageClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    event.stopPropagation(); // Empêche la propagation de l'événement de clic aux messages individuels
+    event.stopPropagation();
   };
 
   const startMessageCreation = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const containerRect = event.currentTarget.getBoundingClientRect();
     const initialPosition = { x: event.clientX - containerRect.left, y: event.clientY - containerRect.top };
-    console.log("startMessageCreation", initialPosition)
-    setMessageInitalPosition(initialPosition);
+    setMessagePosition(initialPosition);
     setIsModalOpen(true);
   };
 
@@ -66,15 +100,20 @@ const Whiteboard = () => {
     <div className="whiteboard">
       <h1>Whiteboard</h1>
       <div className="messages_container"
-      onClick={(e) => startMessageCreation(e)}>
+      onDoubleClick={(e) => startMessageCreation(e)}>
         {messages.map((message: Message) => (
           <Draggable
             key={message.userId}
-            defaultPosition={{x: messageInitalPosition.x, y: messageInitalPosition.y}}
-            bounds="parent">
+            defaultPosition={{x: message.positionX, y: message.positionY}}
+            bounds="parent"
+            // disabled={message.userId !== newMessage?.userId}
+            disabled={message.userId !== userId}
+            >
             <div
               className="message"
               onClick={handleMessageClick}
+              onMouseDown={() => setDisableClick(true)}
+              onMouseUp={() => setDisableClick(false)}
             >
               {message.text}
             </div>
@@ -84,7 +123,7 @@ const Whiteboard = () => {
       {isModalOpen && (
         <div className="modal"
         ref={modalRef}
-        style={{ position: 'absolute', top: messageInitalPosition?.y, left: messageInitalPosition?.x }}>
+        style={{ position: 'absolute', top: messagePosition?.y, left: messagePosition?.x }}>
           <input
             type="text"
             value={inputValue}
@@ -99,12 +138,8 @@ const Whiteboard = () => {
             }}
             ref={inputRef}
           />
-          <button onClick={() => setIsModalOpen(false)}>Cancel</button>
-          <button
-            onClick={() => handleSave()}
-          >
-            Save
-          </button>
+          <button onClick={() => setIsModalOpen(false)}> Cancel </button>
+          <button onClick={() => handleSave()}> Save </button>
         </div>
       )}
     </div>

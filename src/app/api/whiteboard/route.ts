@@ -6,7 +6,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
-  return NextResponse.json({ name: 'John Doe' });
+  const messages = await prisma.message.findMany();
+  return NextResponse.json(messages);
 }
 
 export async function POST(req: Request) {
@@ -16,6 +17,8 @@ export async function POST(req: Request) {
     data: {
       userId: message.userId,
       text: message.text,
+      positionX: message.positionX,
+      positionY: message.positionY,
     },
   });
   return NextResponse.json({ name: 'John Doe' });
