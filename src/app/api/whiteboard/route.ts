@@ -21,5 +21,5 @@ export async function POST(req: Request) {
       positionY: message.positionY,
     },
   });
-  return NextResponse.json({ name: 'John Doe' });
+  return NextResponse.json(newMessage);
 }
