@@ -23,15 +23,13 @@ const Whiteboard = () => {
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
-  const [newMessage, setNewMessage] = useState<Message | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [vaultId, setVaultId] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     console.log("useEffect");
-
     const fetchData = async () => {
       try {
         // Code asynchrone à exécuter une fois que le composant a fini de charger
@@ -43,9 +41,6 @@ const Whiteboard = () => {
         });
         const data = await response.json();
         setMessages(data);
-        console.log("messages");
-        console.log(data);
-        console.log(messages);
       } catch (error) {
         console.error(error);
       }
@@ -55,12 +50,10 @@ const Whiteboard = () => {
       fetchData();
     }
 
-    const userId = localStorage.getItem("userId");
-    if (userId) {
-      setUserId(userId);
+    const vaultId = localStorage.getItem("vaultId");
+    if (vaultId) {
+      setVaultId(vaultId);
     }
-    console.log("userId");
-    console.log(userId);
   }, [messages]);
 
   useEffect(() => {
@@ -77,10 +70,9 @@ const Whiteboard = () => {
     }
   }, [isModalOpen, messagePosition]);
 
-  async function onSismoConnectResponse(response: SismoConnectResponse) {
-    console.log("Sismo Connect Response");
-    console.log(response);
+  async function onButtonSismoConnectResponse(response: SismoConnectResponse) {
     if (response) {
+      console.log("HFGCVKJHHVJKHV");
       // verify on the backend that the response is valid
       const res = await fetch("/api/sismo-connect", {
         method: "POST",
@@ -89,67 +81,57 @@ const Whiteboard = () => {
           "Content-Type": "application/json",
         },
       });
-
       const data = await res.json();
-      console.log("data");
-      console.log(data);
-      const vaultId = data.vaultId;
-      console.log("vaultId");
-      console.log(vaultId);
-      setUserId(vaultId);
+      const vaultId = data.vaultId;;
+      setVaultId(vaultId);
+      localStorage.setItem("vaultId", vaultId);
     }
   }
 
-  const handleSave2 = async (message: SismoConnectResponse) => {
-    // if(responseMessage) {
-      console.log("HEYYYYYYYYYYY");
-      console.log(inputValue);
-      const res = await fetch("/api/sismo-connect-message", {
-        method: "POST",
-        body: JSON.stringify(message),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  const saveMessage = async (message: Message) => {
+    const res = await fetch("/api/whiteboard", {
+      method: "POST",
+      body: JSON.stringify(message),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    console.log("----------->>>>> data");
+    console.log(data);
+  };
 
-      const messageSigned = await res.json();
-      console.log("data");
-      console.log(messageSigned);
+  const verifySaveMessage = async (message: SismoConnectResponse) => {
+    console.log("oœœ message");
+    const res = await fetch("/api/sismo-connect-message", {
+      method: "POST",
+      body: JSON.stringify(message),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("oœœ res");
 
-      if(messageSigned) {
-        const newMessage: Message = messageSigned;
+    const messageSigned = await res.json();
 
-        console.log("===>>>> newMessage");
-        console.log(newMessage);
-    
-        setNewMessage(newMessage);
-        // setMessages([...messages, newMessage]);
-        // setMessages([newMessage, ...messages]);
-        // set the new message in the messages array
-        setMessages((messages) => [...messages, newMessage]);
-        setInputValue("");
-        setIsModalOpen(false);
-    
-        const response = await fetch("/api/whiteboard", {
-          method: "POST",
-          body: JSON.stringify(newMessage),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        console.log("----------->>>>> data");
-        console.log(data);
-      }
-      else {
-        console.error("Error: vaultId is null");
-      }
-    // }
+    if(messageSigned) {
+      const newMessage: Message = messageSigned;
+
+      setMessages((messages) => [...messages, newMessage]);
+      // setVaultId(newMessage.vaultId);
+      setInputValue("");
+      setIsModalOpen(false);
+
+      saveMessage(newMessage);
+    }
+    else {
+      console.error("Error: vaultId is null");
+    }
   };
 
   const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
-  const handleSave = async () => {
+  const requestSaveMessage = async () => {
     sismoConnect.request({
       auth: { authType: AuthType.VAULT },
       claim: { groupId: "0x3d7589d9259eb410180f085cada87030" },
@@ -165,11 +147,8 @@ const Whiteboard = () => {
     const responseMessage: SismoConnectResponse | null = sismoConnect.getResponse();
     if(responseMessage) {
       const fetchData = async () => {
-        console.log("555555555555");
         if(responseMessage.signedMessage) {
-          console.log("responseMessage.signedMessage");
-          console.log(responseMessage.signedMessage);
-          await handleSave2(responseMessage);
+          await verifySaveMessage(responseMessage);
         }
       };
       fetchData();
@@ -198,7 +177,7 @@ const Whiteboard = () => {
     <div className="whiteboard">
       <div className="header">
         <h1>Whiteboard</h1>
-        {/* {!userId && (
+        {!vaultId && (
           <SismoConnectButton
             overrideStyle={{
               gridColumn: "3",
@@ -213,17 +192,17 @@ const Whiteboard = () => {
             // claim={{ groupId: "0x3d7589d9259eb410180f085cada87030" }}
             // onResponseBytes calls a 'setResponse' function with the responseBytes returned by the Sismo Vault
             onResponse={(response: SismoConnectResponse) => {
-              onSismoConnectResponse(response);
+              onButtonSismoConnectResponse(response);
             }}
           />
-        )} */}
-        {userId && (
+        )}
+        {vaultId && (
           <div className="user">
-            <span> {userId.substring(0, 10) + "..."} </span>
+            <span> {vaultId.substring(0, 10) + "..."} </span>
             <button
               onClick={() => {
-                setUserId(null);
-                localStorage.removeItem("userId");
+                setVaultId(null);
+                localStorage.removeItem("vaultId");
               }}>
               {" "}
               Logout
@@ -236,13 +215,12 @@ const Whiteboard = () => {
         onDoubleClick={(e) => startMessageCreation(e)}>
         {messages.map((message: Message) => (
           <Draggable
-            // className="custom-draggable"
-            key={message.userId}
+            key={message.vaultId}
             defaultPosition={{ x: message.positionX, y: message.positionY }}
             bounds="parent"
-            // disabled={message.userId !== newMessage?.userId}
-            disabled={message.userId !== userId}>
-            <div className="message" onClick={handleMessageClick}>
+            disabled={message.vaultId !== vaultId}>
+            <div className="message"
+              onClick={() => vaultId === message.vaultId && handleMessageClick}>
               {message.text}
             </div>
           </Draggable>
@@ -260,14 +238,14 @@ const Whiteboard = () => {
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleSave();
+              requestSaveMessage();
             } else if (e.key === "Escape") {
               setIsModalOpen(false);
             }
           }}
           inputRef={inputRef}
           onClickCancel={(e) => setIsModalOpen(false)}
-          onClickSave={(e) => handleSave()}
+          onClickSave={(e) => requestSaveMessage()}
         />
       )}
     </div>

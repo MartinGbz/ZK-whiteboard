@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Message {
-  userId        String      @id
+  vaultId        String      @id
   text   String
   positionX Int
   positionY Int

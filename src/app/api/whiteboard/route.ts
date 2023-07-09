@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   console.log(message);
   const newMessage = await prisma.message.create({
     data: {
-      userId: message.userId,
+      vaultId: message.vaultId,
       text: message.text,
       positionX: message.positionX,
       positionY: message.positionY,

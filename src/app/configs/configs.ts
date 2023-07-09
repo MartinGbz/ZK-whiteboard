@@ -5,8 +5,8 @@ export const sismoConnectConfig: SismoConnectConfig = {
   vault: {
     impersonate: [
       "dhadrien.sismo.eth",
-      "github:dhadrien",
-      "twitter:dhadrien_",
+      // "github:dhadrien",
+      // "twitter:dhadrien_",
     ],
   },
 };

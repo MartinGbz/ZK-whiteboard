@@ -1,5 +1,5 @@
 export interface Message {
-  userId: string;
+  vaultId: string;
   text: string;
   positionX: number;
   positionY: number;

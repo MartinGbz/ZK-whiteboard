@@ -34,7 +34,7 @@ async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
   const vaultId = result.getUserId(AuthType.VAULT)
   const signedMessage = result.getSignedMessage()
   if(vaultId && signedMessage) {
-    return {userId: vaultId, ...JSON.parse(signedMessage)};
+    return {vaultId: vaultId, ...JSON.parse(signedMessage)};
   }
   // console.log("$$$$$$$$$$$$$$$ vaultId")
   // console.log(vaultId)
