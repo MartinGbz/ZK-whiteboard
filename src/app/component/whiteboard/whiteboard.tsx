@@ -45,14 +45,14 @@ const Whiteboard = () => {
         console.error(error);
       }
     };
-
     if (!messages.length) {
       fetchData();
     }
-
     const vaultId = localStorage.getItem("vaultId");
     if (vaultId) {
       setVaultId(vaultId);
+      console.log("vaultId");
+      console.log(vaultId);
     }
   }, [messages]);
 
@@ -133,6 +133,7 @@ const Whiteboard = () => {
 
   const requestSaveMessage = async () => {
     sismoConnect.request({
+      namespace: "main",
       auth: { authType: AuthType.VAULT },
       claim: { groupId: "0x3d7589d9259eb410180f085cada87030" },
       signature: { message: JSON.stringify({
@@ -189,6 +190,7 @@ const Whiteboard = () => {
             // the auth request we want to make
             // here we want the proof of a Sismo Vault ownership from our users
             auth={{ authType: AuthType.VAULT }}
+            namespace="main"
             // claim={{ groupId: "0x3d7589d9259eb410180f085cada87030" }}
             // onResponseBytes calls a 'setResponse' function with the responseBytes returned by the Sismo Vault
             onResponse={(response: SismoConnectResponse) => {
@@ -218,7 +220,7 @@ const Whiteboard = () => {
             key={message.vaultId}
             defaultPosition={{ x: message.positionX, y: message.positionY }}
             bounds="parent"
-            disabled={message.vaultId !== vaultId}>
+            disabled={vaultId !== message.vaultId}>
             <div className="message"
               onClick={() => vaultId === message.vaultId && handleMessageClick}>
               {message.text}
