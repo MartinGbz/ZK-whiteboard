@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
-import { Message } from "../../types/whiteboard-types";
+import { Message as MessageType } from "../../types/whiteboard-types";
 import Draggable from "react-draggable";
 
 import {
@@ -14,11 +14,13 @@ import {
 } from "@sismo-core/sismo-connect-react";
 import { sismoConnectConfig } from "../../configs/configs";
 import MessageModal from "../message-modal/message-modal";
+import Message from "../message/message";
+import Title from "../title/title";
 
 const Whiteboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [messagePosition, setMessagePosition] = useState<{
     x: number;
     y: number;
@@ -88,7 +90,7 @@ const Whiteboard = () => {
     }
   }
 
-  const saveMessage = async (message: Message) => {
+  const saveMessage = async (message: MessageType) => {
     const res = await fetch("/api/whiteboard", {
       method: "POST",
       body: JSON.stringify(message),
@@ -97,6 +99,12 @@ const Whiteboard = () => {
       },
     });
     const data = await res.json();
+    if(data) {
+      setMessages((messages) => [...messages, message]);
+    }
+    else {
+      alert("Error: you already have created a message");
+    }
     console.log("----------->>>>> data");
     console.log(data);
   };
@@ -115,9 +123,8 @@ const Whiteboard = () => {
     const messageSigned = await res.json();
 
     if(messageSigned) {
-      const newMessage: Message = messageSigned;
+      const newMessage: MessageType = messageSigned;
 
-      setMessages((messages) => [...messages, newMessage]);
       // setVaultId(newMessage.vaultId);
       setInputValue("");
       setIsModalOpen(false);
@@ -156,12 +163,6 @@ const Whiteboard = () => {
     }
   }, []);
 
-  const handleMessageClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    event.stopPropagation();
-  };
-
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
@@ -177,13 +178,21 @@ const Whiteboard = () => {
   return (
     <div className="whiteboard">
       <div className="header">
-        <h1>Whiteboard</h1>
+        {/* <h1>Whiteboard</h1> */}
+        <Title text="whiteboard" style={{
+            textAlign: "center",
+            alignSelf: "center",
+            gridColumn: 2,
+        }}/>
         {!vaultId && (
           <SismoConnectButton
             overrideStyle={{
               gridColumn: "3",
               width: "fit-content",
               justifySelf: "end",
+              height: "15px",
+              // backgroundColor: "smokewhite",
+              // color: "black",
             }}
             // the client config created
             config={sismoConnectConfig}
@@ -200,14 +209,21 @@ const Whiteboard = () => {
         )}
         {vaultId && (
           <div className="user">
-            <span> {vaultId.substring(0, 10) + "..."} </span>
+            <span style={{
+              marginRight: "5px",
+              fontSize: "12px",
+            }}> {vaultId.substring(0, 10) + "..."} </span>
             <button
               onClick={() => {
                 setVaultId(null);
                 localStorage.removeItem("vaultId");
+              }}
+              style={{
+                fontSize: "15px",
+                fontWeight: "bold",
               }}>
               {" "}
-              Logout
+              ↪️ Logout
             </button>
           </div>
         )}
@@ -215,17 +231,22 @@ const Whiteboard = () => {
       <div
         className="messages_container"
         onDoubleClick={(e) => startMessageCreation(e)}>
-        {messages.map((message: Message) => (
-          <Draggable
+        {messages.map((message: MessageType) => (
+          <Message 
             key={message.vaultId}
-            defaultPosition={{ x: message.positionX, y: message.positionY }}
-            bounds="parent"
-            disabled={vaultId !== message.vaultId}>
-            <div className="message"
-              onClick={() => vaultId === message.vaultId && handleMessageClick}>
-              {message.text}
-            </div>
-          </Draggable>
+            message={message}
+            vaultId={vaultId}
+          />
+          // <Draggable
+          //   key={message.vaultId}
+          //   defaultPosition={{ x: message.positionX, y: message.positionY }}
+          //   bounds="parent"
+          //   disabled={vaultId !== message.vaultId}>
+          //   <div className="message"
+          //     onClick={() => vaultId === message.vaultId && handleMessageClick}>
+          //     {message.text}
+          //   </div>
+          // </Draggable>
         ))}
       </div>
       {isModalOpen && (
