@@ -2,14 +2,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
 import { Message as MessageType } from "../../types/whiteboard-types";
-import Draggable from "react-draggable";
 
 import {
   AuthType,
-  ClaimType,
   SismoConnect,
   SismoConnectButton,
-  SismoConnectConfig,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
 import { sismoConnectConfig } from "../../configs/configs";
@@ -34,7 +31,6 @@ const Whiteboard = () => {
     console.log("useEffect");
     const fetchData = async () => {
       try {
-        // Code asynchrone à exécuter une fois que le composant a fini de charger
         const response = await fetch("/api/whiteboard", {
           method: "GET",
           headers: {
@@ -53,8 +49,6 @@ const Whiteboard = () => {
     const vaultId = localStorage.getItem("vaultId");
     if (vaultId) {
       setVaultId(vaultId);
-      console.log("vaultId");
-      console.log(vaultId);
     }
   }, [messages]);
 
@@ -74,7 +68,6 @@ const Whiteboard = () => {
 
   async function onButtonSismoConnectResponse(response: SismoConnectResponse) {
     if (response) {
-      console.log("HFGCVKJHHVJKHV");
       // verify on the backend that the response is valid
       const res = await fetch("/api/sismo-connect", {
         method: "POST",
@@ -105,12 +98,9 @@ const Whiteboard = () => {
     else {
       alert("Error: you already have created a message");
     }
-    console.log("----------->>>>> data");
-    console.log(data);
   };
 
   const verifySaveMessage = async (message: SismoConnectResponse) => {
-    console.log("oœœ message");
     const res = await fetch("/api/sismo-connect-message", {
       method: "POST",
       body: JSON.stringify(message),
@@ -118,17 +108,13 @@ const Whiteboard = () => {
         "Content-Type": "application/json",
       },
     });
-    console.log("oœœ res");
 
     const messageSigned = await res.json();
 
     if(messageSigned) {
       const newMessage: MessageType = messageSigned;
-
-      // setVaultId(newMessage.vaultId);
       setInputValue("");
       setIsModalOpen(false);
-
       saveMessage(newMessage);
     }
     else {
@@ -178,7 +164,6 @@ const Whiteboard = () => {
   return (
     <div className="whiteboard">
       <div className="header">
-        {/* <h1>Whiteboard</h1> */}
         <Title text="whiteboard" style={{
             textAlign: "center",
             alignSelf: "center",
@@ -191,17 +176,10 @@ const Whiteboard = () => {
               width: "fit-content",
               justifySelf: "end",
               height: "15px",
-              // backgroundColor: "smokewhite",
-              // color: "black",
             }}
-            // the client config created
             config={sismoConnectConfig}
-            // the auth request we want to make
-            // here we want the proof of a Sismo Vault ownership from our users
             auth={{ authType: AuthType.VAULT }}
             namespace="main"
-            // claim={{ groupId: "0x3d7589d9259eb410180f085cada87030" }}
-            // onResponseBytes calls a 'setResponse' function with the responseBytes returned by the Sismo Vault
             onResponse={(response: SismoConnectResponse) => {
               onButtonSismoConnectResponse(response);
             }}
@@ -237,16 +215,6 @@ const Whiteboard = () => {
             message={message}
             vaultId={vaultId}
           />
-          // <Draggable
-          //   key={message.vaultId}
-          //   defaultPosition={{ x: message.positionX, y: message.positionY }}
-          //   bounds="parent"
-          //   disabled={vaultId !== message.vaultId}>
-          //   <div className="message"
-          //     onClick={() => vaultId === message.vaultId && handleMessageClick}>
-          //     {message.text}
-          //   </div>
-          // </Draggable>
         ))}
       </div>
       {isModalOpen && (

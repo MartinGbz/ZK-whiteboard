@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { Message } from "../../types/whiteboard-types";
 
 import { PrismaClient } from "@prisma/client";
 
@@ -12,15 +11,12 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const message = await req.json();
-  console.log(message);
   try {
     const existingMessage = await prisma.message.findUnique({
       where: {
         vaultId: message.vaultId,
       },
     });
-    console.log("--°°° --- existingMessage");
-    console.log(existingMessage);
     if (!existingMessage) {
       const newMessage = await prisma.message.create({
         data: {
@@ -37,7 +33,6 @@ export async function POST(req: Request) {
     }
   }
   catch (error) {
-    console.log(error);
     return NextResponse.json(error);
   }
 }

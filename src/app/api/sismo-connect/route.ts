@@ -10,8 +10,6 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const SismoConnectResponse = await req.json();
   const vaultId = await verifyResponse(SismoConnectResponse);
-  console.log(">>22222>>> vaultId")
-  console.log(vaultId)
   return NextResponse.json({ vaultId: vaultId });
 }
 
@@ -25,7 +23,5 @@ async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
     }
   )
   const vaultId = result.getUserId(AuthType.VAULT)
-  console.log(">>>>> vaultId")
-  console.log(vaultId)
   return vaultId;
 }

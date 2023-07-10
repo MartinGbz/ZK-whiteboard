@@ -4,13 +4,11 @@ import Draggable from "react-draggable";
 import { Message } from "../../types/whiteboard-types";
 
 interface MessageProps {
-  style?: CSSProperties;
   message: Message;
   vaultId: string | null;
 }
 
 const Message: React.FC<MessageProps> = ({
-  style,
   message,
   vaultId
 }) => {

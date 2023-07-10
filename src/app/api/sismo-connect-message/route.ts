@@ -1,5 +1,4 @@
 import { sismoConnectConfig } from "@/app/configs/configs";
-// import { SismoConnect, SismoConnectResponse, SismoConnectVerifiedResult } from "@sismo-core/sismo-connect-react";
 import { SismoConnect, SismoConnectVerifiedResult, AuthType, SismoConnectResponse } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 
@@ -9,19 +8,14 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  console.log("$$$ 00000 $$$ body")
-  console.log(body)
   const SismoConnectResponse = body;
   const newMessage = await verifyResponse(SismoConnectResponse);
-  console.log("$$$ 22222 $$$ signedMessage")
-  console.log(newMessage)
   return NextResponse.json(newMessage);
 }
 
 const sismoConnect = SismoConnect({config: sismoConnectConfig});
 
 async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
-  console.log("$$$$$$$$$$$$$$$ message")
   let message = sismoConnectResponse.signedMessage ? sismoConnectResponse.signedMessage : "";
   const result: SismoConnectVerifiedResult = await sismoConnect.verify(
     sismoConnectResponse,
@@ -36,7 +30,4 @@ async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
   if(vaultId && signedMessage) {
     return {vaultId: vaultId, ...JSON.parse(signedMessage)};
   }
-  // console.log("$$$$$$$$$$$$$$$ vaultId")
-  // console.log(vaultId)
-  // return vaultId;
 }
