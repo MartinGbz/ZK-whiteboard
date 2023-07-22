@@ -33,6 +33,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
     justifyContent: "space-between",
     height: "150px",
     boxShadow: "5px 5px 15px 1px grey",
+    color: "black",
   };
 
   const buttonStyle: CSSProperties = {

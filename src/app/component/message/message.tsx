@@ -21,6 +21,7 @@ const Message: React.FC<MessageProps> = ({
     position: "absolute",
     border: "1px solid gray",
     borderRadius: "5px",
+    color: "black",
   };
 
   useEffect(() => {}, []);
@@ -39,7 +40,7 @@ const Message: React.FC<MessageProps> = ({
     disabled={vaultId !== message.vaultId}>
     <div className="message"
     style={messageStyle}
-      onClick={() => vaultId === message.vaultId && handleMessageClick}>
+    onClick={() => vaultId === message.vaultId && handleMessageClick}>
       {message.text}
       <div
         style={{
