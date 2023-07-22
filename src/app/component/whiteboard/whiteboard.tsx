@@ -14,6 +14,7 @@ import MessageModal from "../message-modal/message-modal";
 import Message from "../message/message";
 import Title from "../title/title";
 import { useRouter } from 'next/navigation';
+import Loading from "../loading-modal/loading-modal";
 
 const Whiteboard = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -24,10 +25,9 @@ const Whiteboard = () => {
     y: number;
   }>({ x: 0, y: 0 });
   const [vaultId, setVaultId] = useState<string | null>(null);
-  const [sismoConnectResponseLogin, setSismoConnectResponseLogin] = useState<SismoConnectResponse | null>(null);
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] = useState<SismoConnectResponse | null>(null);
-  const [routerReady, setRouterReady] = useState<Boolean>(false);
   const [isNewMessageCalled, setIsNewMessageCalled] = useState<Boolean>(false);
+  const [isVerifying, setIsVerifying] = useState<Boolean>(false);
 
   const router = useRouter();
 
@@ -36,20 +36,11 @@ const Whiteboard = () => {
     router.push('/');
   };
 
-  // useEffect(() => {
-  //   if (router.isReady) {
-  //     // Le routage est prêt, vous pouvez maintenant accéder à l'objet router
-  //     // et effectuer des opérations de routage
-  //     setRouterReady(true);
-  //   }
-  // }, [router.isReady]);
-
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     console.log("useEffect");
-    console.log("messages", messages);
     const fetchData = async () => {
       try {
         const response = await fetch("/api/whiteboard", {
@@ -61,7 +52,6 @@ const Whiteboard = () => {
         const messages = await response.json();
         setMessages(messages);
         if(sismoConnectResponseMessage) {
-          console.log("messages", messages)
           await verifySaveMessage(sismoConnectResponseMessage, messages);
         }
       } catch (error) {
@@ -80,7 +70,6 @@ const Whiteboard = () => {
 
   useEffect(() => {
     console.log("useEffect 2");
-    console.log("isNewMessageCalled", isNewMessageCalled);
     // Focus the input when the modal opens
     if (isModalOpen && inputRef.current) {
       inputRef.current.focus();
@@ -95,7 +84,6 @@ const Whiteboard = () => {
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse come from the message creation
-    console.log(sismoConnectResponse);
     if(sismoConnectResponse.proofs.length < 2) {
       // verify on the backend that the response is valid
       const response = await fetch("/api/sismo-connect", {
@@ -107,7 +95,6 @@ const Whiteboard = () => {
       });
       const data = await response.json();
       const vaultId = data.vaultId;
-      console.log("loginWithSismo");
       setVaultId(vaultId);
       localStorage.setItem("vaultId", vaultId);
       redirectToRoot();
@@ -125,12 +112,12 @@ const Whiteboard = () => {
     const data = await response.json();
     if(data) {
       setMessages((messages) => [...messages, message]);
-      console.log("messages.some((message: MessageType) => message.vaultId === vaultId)", messages.some((message: MessageType) => message.vaultId === vaultId));
     }
     redirectToRoot();
   };
 
   const verifySaveMessage = async (message: SismoConnectResponse, argMessages: MessageType[]) => {
+    setIsVerifying(true);
     const response = await fetch("/api/sismo-connect-message", {
       method: "POST",
       body: JSON.stringify(message),
@@ -154,6 +141,7 @@ const Whiteboard = () => {
     else {
       console.error("Error: vaultId is null");
     }
+    setIsVerifying(false);
   };
 
   const sismoConnect = SismoConnect({ config: sismoConnectConfig });
@@ -278,6 +266,9 @@ const Whiteboard = () => {
           onClickCancel={(e) => setIsModalOpen(false)}
           onClickSave={(e) => requestSaveMessage()}
         />
+      )}
+      {isVerifying && (
+        <Loading/>
       )}
     </div>
   );
