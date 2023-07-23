@@ -27,7 +27,7 @@ const Whiteboard = () => {
   const [vaultId, setVaultId] = useState<string | null>(null);
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] = useState<SismoConnectResponse | null>(null);
   const [isNewMessageCalled, setIsNewMessageCalled] = useState<Boolean>(false);
-  const [isVerifying, setIsVerifying] = useState<Boolean>(false);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -113,7 +113,6 @@ const Whiteboard = () => {
     if(data) {
       setMessages((messages) => [...messages, message]);
     }
-    redirectToRoot();
   };
 
   const verifySaveMessage = async (message: SismoConnectResponse, argMessages: MessageType[]) => {
@@ -142,6 +141,7 @@ const Whiteboard = () => {
       console.error("Error: vaultId is null");
     }
     setIsVerifying(false);
+    redirectToRoot();
   };
 
   const sismoConnect = SismoConnect({ config: sismoConnectConfig });
@@ -244,6 +244,7 @@ const Whiteboard = () => {
             vaultId={vaultId}
           />
         ))}
+        <Loading isVerifying={isVerifying}/>
       </div>
       {isModalOpen && (
         <MessageModal
@@ -266,9 +267,6 @@ const Whiteboard = () => {
           onClickCancel={(e) => setIsModalOpen(false)}
           onClickSave={(e) => requestSaveMessage()}
         />
-      )}
-      {isVerifying && (
-        <Loading/>
       )}
     </div>
   );
