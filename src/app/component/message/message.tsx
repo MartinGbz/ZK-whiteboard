@@ -8,11 +8,7 @@ interface MessageProps {
   vaultId: string | null;
 }
 
-const Message: React.FC<MessageProps> = ({
-  message,
-  vaultId
-}) => {
-
+const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   const messageStyle: CSSProperties = {
     backgroundColor: "white",
     padding: "10px",
@@ -34,21 +30,23 @@ const Message: React.FC<MessageProps> = ({
 
   return (
     <Draggable
-    key={message.vaultId}
-    defaultPosition={{ x: message.positionX, y: message.positionY }}
-    bounds="parent"
-    disabled={vaultId !== message.vaultId}>
-    <div className="message"
-    style={messageStyle}
-    onClick={() => vaultId === message.vaultId && handleMessageClick}>
-      {message.text}
+      key={message.vaultId}
+      defaultPosition={{ x: message.positionX, y: message.positionY }}
+      bounds="parent"
+      disabled={vaultId !== message.vaultId}>
       <div
-        style={{
-          fontSize: "10px",
-        }}
-      >{"from: " + message.vaultId.substring(0, 10) + "..."}</div>
-    </div>
-  </Draggable>
+        className="message"
+        style={messageStyle}
+        onClick={() => vaultId === message.vaultId && handleMessageClick}>
+        {message.text}
+        <div
+          style={{
+            fontSize: "10px",
+          }}>
+          {"from: " + message.vaultId.substring(0, 10) + "..."}
+        </div>
+      </div>
+    </Draggable>
   );
 };
 

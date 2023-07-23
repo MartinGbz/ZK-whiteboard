@@ -4,3 +4,8 @@ export interface Message {
   positionX: number;
   positionY: number;
 }
+
+export interface Position {
+  x: number;
+  y: number;
+}

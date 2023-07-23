@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
-import { Message as MessageType } from "../../types/whiteboard-types";
+import { Position, Message as MessageType } from "../../types/whiteboard-types";
 
 import {
   AuthType,
@@ -13,34 +13,33 @@ import { sismoConnectConfig } from "../../configs/configs";
 import MessageModal from "../message-modal/message-modal";
 import Message from "../message/message";
 import Title from "../title/title";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import Loading from "../loading-modal/loading-modal";
 
 const Whiteboard = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageInputValue, setMessageInputValue] = useState("");
-  const [messagePosition, setMessagePosition] = useState<{
-    x: number;
-    y: number;
-  }>({ x: 0, y: 0 });
+  const [messagePosition, setMessagePosition] = useState<Position>({
+    x: 0,
+    y: 0,
+  });
   const [vaultId, setVaultId] = useState<string | null>(null);
-  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] = useState<SismoConnectResponse | null>(null);
-  const [isNewMessageCalled, setIsNewMessageCalled] = useState<Boolean>(false);
+  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
+    useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
+
+  const messageInputRef = useRef<HTMLInputElement>(null);
+  const messageModalRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
 
   // Fonction pour rediriger à la racine du site
-  const redirectToRoot = () => {
-    router.push('/');
-  };
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
+  const redirectToRoot = useCallback(() => {
+    router.push("/");
+  }, [router]);
 
   useEffect(() => {
-    console.log("useEffect");
     const fetchData = async () => {
       try {
         const response = await fetch("/api/whiteboard", {
@@ -51,7 +50,7 @@ const Whiteboard = () => {
         });
         const messages = await response.json();
         setMessages(messages);
-        if(sismoConnectResponseMessage) {
+        if (sismoConnectResponseMessage) {
           await verifySaveMessage(sismoConnectResponseMessage, messages);
         }
       } catch (error) {
@@ -63,28 +62,57 @@ const Whiteboard = () => {
     }
     const storagedVaultId = localStorage.getItem("vaultId");
     if (storagedVaultId) {
-      console.log("storagedVaultId", storagedVaultId);
       setVaultId(storagedVaultId);
     }
-  }, [messages, sismoConnectResponseMessage]);
+
+    const verifySaveMessage = async (
+      message: SismoConnectResponse,
+      argMessages: MessageType[]
+    ) => {
+      setIsVerifying(true);
+      const response = await fetch("/api/sismo-connect-message", {
+        method: "POST",
+        body: JSON.stringify(message),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const messageSigned = await response.json();
+
+      const isUserMessageExists = argMessages.some(
+        (message: MessageType) => message.vaultId === messageSigned.vaultId
+      );
+      if (isUserMessageExists) {
+        alert("Error: you already have created a message");
+      } else if (messageSigned) {
+        const newMessage: MessageType = messageSigned;
+        setMessageInputValue("");
+        setIsModalOpen(false);
+        saveMessage(newMessage);
+      } else {
+        console.error("Error: messageSigned is undefined");
+      }
+      setIsVerifying(false);
+      redirectToRoot();
+    };
+  }, [messages, redirectToRoot, sismoConnectResponseMessage]);
 
   useEffect(() => {
-    console.log("useEffect 2");
     // Focus the input when the modal opens
-    if (isModalOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isModalOpen && messageInputRef.current) {
+      messageInputRef.current.focus();
     }
-
     // Reset the modal position when it opens
-    if (isModalOpen && modalRef.current && messagePosition) {
-      modalRef.current.style.top = `${messagePosition.y}px`;
-      modalRef.current.style.left = `${messagePosition.x}px`;
+    if (isModalOpen && messageModalRef.current && messagePosition) {
+      messageModalRef.current.style.top = `${messagePosition.y}px`;
+      messageModalRef.current.style.left = `${messagePosition.x}px`;
     }
-  }, [isModalOpen, messagePosition, isNewMessageCalled]);
+  }, [isModalOpen, messagePosition]);
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse come from the message creation
-    if(sismoConnectResponse.proofs.length < 2) {
+    if (sismoConnectResponse.proofs.length < 2) {
       // verify on the backend that the response is valid
       const response = await fetch("/api/sismo-connect", {
         method: "POST",
@@ -110,38 +138,9 @@ const Whiteboard = () => {
       },
     });
     const data = await response.json();
-    if(data) {
+    if (data) {
       setMessages((messages) => [...messages, message]);
     }
-  };
-
-  const verifySaveMessage = async (message: SismoConnectResponse, argMessages: MessageType[]) => {
-    setIsVerifying(true);
-    const response = await fetch("/api/sismo-connect-message", {
-      method: "POST",
-      body: JSON.stringify(message),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const messageSigned = await response.json();
-    
-    const isUserMessageExists = argMessages.some((message: MessageType) => message.vaultId === messageSigned.vaultId);
-    if(isUserMessageExists) {
-      alert("Error: you already have created a message");
-    }
-    else if(messageSigned) {
-      const newMessage: MessageType = messageSigned;
-      setMessageInputValue("");
-      setIsModalOpen(false);
-      saveMessage(newMessage);
-    }
-    else {
-      console.error("Error: vaultId is null");
-    }
-    setIsVerifying(false);
-    redirectToRoot();
   };
 
   const sismoConnect = SismoConnect({ config: sismoConnectConfig });
@@ -151,19 +150,22 @@ const Whiteboard = () => {
       namespace: "main",
       auth: { authType: AuthType.VAULT },
       claim: { groupId: "0x3d7589d9259eb410180f085cada87030" },
-      signature: { message: JSON.stringify({
-        text: messageInputValue,
-        positionX: messagePosition.x,
-        positionY: messagePosition.y,
-      })},
+      signature: {
+        message: JSON.stringify({
+          text: messageInputValue,
+          positionX: messagePosition.x,
+          positionY: messagePosition.y,
+        }),
+      },
     });
   };
 
   useEffect(() => {
-    const responseMessage: SismoConnectResponse | null = sismoConnect.getResponse();
-    if(responseMessage) {
+    const responseMessage: SismoConnectResponse | null =
+      sismoConnect.getResponse();
+    if (responseMessage) {
       const fetchData = async () => {
-        if(responseMessage.signedMessage) {
+        if (responseMessage.signedMessage) {
           setSismoConnectResponseMessage(responseMessage);
         }
       };
@@ -174,7 +176,6 @@ const Whiteboard = () => {
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    setIsNewMessageCalled(true);
     const containerRect = event.currentTarget.getBoundingClientRect();
     const initialPosition = {
       x: event.clientX - containerRect.left,
@@ -187,11 +188,14 @@ const Whiteboard = () => {
   return (
     <div className="whiteboard">
       <div className="header">
-        <Title text="whiteboard" style={{
+        <Title
+          text="whiteboard"
+          style={{
             textAlign: "center",
             alignSelf: "center",
             gridColumn: 2,
-        }}/>
+          }}
+        />
         {!vaultId && (
           <SismoConnectButton
             overrideStyle={{
@@ -199,7 +203,6 @@ const Whiteboard = () => {
               width: "fit-content",
               justifySelf: "end",
               height: "15px",
-              
             }}
             config={sismoConnectConfig}
             auth={{ authType: AuthType.VAULT }}
@@ -212,21 +215,15 @@ const Whiteboard = () => {
         )}
         {vaultId && (
           <div className="user">
-            <span style={{
-              marginRight: "5px",
-              fontSize: "12px",
-              color: "white",
-            }}> {vaultId.substring(0, 10) + "..."} </span>
+            <span className="user_id">
+              {" "}
+              {vaultId.substring(0, 10) + "..."}{" "}
+            </span>
             <button
+              className="logout_button"
               onClick={() => {
-                console.log("logout");
                 setVaultId(null);
                 localStorage.removeItem("vaultId");
-              }}
-              style={{
-                fontSize: "15px",
-                fontWeight: "bold",
-                color: "white",
               }}>
               {" "}
               ↪️ Logout
@@ -238,17 +235,13 @@ const Whiteboard = () => {
         className="messages_container"
         onDoubleClick={(e) => startMessageCreation(e)}>
         {messages.map((message: MessageType) => (
-          <Message 
-            key={message.vaultId}
-            message={message}
-            vaultId={vaultId}
-          />
+          <Message key={message.vaultId} message={message} vaultId={vaultId} />
         ))}
-        <Loading isVerifying={isVerifying}/>
+        <Loading isVerifying={isVerifying} />
       </div>
       {isModalOpen && (
         <MessageModal
-          modalRef={modalRef}
+          modalRef={messageModalRef}
           style={{
             position: "absolute",
             top: messagePosition?.y,
@@ -263,7 +256,7 @@ const Whiteboard = () => {
               setIsModalOpen(false);
             }
           }}
-          inputRef={inputRef}
+          inputRef={messageInputRef}
           onClickCancel={(e) => setIsModalOpen(false)}
           onClickSave={(e) => requestSaveMessage()}
         />

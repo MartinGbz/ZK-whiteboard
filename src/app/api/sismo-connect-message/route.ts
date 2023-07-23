@@ -1,5 +1,10 @@
 import { sismoConnectConfig } from "@/app/configs/configs";
-import { SismoConnect, SismoConnectVerifiedResult, AuthType, SismoConnectResponse } from "@sismo-core/sismo-connect-server";
+import {
+  SismoConnect,
+  SismoConnectVerifiedResult,
+  AuthType,
+  SismoConnectResponse,
+} from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -13,10 +18,12 @@ export async function POST(req: Request) {
   return NextResponse.json(newMessage);
 }
 
-const sismoConnect = SismoConnect({config: sismoConnectConfig});
+const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
-  let message = sismoConnectResponse.signedMessage ? sismoConnectResponse.signedMessage : "";
+  let message = sismoConnectResponse.signedMessage
+    ? sismoConnectResponse.signedMessage
+    : "";
   const result: SismoConnectVerifiedResult = await sismoConnect.verify(
     sismoConnectResponse,
     {
@@ -24,10 +31,10 @@ async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
       claims: [{ groupId: "0x3d7589d9259eb410180f085cada87030" }],
       signature: { message: message },
     }
-  )
-  const vaultId = result.getUserId(AuthType.VAULT)
-  const signedMessage = result.getSignedMessage()
-  if(vaultId && signedMessage) {
-    return {vaultId: vaultId, ...JSON.parse(signedMessage)};
+  );
+  const vaultId = result.getUserId(AuthType.VAULT);
+  const signedMessage = result.getSignedMessage();
+  if (vaultId && signedMessage) {
+    return { vaultId: vaultId, ...JSON.parse(signedMessage) };
   }
 }

@@ -41,44 +41,67 @@ const MessageModal: React.FC<MessageModalProps> = ({
     border: "1px solid transparent",
     padding: "5px",
     marginRight: "5px",
+    width: "10vh",
+    fontSize: "15px",
   };
 
   const cancelButtonStyle: CSSProperties = {
-    backgroundColor: "rgb(216 206 207)"
-  }
+    backgroundColor: "rgb(216 206 207)",
+  };
 
   const saveButtonStyle: CSSProperties = {
-    backgroundColor: "rgba(206, 216, 206)"
-  }
+    backgroundColor: "rgba(206, 216, 206)",
+  };
 
   const combinedStyle: CSSProperties = { ...baseStyle, ...style };
 
   return (
     <div className="message-modal" ref={modalRef} style={combinedStyle}>
-      <h3>New message</h3>
-      <div style={{
-        display: "flex",
-        flexDirection: "row",
-        height: "30px",
-      }}>
+      <h3
+        style={{
+          alignSelf: "center",
+        }}>
+        New message
+      </h3>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          height: "30px",
+        }}>
         <input
           type="text"
           value={inputValue}
           onChange={onChange ? (e) => onChange(e) : undefined}
           onKeyDown={onKeyDown ? (e) => onKeyDown(e) : undefined}
           ref={inputRef}
-          style={{ borderRadius: "5px", border: "1px solid", padding: "5px", height: "100%" }}
+          style={{
+            borderRadius: "5px",
+            border: "1px solid",
+            padding: "5px",
+            height: "100%",
+          }}
         />
-        <input style={{ borderRadius: "5px", height: "100%"}} type="color" defaultValue={"whitesmoke"}/>
+        <input
+          style={{ borderRadius: "5px", height: "100%" }}
+          type="color"
+          defaultValue={"whitesmoke"}
+        />
       </div>
-      <div style={{
-        display: "flex",
-        flexDirection: "row",
-      }}>
-        <button onClick={onClickCancel ? (e) => onClickCancel(e) : undefined} style={{...cancelButtonStyle, ...buttonStyle}}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-evenly",
+        }}>
+        <button
+          onClick={onClickCancel ? (e) => onClickCancel(e) : undefined}
+          style={{ ...cancelButtonStyle, ...buttonStyle }}>
           ❌ Cancel
         </button>
-        <button onClick={onClickSave ? (e) => onClickSave(e) : undefined} style={{...saveButtonStyle, ...buttonStyle}}>
+        <button
+          onClick={onClickSave ? (e) => onClickSave(e) : undefined}
+          style={{ ...saveButtonStyle, ...buttonStyle }}>
           ✅ Save
         </button>
       </div>

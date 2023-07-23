@@ -7,11 +7,7 @@ interface MessageProps {
   style?: CSSProperties;
 }
 
-const Title: React.FC<MessageProps> = ({
-  text,
-  style,
-}) => {
-
+const Title: React.FC<MessageProps> = ({ text, style }) => {
   const transformedElements = [];
 
   for (let i = 0; i < text.length; i++) {
@@ -21,15 +17,16 @@ const Title: React.FC<MessageProps> = ({
       <span
         key={i}
         className={`waviy-char`}
-        style={{ animationDelay: `${animationDelay}s` }}
-      >
+        style={{ animationDelay: `${animationDelay}s` }}>
         {char}
       </span>
     );
   }
 
   return (
-    <div className="waviy" style={style}>{transformedElements}</div>
+    <div className="waviy" style={style}>
+      {transformedElements}
+    </div>
   );
 };
 

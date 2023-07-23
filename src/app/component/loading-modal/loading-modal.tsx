@@ -6,10 +6,7 @@ interface LoadingProps {
   isVerifying: boolean;
 }
 
-const Loading: React.FC<LoadingProps> = ({
-  isVerifying
-}) => {
-
+const Loading: React.FC<LoadingProps> = ({ isVerifying }) => {
   const loadingStyle: CSSProperties = {
     backgroundColor: "#514f4f",
     padding: "10px",
@@ -33,19 +30,15 @@ const Loading: React.FC<LoadingProps> = ({
     color: "white",
   };
 
-  const checkmarkStyle: CSSProperties = {
-    textAlign: "center",
-    fontSize: "50px",
-  };
-
   return (
-    <div style={{
-      backdropFilter: "blur(10px)",
-      width: "100%",
-      height: "100%",
-      position: "absolute",
-      display: isVerifying ? "flex" : "none",
-    }}>
+    <div
+      style={{
+        backdropFilter: "blur(10px)",
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        display: isVerifying ? "flex" : "none",
+      }}>
       <div style={loadingStyle}>
         <div>
           <h1 style={titleStyle}>Checking the proof...</h1>

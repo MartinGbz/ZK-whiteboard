@@ -1,6 +1,11 @@
 import { sismoConnectConfig } from "@/app/configs/configs";
 // import { SismoConnect, SismoConnectResponse, SismoConnectVerifiedResult } from "@sismo-core/sismo-connect-react";
-import { SismoConnect, SismoConnectVerifiedResult, AuthType, SismoConnectResponse } from "@sismo-core/sismo-connect-server";
+import {
+  SismoConnect,
+  SismoConnectVerifiedResult,
+  AuthType,
+  SismoConnectResponse,
+} from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -13,7 +18,7 @@ export async function POST(req: Request) {
   return NextResponse.json({ vaultId: vaultId });
 }
 
-const sismoConnect = SismoConnect({config: sismoConnectConfig});
+const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
   const result: SismoConnectVerifiedResult = await sismoConnect.verify(
@@ -21,7 +26,7 @@ async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
     {
       auths: [{ authType: AuthType.VAULT }],
     }
-  )
-  const vaultId = result.getUserId(AuthType.VAULT)
+  );
+  const vaultId = result.getUserId(AuthType.VAULT);
   return vaultId;
 }

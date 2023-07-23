@@ -31,8 +31,7 @@ export async function POST(req: Request) {
       console.error("Message already exists");
       return NextResponse.json(null);
     }
-  }
-  catch (error) {
+  } catch (error) {
     return NextResponse.json(error);
   }
 }

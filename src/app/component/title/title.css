@@ -8,13 +8,14 @@
   color: #fff;
   /* text-transform: uppercase; */
   animation: waviy 8s infinite;
-  
 }
 @keyframes waviy {
-  0%,8%,20% {
-    transform: translateY(0)
+  0%,
+  8%,
+  20% {
+    transform: translateY(0);
   }
   4% {
-    transform: translateY(-10px)
+    transform: translateY(-10px);
   }
 }
