@@ -30,7 +30,7 @@ async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
     sismoConnectResponse,
     {
       auths: [{ authType: AuthType.VAULT }],
-      claims: [{ groupId: "0x3d7589d9259eb410180f085cada87030" }],
+      claims: [{ groupId: "0x0f800ff28a426924cbe66b67b9f837e2" }],
       signature: { message: message },
     }
   );
