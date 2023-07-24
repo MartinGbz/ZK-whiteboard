@@ -2,6 +2,7 @@
 import React, { CSSProperties, useEffect } from "react";
 import Draggable from "react-draggable";
 import { Message } from "../../types/whiteboard-types";
+import { MAX_Z_INDEX } from "@/app/configs/configs";
 
 interface MessageProps {
   message: Message;
@@ -11,7 +12,7 @@ interface MessageProps {
 const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color,
-    zIndex: 10000 - message.order,
+    zIndex: MAX_Z_INDEX - message.order,
     padding: "10px",
     marginBottom: "10px",
     cursor: "grab",

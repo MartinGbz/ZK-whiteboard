@@ -28,7 +28,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
 }) => {
   const baseStyle: CSSProperties = {
     backgroundColor: "rgb(200 200 200 / 30%)",
-    backdropFilter: "blur(4px)",
+    backdropFilter: "blur(5px)",
     padding: "20px",
     border: "1px solid transparent",
     borderRadius: "5px",
@@ -37,7 +37,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
     justifyContent: "space-between",
     height: "150px",
     width: "300px",
-    boxShadow: "5px 5px 15px 1px grey",
+    boxShadow: "5px 5px 35px 1px grey",
     color: "black",
   };
 

@@ -9,7 +9,11 @@ import {
   SismoConnectButton,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
-import { sismoConnectConfig } from "../../configs/configs";
+import {
+  MAX_Z_INDEX,
+  defaultInputColor,
+  sismoConnectConfig,
+} from "../../configs/configs";
 import MessageModal from "../message-modal/message-modal";
 import Message from "../message/message";
 import Title from "../title/title";
@@ -21,7 +25,7 @@ const Whiteboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageInputValue, setMessageInputValue] = useState("");
   const [messageInputColorValue, setMessageInputColorValue] =
-    useState("#F5F5F5");
+    useState(defaultInputColor);
   const [messagePosition, setMessagePosition] = useState<Position>({
     x: 0,
     y: 0,
@@ -58,7 +62,7 @@ const Whiteboard = () => {
       if (messageSigned) {
         const newMessage: MessageType = messageSigned;
         setMessageInputValue("");
-        setMessageInputColorValue("#F5F5F5");
+        setMessageInputColorValue(defaultInputColor);
         setIsModalOpen(false);
 
         saveMessage(newMessage);
@@ -212,6 +216,8 @@ const Whiteboard = () => {
               width: "fit-content",
               justifySelf: "end",
               height: "15px",
+              backgroundColor: "lightgray",
+              color: "black",
             }}
             config={sismoConnectConfig}
             auth={{ authType: AuthType.VAULT }}
@@ -257,6 +263,7 @@ const Whiteboard = () => {
             position: "absolute",
             top: messagePosition?.y,
             left: messagePosition?.x,
+            zIndex: MAX_Z_INDEX + 1,
           }}
           inputValue={messageInputValue}
           inputColorValue={messageInputColorValue}
