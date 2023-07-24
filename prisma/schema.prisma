@@ -11,8 +11,10 @@ datasource db {
 }
 
 model Message {
-  vaultId        String      @id
-  text   String
-  positionX Int
-  positionY Int
+  vaultId   String @id
+  text      String
+  positionX Float
+  positionY Float
+  order     Int    @default(autoincrement())
+  color     String
 }

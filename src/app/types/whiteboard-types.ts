@@ -3,6 +3,8 @@ export interface Message {
   text: string;
   positionX: number;
   positionY: number;
+  order: number;
+  color: string;
 }
 
 export interface Position {

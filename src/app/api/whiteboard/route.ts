@@ -11,6 +11,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const message = await req.json();
+  console.log(message);
   try {
     const existingMessage = await prisma.message.findUnique({
       where: {
@@ -24,14 +25,18 @@ export async function POST(req: Request) {
           text: message.text,
           positionX: message.positionX,
           positionY: message.positionY,
+          order: message.order,
+          color: message.color,
         },
       });
+      console.log(newMessage);
       return NextResponse.json(newMessage);
     } else {
       console.error("Message already exists");
-      return NextResponse.json(null);
+      return NextResponse.json({ error: "user already posted message" });
     }
   } catch (error) {
+    console.log(error);
     return NextResponse.json(error);
   }
 }

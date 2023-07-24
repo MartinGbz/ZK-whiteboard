@@ -12,9 +12,11 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  console.log("heyyy");
   const body = await req.json();
-  const SismoConnectResponse = body;
-  const newMessage = await verifyResponse(SismoConnectResponse);
+  const sismoConnectResponse = body;
+  console.log(sismoConnectResponse);
+  const newMessage = await verifyResponse(sismoConnectResponse);
   return NextResponse.json(newMessage);
 }
 

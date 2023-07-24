@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
 import { Position, Message as MessageType } from "../../types/whiteboard-types";
 
@@ -20,6 +20,8 @@ const Whiteboard = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageInputValue, setMessageInputValue] = useState("");
+  const [messageInputColorValue, setMessageInputColorValue] =
+    useState("#F5F5F5");
   const [messagePosition, setMessagePosition] = useState<Position>({
     x: 0,
     y: 0,
@@ -28,6 +30,8 @@ const Whiteboard = () => {
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [isUserMessageExists, setIsUserMessageExists] =
+    useState<boolean>(false);
 
   const messageInputRef = useRef<HTMLInputElement>(null);
   const messageModalRef = useRef<HTMLDivElement>(null);
@@ -40,31 +44,6 @@ const Whiteboard = () => {
   }, [router]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/whiteboard", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const messages = await response.json();
-        setMessages(messages);
-        if (sismoConnectResponseMessage) {
-          await verifySaveMessage(sismoConnectResponseMessage, messages);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    if (!messages.length) {
-      fetchData();
-    }
-    const storagedVaultId = localStorage.getItem("vaultId");
-    if (storagedVaultId) {
-      setVaultId(storagedVaultId);
-    }
-
     const verifySaveMessage = async (
       message: SismoConnectResponse,
       argMessages: MessageType[]
@@ -80,23 +59,66 @@ const Whiteboard = () => {
 
       const messageSigned = await response.json();
 
-      const isUserMessageExists = argMessages.some(
-        (message: MessageType) => message.vaultId === messageSigned.vaultId
-      );
-      if (isUserMessageExists) {
-        alert("Error: you already have created a message");
-      } else if (messageSigned) {
+      // const isUserMessageExists = argMessages.some(
+      //   (message: MessageType) => message.vaultId === messageSigned.vaultId
+      // );
+
+      if (messageSigned) {
+        console.log("messageSigned");
         const newMessage: MessageType = messageSigned;
         setMessageInputValue("");
+        setMessageInputColorValue("#F5F5F5");
         setIsModalOpen(false);
         saveMessage(newMessage);
-      } else {
-        console.error("Error: messageSigned is undefined");
       }
+
+      // console.log("isUserMessageExists");
+      // console.log(isUserMessageExists);
+      // console.log("messageSigned");
+      // console.log(messageSigned);
+      // if (isUserMessageExists) {
+      //   alert("Error: you already have created a message");
+      // } else if (messageSigned) {
+      // } else {
+      //   console.error("Error: messageSigned is undefined");
+      // }
       setIsVerifying(false);
       redirectToRoot();
     };
-  }, [messages, redirectToRoot, sismoConnectResponseMessage]);
+    if (sismoConnectResponseMessage) {
+      console.log("sismoConnectResponseMessage");
+      verifySaveMessage(sismoConnectResponseMessage, messages);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [redirectToRoot, sismoConnectResponseMessage]);
+
+  useEffect(() => {
+    console.log("messages");
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/whiteboard", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const messages = await response.json();
+        setMessages(messages);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (!messages.length) {
+      fetchData();
+    }
+    // if there is a message with the same vaultId, set a state to true
+    const isUserMessageExists = messages.some(
+      (message: MessageType) => message.vaultId === vaultId
+    );
+    console.log("isUserMessageExists");
+    console.log(isUserMessageExists);
+    setIsUserMessageExists(isUserMessageExists);
+  }, [messages.length, vaultId]);
 
   useEffect(() => {
     // Focus the input when the modal opens
@@ -130,6 +152,8 @@ const Whiteboard = () => {
   }
 
   const saveMessage = async (message: MessageType) => {
+    console.log("saveMessage");
+    console.log(message);
     const response = await fetch("/api/whiteboard", {
       method: "POST",
       body: JSON.stringify(message),
@@ -138,7 +162,10 @@ const Whiteboard = () => {
       },
     });
     const data = await response.json();
-    if (data) {
+    console.log(data);
+    if (data.error) {
+      alert(data.error);
+    } else {
       setMessages((messages) => [...messages, message]);
     }
   };
@@ -146,6 +173,14 @@ const Whiteboard = () => {
   const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
   const requestSaveMessage = async () => {
+    console.log(
+      JSON.stringify({
+        text: messageInputValue,
+        positionX: messagePosition.x,
+        positionY: messagePosition.y,
+        color: messageInputColorValue,
+      })
+    );
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
@@ -155,6 +190,7 @@ const Whiteboard = () => {
           text: messageInputValue,
           positionX: messagePosition.x,
           positionY: messagePosition.y,
+          color: messageInputColorValue.substring(1),
         }),
       },
     });
@@ -173,9 +209,17 @@ const Whiteboard = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const storagedVaultId = localStorage.getItem("vaultId");
+    if (storagedVaultId) {
+      setVaultId(storagedVaultId);
+    }
+  }, []);
+
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
+    console.log("startMessageCreation");
     const containerRect = event.currentTarget.getBoundingClientRect();
     const initialPosition = {
       x: event.clientX - containerRect.left,
@@ -233,7 +277,10 @@ const Whiteboard = () => {
       </div>
       <div
         className="messages_container"
-        onDoubleClick={(e) => startMessageCreation(e)}>
+        style={{
+          cursor: isUserMessageExists ? "not-allowed" : "pointer",
+        }}
+        onDoubleClick={(e) => !isUserMessageExists && startMessageCreation(e)}>
         {messages.map((message: MessageType) => (
           <Message key={message.vaultId} message={message} vaultId={vaultId} />
         ))}
@@ -248,7 +295,9 @@ const Whiteboard = () => {
             left: messagePosition?.x,
           }}
           inputValue={messageInputValue}
+          inputColorValue={messageInputColorValue}
           onChange={(e) => setMessageInputValue(e.target.value)}
+          onColorChange={(e) => setMessageInputColorValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               requestSaveMessage();

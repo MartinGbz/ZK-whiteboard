@@ -10,7 +10,8 @@ interface MessageProps {
 
 const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   const messageStyle: CSSProperties = {
-    backgroundColor: "white",
+    backgroundColor: "#" + message.color,
+    zIndex: message.order,
     padding: "10px",
     marginBottom: "10px",
     cursor: "grab",
@@ -18,6 +19,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
     border: "1px solid gray",
     borderRadius: "5px",
     color: "black",
+    fontSize: "20px",
   };
 
   useEffect(() => {}, []);

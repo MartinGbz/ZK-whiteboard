@@ -5,7 +5,9 @@ interface MessageModalProps {
   style?: CSSProperties;
   modalRef?: React.RefObject<HTMLDivElement>;
   inputValue?: string;
+  inputColorValue?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onColorChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   inputRef?: React.RefObject<HTMLInputElement>;
   onClickCancel?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -16,7 +18,9 @@ const MessageModal: React.FC<MessageModalProps> = ({
   style,
   modalRef,
   inputValue,
+  inputColorValue,
   onChange,
+  onColorChange,
   onKeyDown,
   inputRef,
   onClickCancel,
@@ -32,6 +36,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
     flexDirection: "column",
     justifyContent: "space-between",
     height: "150px",
+    width: "300px",
     boxShadow: "5px 5px 15px 1px grey",
     color: "black",
   };
@@ -57,12 +62,13 @@ const MessageModal: React.FC<MessageModalProps> = ({
 
   return (
     <div className="message-modal" ref={modalRef} style={combinedStyle}>
-      <h3
+      <span
         style={{
           alignSelf: "center",
+          fontSize: "20px",
         }}>
         New message
-      </h3>
+      </span>
       <div
         style={{
           display: "flex",
@@ -80,12 +86,15 @@ const MessageModal: React.FC<MessageModalProps> = ({
             border: "1px solid",
             padding: "5px",
             height: "100%",
+            width: "100%",
+            fontSize: "15px",
           }}
         />
         <input
           style={{ borderRadius: "5px", height: "100%" }}
           type="color"
-          defaultValue={"whitesmoke"}
+          value={inputColorValue}
+          onChange={onColorChange ? (e) => onColorChange(e) : undefined}
         />
       </div>
       <div
