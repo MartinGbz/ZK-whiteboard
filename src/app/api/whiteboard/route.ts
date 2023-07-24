@@ -30,13 +30,14 @@ export async function POST(req: Request) {
         },
       });
       console.log(newMessage);
-      return NextResponse.json(newMessage);
+      const messages = await prisma.message.findMany();
+      return NextResponse.json(messages);
     } else {
       console.error("Message already exists");
       return NextResponse.json({ error: "user already posted message" });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return NextResponse.json(error);
   }
 }

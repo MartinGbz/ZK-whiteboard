@@ -11,7 +11,7 @@ interface MessageProps {
 const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color,
-    zIndex: message.order,
+    zIndex: 10000 - message.order,
     padding: "10px",
     marginBottom: "10px",
     cursor: "grab",

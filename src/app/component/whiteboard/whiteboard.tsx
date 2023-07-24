@@ -59,12 +59,7 @@ const Whiteboard = () => {
 
       const messageSigned = await response.json();
 
-      // const isUserMessageExists = argMessages.some(
-      //   (message: MessageType) => message.vaultId === messageSigned.vaultId
-      // );
-
       if (messageSigned) {
-        console.log("messageSigned");
         const newMessage: MessageType = messageSigned;
         setMessageInputValue("");
         setMessageInputColorValue("#F5F5F5");
@@ -72,16 +67,6 @@ const Whiteboard = () => {
         saveMessage(newMessage);
       }
 
-      // console.log("isUserMessageExists");
-      // console.log(isUserMessageExists);
-      // console.log("messageSigned");
-      // console.log(messageSigned);
-      // if (isUserMessageExists) {
-      //   alert("Error: you already have created a message");
-      // } else if (messageSigned) {
-      // } else {
-      //   console.error("Error: messageSigned is undefined");
-      // }
       setIsVerifying(false);
       redirectToRoot();
     };
@@ -93,32 +78,12 @@ const Whiteboard = () => {
   }, [redirectToRoot, sismoConnectResponseMessage]);
 
   useEffect(() => {
-    console.log("messages");
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/whiteboard", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const messages = await response.json();
-        setMessages(messages);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    if (!messages.length) {
-      fetchData();
-    }
     // if there is a message with the same vaultId, set a state to true
     const isUserMessageExists = messages.some(
       (message: MessageType) => message.vaultId === vaultId
     );
-    console.log("isUserMessageExists");
-    console.log(isUserMessageExists);
     setIsUserMessageExists(isUserMessageExists);
-  }, [messages.length, vaultId]);
+  }, [messages, vaultId]);
 
   useEffect(() => {
     // Focus the input when the modal opens
@@ -166,7 +131,9 @@ const Whiteboard = () => {
     if (data.error) {
       alert(data.error);
     } else {
-      setMessages((messages) => [...messages, message]);
+      console.log("data");
+      console.log(data);
+      setMessages(data);
     }
   };
 
@@ -210,6 +177,25 @@ const Whiteboard = () => {
   }, []);
 
   useEffect(() => {
+    console.log("messages");
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/whiteboard", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const messages = await response.json();
+        setMessages(messages);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (!messages.length) {
+      fetchData();
+    }
+
     const storagedVaultId = localStorage.getItem("vaultId");
     if (storagedVaultId) {
       setVaultId(storagedVaultId);
