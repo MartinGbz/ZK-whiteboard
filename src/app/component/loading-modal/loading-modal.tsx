@@ -1,5 +1,5 @@
 "use client";
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { CSSProperties } from "react";
 import "./loading-modal.css";
 
 interface LoadingProps {

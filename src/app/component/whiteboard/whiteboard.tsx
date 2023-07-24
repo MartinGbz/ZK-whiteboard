@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
 import { Position, Message as MessageType } from "../../types/whiteboard-types";
 
@@ -38,7 +38,6 @@ const Whiteboard = () => {
 
   const router = useRouter();
 
-  // Fonction pour rediriger à la racine du site
   const redirectToRoot = useCallback(() => {
     router.push("/");
   }, [router]);
@@ -117,9 +116,8 @@ const Whiteboard = () => {
   }, []);
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
-    // if the reponse come from the message creation
+    // if the reponse does not come from the message creation
     if (sismoConnectResponse.proofs.length < 2) {
-      // verify on the backend that the response is valid
       const response = await fetch("/api/sismo-connect", {
         method: "POST",
         body: JSON.stringify(sismoConnectResponse),

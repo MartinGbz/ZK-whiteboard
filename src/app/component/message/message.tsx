@@ -1,5 +1,5 @@
 "use client";
-import React, { CSSProperties, useEffect, useRef, useState } from "react";
+import React, { CSSProperties, useEffect } from "react";
 import Draggable from "react-draggable";
 import { Message } from "../../types/whiteboard-types";
 

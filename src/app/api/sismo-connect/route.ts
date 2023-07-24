@@ -1,5 +1,4 @@
 import { sismoConnectConfig } from "@/app/configs/configs";
-// import { SismoConnect, SismoConnectResponse, SismoConnectVerifiedResult } from "@sismo-core/sismo-connect-react";
 import {
   SismoConnect,
   SismoConnectVerifiedResult,
