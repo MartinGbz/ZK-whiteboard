@@ -249,6 +249,7 @@ const Whiteboard = () => {
         className="messages_container"
         style={{
           cursor: isUserMessageExists ? "not-allowed" : "pointer",
+          position: "relative",
         }}
         onDoubleClick={(e) => !isUserMessageExists && startMessageCreation(e)}>
         {messages.map((message: MessageType) => (

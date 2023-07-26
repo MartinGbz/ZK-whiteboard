@@ -3,7 +3,7 @@ import React, { CSSProperties, useEffect } from "react";
 import Draggable from "react-draggable";
 import { Message } from "../../types/whiteboard-types";
 import { MAX_Z_INDEX } from "@/app/configs/configs";
-
+import "./message.css";
 interface MessageProps {
   message: Message;
   vaultId: string | null;
@@ -13,14 +13,10 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color,
     zIndex: MAX_Z_INDEX - message.order,
-    padding: "10px",
-    marginBottom: "10px",
-    cursor: "grab",
-    position: "absolute",
-    border: "1px solid gray",
-    borderRadius: "5px",
-    color: "black",
-    fontSize: "20px",
+    animation:
+      vaultId === message.vaultId
+        ? "zoom-in-zoom-out 8s cubic-bezier(1, 1, 1, 1) infinite"
+        : "none",
   };
 
   useEffect(() => {}, []);
@@ -40,7 +36,9 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
       <div
         className="message"
         style={messageStyle}
-        onClick={() => vaultId === message.vaultId && handleMessageClick}>
+        onClick={(event) =>
+          vaultId === message.vaultId && handleMessageClick(event)
+        }>
         {message.text}
         <div
           style={{
