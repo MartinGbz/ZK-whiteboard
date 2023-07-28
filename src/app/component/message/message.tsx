@@ -1,5 +1,5 @@
 "use client";
-import React, { CSSProperties, useEffect } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 import Draggable from "react-draggable";
 import { Message } from "../../types/whiteboard-types";
 import { MAX_Z_INDEX } from "@/app/configs/configs";
@@ -10,16 +10,40 @@ interface MessageProps {
 }
 
 const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
+  const [x, setX] = useState(message.positionX);
+  const [y, setY] = useState(message.positionY);
+
+  const [startClientX, setStartClientX] = useState(0);
+  const [startClientY, setStartClientY] = useState(0);
+
+  const [isDragging, setIsDragging] = useState(false);
+
+  const [isHovering, setIsHovering] = useState(false);
+
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color,
-    zIndex: MAX_Z_INDEX - message.order,
-    animation:
-      vaultId === message.vaultId
-        ? "zoom-in-zoom-out 8s cubic-bezier(1, 1, 1, 1) infinite"
-        : "none",
+    zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
+    // animation:
+    //   vaultId === message.vaultId
+    //     ? "bright-in-bright-out 8s cubic-bezier(1, 1, 1, 1) infinite"
+    //     : "none",
+    cursor: vaultId === message.vaultId ? "grab" : "default",
+    position: "absolute",
+    top: y,
+    left: x,
+    display: isDragging ? "none" : "block",
+    // "&::before": {
+    //   content: "",
+    //   position: "absolute",
+    //   width: "100px",
+    //   height: "100%",
+    //   backgroundImage:
+    //     "linear-gradient(120deg,rgba(255, 255, 255, 0) 30%,rgba(255, 255, 255, 0.8),rgba(255, 255, 255, 0) 70%)",
+    //   top: "0",
+    //   left: "-100px",
+    //   animation: "shine 3s infinite linear",
+    // },
   };
-
-  useEffect(() => {}, []);
 
   const handleMessageClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -27,27 +51,98 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
     event.stopPropagation();
   };
 
+  const onDrag = (event: React.DragEvent<HTMLDivElement>) => {
+    // console.log(event);
+    // console.log(message.positionX, message.positionY);
+    // console.log(x, y);
+    // console.log(startClientX);
+    setIsDragging(true);
+    if (startClientX === 0 && startClientY === 0) {
+      console.log("heyyyyy");
+      console.log(startClientX);
+      console.log(startClientY);
+      console.log(event.clientX);
+      console.log(event.clientY);
+      setStartClientX(event.clientX);
+      setStartClientY(event.clientY);
+      console.log(startClientX);
+      console.log(startClientY);
+    }
+    if (
+      startClientX !== 0 &&
+      startClientY !== 0 &&
+      event.clientX !== 0 &&
+      event.clientX !== 0
+    ) {
+      const diffX = startClientX - event.clientX;
+      const diffY = startClientY - event.clientY;
+      console.log(event.clientX);
+      console.log(event.clientY);
+      // console.log(diffX);
+      // console.log(diffY);
+      setX(message.positionX - diffX);
+      setY(message.positionY - diffY);
+      // console.log(x);
+      // console.log(y);
+    }
+  };
+
+  const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    console.log(event);
+    // event.dataTransfer.setDragImage(
+    //   event.currentTarget,
+    //   window.outerWidth,
+    //   window.outerHeight
+    // );
+    // setStartClientX(event.clientX);
+    // setStartClientY(event.clientY);
+  };
+
+  const onDragEnd = (event: React.DragEvent<HTMLDivElement>) => {
+    setIsDragging(false);
+    console.log(event);
+    console.log(message.positionX, message.positionY);
+    console.log(x, y);
+    // const diffX = startClientX - event.clientX;
+    // const diffY = startClientY - event.clientY;
+    // setX(x - diffX);
+    // setY(y - diffY);
+  };
+
+  const handleMouseEnter = () => {
+    console.log("mouse enter");
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    console.log("mouse enter");
+    setIsHovering(false);
+  };
+
   return (
-    <Draggable
+    <div
       key={message.vaultId}
-      defaultPosition={{ x: message.positionX, y: message.positionY }}
-      bounds="parent"
-      disabled={vaultId !== message.vaultId}>
+      draggable={vaultId === message.vaultId}
+      onDrag={(event) => onDrag(event)}
+      onDragStart={(event) => onDragStart(event)}
+      onDragEnd={(event) => onDragEnd(event)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`message hoverable ${
+        vaultId === message.vaultId && !isDragging ? "shine" : ""
+      }`}
+      style={messageStyle}
+      onClick={(event) =>
+        vaultId === message.vaultId && handleMessageClick(event)
+      }>
+      {message.text}
       <div
-        className="message"
-        style={messageStyle}
-        onClick={(event) =>
-          vaultId === message.vaultId && handleMessageClick(event)
-        }>
-        {message.text}
-        <div
-          style={{
-            fontSize: "10px",
-          }}>
-          {"from: " + message.vaultId.substring(0, 10) + "..."}
-        </div>
+        style={{
+          fontSize: "10px",
+        }}>
+        {"from: " + message.vaultId.substring(0, 10) + "..."}
       </div>
-    </Draggable>
+    </div>
   );
 };
 
