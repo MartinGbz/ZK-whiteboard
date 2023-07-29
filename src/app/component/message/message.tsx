@@ -2,7 +2,7 @@
 import React, { CSSProperties, useEffect, useState } from "react";
 import Draggable from "react-draggable";
 import { Message } from "../../types/whiteboard-types";
-import { MAX_Z_INDEX } from "@/app/configs/configs";
+import { MAX_Z_INDEX, TRANSPARENCY } from "@/app/configs/configs";
 import "./message.css";
 interface MessageProps {
   message: Message;
@@ -21,7 +21,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   const [isHovering, setIsHovering] = useState(false);
 
   const messageStyle: CSSProperties = {
-    backgroundColor: "#" + message.color,
+    backgroundColor: "#" + message.color + TRANSPARENCY,
     zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
     // animation:
     //   vaultId === message.vaultId
@@ -31,7 +31,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
     position: "absolute",
     top: y,
     left: x,
-    display: isDragging ? "none" : "block",
+    display: isDragging ? "none" : "flex",
     // "&::before": {
     //   content: "",
     //   position: "absolute",
@@ -65,8 +65,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
       console.log(event.clientY);
       setStartClientX(event.clientX);
       setStartClientY(event.clientY);
-      console.log(startClientX);
-      console.log(startClientY);
     }
     if (
       startClientX !== 0 &&
@@ -76,37 +74,13 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
     ) {
       const diffX = startClientX - event.clientX;
       const diffY = startClientY - event.clientY;
-      console.log(event.clientX);
-      console.log(event.clientY);
-      // console.log(diffX);
-      // console.log(diffY);
       setX(message.positionX - diffX);
       setY(message.positionY - diffY);
-      // console.log(x);
-      // console.log(y);
     }
-  };
-
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-    console.log(event);
-    // event.dataTransfer.setDragImage(
-    //   event.currentTarget,
-    //   window.outerWidth,
-    //   window.outerHeight
-    // );
-    // setStartClientX(event.clientX);
-    // setStartClientY(event.clientY);
   };
 
   const onDragEnd = (event: React.DragEvent<HTMLDivElement>) => {
     setIsDragging(false);
-    console.log(event);
-    console.log(message.positionX, message.positionY);
-    console.log(x, y);
-    // const diffX = startClientX - event.clientX;
-    // const diffY = startClientY - event.clientY;
-    // setX(x - diffX);
-    // setY(y - diffY);
   };
 
   const handleMouseEnter = () => {
@@ -124,7 +98,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
       key={message.vaultId}
       draggable={vaultId === message.vaultId}
       onDrag={(event) => onDrag(event)}
-      onDragStart={(event) => onDragStart(event)}
       onDragEnd={(event) => onDragEnd(event)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -135,12 +108,20 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
       onClick={(event) =>
         vaultId === message.vaultId && handleMessageClick(event)
       }>
-      {message.text}
+      <div>{message.text}</div>
       <div
         style={{
-          fontSize: "10px",
+          display: "flex",
+          justifyContent: "flex-end",
         }}>
-        {"from: " + message.vaultId.substring(0, 10) + "..."}
+        <div
+          style={{
+            fontSize: "10px",
+            fontWeight: "normal",
+            fontFamily: "Inter-Regular",
+          }}>
+          {"from: " + message.vaultId.substring(0, 10) + "..."}
+        </div>
       </div>
     </div>
   );

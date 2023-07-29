@@ -1,0 +1,43 @@
+@font-face {
+  font-family: "Lumanosimo";
+  /* src: url(/src/app/fonts/Lumanosimo-Regular.ttf); */
+  src: url(./fonts/Lumanosimo-Regular.ttf);
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url(./fonts/Satoshi.ttf);
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url(./fonts/Nunito/NunitoSans_10pt_Condensed-Black.ttf);
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter-SemiBold";
+  src: url(./fonts/Inter/Inter-SemiBold.ttf);
+  font-weight: semi-bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter-Regular";
+  src: url(./fonts/Inter/Inter-Regular.ttf);
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  /* font-family: "Nunito Sans", sans-serif; */
+  /* font-family: "Satoshi"; */
+  font-family: "Inter-SemiBold";
+  /* font-family: "Nunito", sans-serif; */
+  /* font-family: "Lumanosimo", sans-serif; */
+}

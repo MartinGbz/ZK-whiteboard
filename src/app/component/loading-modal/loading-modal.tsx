@@ -1,6 +1,7 @@
 "use client";
 import React, { CSSProperties } from "react";
 import "./loading-modal.css";
+import { MAX_Z_INDEX } from "@/app/configs/configs";
 
 interface LoadingProps {
   isVerifying: boolean;
@@ -38,6 +39,7 @@ const Loading: React.FC<LoadingProps> = ({ isVerifying }) => {
         height: "100%",
         position: "absolute",
         display: isVerifying ? "flex" : "none",
+        zIndex: MAX_Z_INDEX + 2,
       }}>
       <div style={loadingStyle}>
         <div>
