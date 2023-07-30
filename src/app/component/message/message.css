@@ -4,7 +4,8 @@
 
   padding: 10px;
   /* position: absolute; */
-  position: relative;
+  position: sticky;
+  width: fit-content;
   border-radius: 10px;
   color: black;
   font-size: 18px;
