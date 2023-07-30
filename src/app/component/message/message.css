@@ -6,8 +6,8 @@
   /* position: absolute; */
   position: fixed;
   width: fit-content;
-  min-width: max-content;
-  /* min-width: min-content; */
+  max-width: 200px;
+  /* min-width: ; */
   border-radius: 10px;
   color: black;
   font-size: 18px;

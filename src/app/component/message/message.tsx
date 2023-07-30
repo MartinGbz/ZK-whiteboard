@@ -119,6 +119,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
             fontSize: "10px",
             fontWeight: "normal",
             fontFamily: "Inter-Regular",
+            whiteSpace: "nowrap",
           }}>
           {"from: " + message.vaultId.substring(0, 10) + "..."}
         </div>
