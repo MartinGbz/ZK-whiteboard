@@ -29,7 +29,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
     backgroundColor: "#" + message.color + TRANSPARENCY,
     zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
     // cursor: vaultId === message.vaultId ? "grab" : "default",
-    // boxShadow: `${"#" + message.color} 0px 0px 30px 2px`,
     animation:
       vaultId === message.vaultId && !isHovering
         ? `shine 5s infinite linear`
