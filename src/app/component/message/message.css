@@ -4,8 +4,10 @@
 
   padding: 10px;
   /* position: absolute; */
-  position: sticky;
+  position: fixed;
   width: fit-content;
+  min-width: max-content;
+  /* min-width: min-content; */
   border-radius: 10px;
   color: black;
   font-size: 18px;
@@ -16,6 +18,18 @@
 .message:hover {
   transform: scale(1.1);
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 15px 5px;
+}
+
+@keyframes shine {
+  0% {
+    box-shadow: var(--shadow-color) 0px 0px 0px 0px;
+  }
+  15% {
+    box-shadow: var(--shadow-color) 0px 0px 30px 2px;
+  }
+  30% {
+    box-shadow: var(--shadow-color) 0px 0px 0px 0px;
+  }
 }
 
 /* .message.shine:before {
@@ -34,7 +48,7 @@
   animation: shine 3s infinite linear;
 } */
 
-@keyframes shine {
+/* @keyframes shine {
   0% {
     left: -100%;
   }
@@ -44,4 +58,4 @@
   100% {
     left: 100%;
   }
-}
+} */

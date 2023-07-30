@@ -28,6 +28,18 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   const [scale, setScale] = useState(1);
   const [originalWidth, setOriginalWidth] = useState(1);
 
+  const shine = `
+    0% {
+      box-shadow: rgb(255 225 0) 0px 0px 0px 0px;
+    }
+    15% {
+      box-shadow: rgb(255 225 0) 0px 0px 30px 2px;
+    }
+    30% {
+      box-shadow: rgb(255 225 0) 0px 0px 0px 0px;
+    }
+  `;
+
   useEffect(() => {
     if (messageRef.current) {
       const rect = messageRef.current.getBoundingClientRect();
@@ -35,14 +47,22 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
       console.log(scale);
       setOriginalWidth(rect.width);
     }
+
+    console.log(`${"#" + message.color} 0px 0px 30px 2px`);
   }, []);
 
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color + TRANSPARENCY,
     zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
     cursor: vaultId === message.vaultId ? "grab" : "default",
+    // boxShadow: `${"#" + message.color} 0px 0px 30px 2px`,
+    animation:
+      vaultId === message.vaultId && !isHovering
+        ? `shine 5s infinite linear`
+        : "",
     top: y,
     left: x,
+    ["--shadow-color" as string]: `#${message.color}`,
   };
 
   const deleteButtonStyle: CSSProperties = {
@@ -115,7 +135,8 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
     <div
       ref={messageRef}
       key={message.vaultId}
-      draggable={vaultId === message.vaultId}
+      draggable={true}
+      // draggable={vaultId === message.vaultId}
       onDrag={(event) => onDrag(event)}
       onDragEnd={(event) => onDragEnd(event)}
       onMouseEnter={handleMouseEnter}
