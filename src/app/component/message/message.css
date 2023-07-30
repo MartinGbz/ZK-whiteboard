@@ -3,12 +3,13 @@
   flex-direction: column;
 
   padding: 10px;
-  position: absolute;
+  /* position: absolute; */
+  position: relative;
   border-radius: 10px;
   color: black;
   font-size: 18px;
   transition: transform 0.2s;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .message:hover {
@@ -16,7 +17,7 @@
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 15px 5px;
 }
 
-.message.shine:before {
+/* .message.shine:before {
   content: "";
   position: absolute;
   width: 100%;
@@ -30,7 +31,7 @@
   top: 0;
   left: -100px;
   animation: shine 3s infinite linear;
-}
+} */
 
 @keyframes shine {
   0% {

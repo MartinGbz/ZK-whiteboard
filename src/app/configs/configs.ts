@@ -12,6 +12,6 @@ export const sismoConnectConfig: SismoConnectConfig = {
 };
 
 export const MAX_Z_INDEX = 10000;
-export const TRANSPARENCY = "B4"; // 80% of 255
+export const TRANSPARENCY = "E6";
 
 export const defaultInputColor = "#F5F5F5";

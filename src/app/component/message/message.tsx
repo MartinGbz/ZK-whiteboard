@@ -1,9 +1,11 @@
 "use client";
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
 import { Message } from "../../types/whiteboard-types";
 import { MAX_Z_INDEX, TRANSPARENCY } from "@/app/configs/configs";
 import "./message.css";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 interface MessageProps {
   message: Message;
   vaultId: string | null;
@@ -20,6 +22,21 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
 
   const [isHovering, setIsHovering] = useState(false);
 
+  const messageRef = useRef<HTMLInputElement>(null);
+  const deleteButtonRef = useRef<HTMLInputElement>(null);
+
+  const [scale, setScale] = useState(1);
+  const [originalWidth, setOriginalWidth] = useState(1);
+
+  useEffect(() => {
+    if (messageRef.current) {
+      const rect = messageRef.current.getBoundingClientRect();
+      setScale(rect.width / messageRef.current.offsetWidth);
+      console.log(scale);
+      setOriginalWidth(rect.width);
+    }
+  }, []);
+
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color + TRANSPARENCY,
     zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
@@ -27,7 +44,52 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
     position: "absolute",
     top: y,
     left: x,
-    display: isDragging ? "none" : "flex",
+    // display: isDragging ? "none" : "flex",
+  };
+
+  // const containerStyle: CSSProperties = {
+  //   zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
+  //   position: "absolute",
+  //   top: y,
+  //   left: x,
+  //   display: isDragging ? "none" : "flex",
+  //   // backgroundColor: "black",
+  //   width: "fit-content",
+  // };
+
+  const deleteButtonStyle: CSSProperties = {
+    zIndex: MAX_Z_INDEX + 100,
+    // backgroundColor: isHovering ? "red" : "black",
+    backgroundColor: "#ff5656",
+    borderRadius: "50%",
+    // padding: "5px",
+    // width: "25px",
+    // height: "25px",
+    // fontSize: "5px",
+    textAlign: "center",
+    position: "absolute",
+    // top: isHovering ? `-15px` : "0px",
+    // right: isHovering ? `-15px` : "0px",
+
+    top: "-10px",
+    right: "-10px",
+    // transition: "background 1s",
+    transition: "opacity 0.2s, transform 0.2s, translate 0.2s",
+    opacity: isHovering ? "1" : "0",
+    transform: isHovering ? "scale(1.1)" : "scale(1)",
+    cursor: "pointer",
+    display: "inline-flex",
+    padding: "5px",
+    boxShadow: "rgba(0, 0, 0, 0.25) -5px 5px 15px 3px",
+    // translate: isHovering
+    //   ? `translate((${
+    //       (deleteButton.current?.width * 1.1 - deleteButton.current?.width) / 2
+    //     }), ${
+    //       (deleteButton.current?.height * 1.1 - deleteButton.current?.height) /
+    //       2
+    //     })"`
+    //   : "translate(0, 0)",
+    // display: isHovering ? "block" : "none",
   };
 
   const handleMessageClick = (
@@ -61,23 +123,36 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
 
   const handleMouseEnter = () => {
     setIsHovering(true);
+    if (messageRef.current) {
+      console.log(messageRef.current?.width);
+      const rect = messageRef.current.getBoundingClientRect();
+      console.log(rect.width);
+      console.log(originalWidth);
+    }
   };
 
   const handleMouseLeave = () => {
     setIsHovering(false);
+    if (messageRef.current) {
+      console.log(messageRef.current?.width);
+      const rect = messageRef.current.getBoundingClientRect();
+      console.log(rect.width);
+    }
   };
 
   return (
     <div
+      ref={messageRef}
       key={message.vaultId}
       draggable={vaultId === message.vaultId}
       onDrag={(event) => onDrag(event)}
       onDragEnd={(event) => onDragEnd(event)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`message hoverable ${
-        vaultId === message.vaultId && !isDragging ? "shine" : ""
-      }`}
+      className="message hoverable"
+      // className={`message hoverable ${
+      //   vaultId === message.vaultId && !isDragging ? "shine" : ""
+      // }`}
       style={messageStyle}
       onClick={(event) =>
         vaultId === message.vaultId && handleMessageClick(event)
@@ -96,6 +171,17 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
           }}>
           {"from: " + message.vaultId.substring(0, 10) + "..."}
         </div>
+      </div>
+      <div
+        ref={deleteButtonRef}
+        className="delete_button"
+        style={deleteButtonStyle}>
+        <DeleteIcon
+          style={{
+            color: "white",
+            fontSize: "small",
+          }}
+        />
       </div>
     </div>
   );
