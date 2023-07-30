@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
 import { Position, Message as MessageType } from "../../types/whiteboard-types";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 import {
   AuthType,
@@ -240,7 +241,7 @@ const Whiteboard = () => {
                 localStorage.removeItem("vaultId");
               }}>
               {" "}
-              ↪️ Logout
+              <LogoutIcon /> Logout
             </button>
           </div>
         )}

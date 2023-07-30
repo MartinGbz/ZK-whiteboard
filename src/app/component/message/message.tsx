@@ -2,7 +2,7 @@
 import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
 import { Message } from "../../types/whiteboard-types";
-import { MAX_Z_INDEX, TRANSPARENCY } from "@/app/configs/configs";
+import { MAX_Z_INDEX, TRANSPARENCY, redColor } from "@/app/configs/configs";
 import "./message.css";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -55,7 +55,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
 
   const deleteButtonStyle: CSSProperties = {
     zIndex: MAX_Z_INDEX + 100,
-    backgroundColor: "#ff5656",
+    backgroundColor: redColor,
     borderRadius: "50%",
     textAlign: "center",
     position: "absolute",

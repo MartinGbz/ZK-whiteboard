@@ -1,5 +1,8 @@
 "use client";
 import React, { CSSProperties } from "react";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { greenColor, redColor } from "@/app/configs/configs";
 
 interface MessageModalProps {
   style?: CSSProperties;
@@ -91,7 +94,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
           }}
         />
         <input
-          style={{ borderRadius: "5px", height: "100%" }}
+          style={{ borderRadius: "5px", height: "100%", marginLeft: "5px" }}
           type="color"
           value={inputColorValue}
           onChange={onColorChange ? (e) => onColorChange(e) : undefined}
@@ -106,12 +109,24 @@ const MessageModal: React.FC<MessageModalProps> = ({
         <button
           onClick={onClickCancel ? (e) => onClickCancel(e) : undefined}
           style={{ ...cancelButtonStyle, ...buttonStyle }}>
-          ❌ Cancel
+          <CancelIcon
+            style={{
+              fontSize: "25px",
+              color: redColor,
+            }}
+          />{" "}
+          Cancel
         </button>
         <button
           onClick={onClickSave ? (e) => onClickSave(e) : undefined}
           style={{ ...saveButtonStyle, ...buttonStyle }}>
-          ✅ Save
+          <CheckCircleIcon
+            style={{
+              fontSize: "25px",
+              color: greenColor,
+            }}
+          />{" "}
+          Save
         </button>
       </div>
     </div>
