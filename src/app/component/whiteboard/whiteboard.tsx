@@ -248,7 +248,7 @@ const Whiteboard = () => {
       <div
         className="messages_container"
         style={{
-          cursor: isUserMessageExists ? "not-allowed" : "pointer",
+          cursor: isUserMessageExists ? "default" : "pointer",
           position: "relative",
         }}
         onDoubleClick={(e) => !isUserMessageExists && startMessageCreation(e)}>
