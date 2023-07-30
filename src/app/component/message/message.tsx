@@ -25,20 +25,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   const messageRef = useRef<HTMLInputElement>(null);
   const deleteButtonRef = useRef<HTMLInputElement>(null);
 
-  const [scale, setScale] = useState(1);
-  const [originalWidth, setOriginalWidth] = useState(1);
-
-  useEffect(() => {
-    if (messageRef.current) {
-      const rect = messageRef.current.getBoundingClientRect();
-      setScale(rect.width / messageRef.current.offsetWidth);
-      console.log(scale);
-      setOriginalWidth(rect.width);
-    }
-
-    console.log(`${"#" + message.color} 0px 0px 30px 2px`);
-  }, []);
-
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color + TRANSPARENCY,
     zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
@@ -102,21 +88,10 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
 
   const handleMouseEnter = () => {
     setIsHovering(true);
-    if (messageRef.current) {
-      console.log(messageRef.current?.width);
-      const rect = messageRef.current.getBoundingClientRect();
-      console.log(rect.width);
-      console.log(originalWidth);
-    }
   };
 
   const handleMouseLeave = () => {
     setIsHovering(false);
-    if (messageRef.current) {
-      console.log(messageRef.current?.width);
-      const rect = messageRef.current.getBoundingClientRect();
-      console.log(rect.width);
-    }
   };
 
   return (

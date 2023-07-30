@@ -11,7 +11,6 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const message = await req.json();
-  console.log(message);
   try {
     const existingMessage = await prisma.message.findUnique({
       where: {
@@ -29,7 +28,6 @@ export async function POST(req: Request) {
           color: message.color,
         },
       });
-      console.log(newMessage);
       const messages = await prisma.message.findMany();
       return NextResponse.json(messages);
     } else {
