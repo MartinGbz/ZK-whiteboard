@@ -37,6 +37,7 @@ const Whiteboard = () => {
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const messageInputRef = useRef<HTMLInputElement>(null);
   const messageModalRef = useRef<HTMLDivElement>(null);
@@ -199,6 +200,38 @@ const Whiteboard = () => {
     setIsModalOpen(true);
   };
 
+  async function deleteMessage(message: MessageType): Promise<void> {
+    // delete message from the database
+    if (message.vaultId == vaultId) {
+      setIsDeleting(true);
+      await deleteMessageFromDatabase(message);
+      setIsDeleting(false);
+    }
+  }
+
+  const deleteMessageFromDatabase = async (message: MessageType) => {
+    console.log("deleting message");
+    console.log(message);
+    console.log(JSON.stringify(message));
+
+    const response = await fetch(`/api/whiteboard?vaultId=${message.vaultId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    if (data.error) {
+      console.error(data);
+    } else {
+      // delete message from the state
+      const newMessages = messages.filter(
+        (message: MessageType) => message.vaultId !== data.vaultId
+      );
+      setMessages(newMessages);
+    }
+  };
+
   return (
     <div className="whiteboard">
       <div className="header">
@@ -254,9 +287,15 @@ const Whiteboard = () => {
         }}
         onDoubleClick={(e) => !isUserMessageExists && startMessageCreation(e)}>
         {messages.map((message: MessageType) => (
-          <Message key={message.vaultId} message={message} vaultId={vaultId} />
+          <Message
+            key={message.vaultId}
+            message={message}
+            vaultId={vaultId}
+            onDelete={(message) => deleteMessage(message)}
+          />
         ))}
-        <Loading isVerifying={isVerifying} />
+        {isVerifying && <Loading text="Checking the proof..." />}
+        {isDeleting && <Loading text="Message deletion..." />}
       </div>
       {isModalOpen && (
         <MessageModal
@@ -265,7 +304,7 @@ const Whiteboard = () => {
             position: "absolute",
             top: messagePosition?.y,
             left: messagePosition?.x,
-            zIndex: MAX_Z_INDEX + 1,
+            zIndex: MAX_Z_INDEX + 2,
           }}
           inputValue={messageInputValue}
           inputColorValue={messageInputColorValue}

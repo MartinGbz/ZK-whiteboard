@@ -4,10 +4,11 @@ import "./loading-modal.css";
 import { MAX_Z_INDEX } from "@/app/configs/configs";
 
 interface LoadingProps {
-  isVerifying: boolean;
+  // isVerifying: boolean;
+  text: string;
 }
 
-const Loading: React.FC<LoadingProps> = ({ isVerifying }) => {
+const Loading: React.FC<LoadingProps> = ({ text }) => {
   const loadingStyle: CSSProperties = {
     backgroundColor: "#514f4f",
     padding: "10px",
@@ -38,12 +39,12 @@ const Loading: React.FC<LoadingProps> = ({ isVerifying }) => {
         width: "100%",
         height: "100%",
         position: "absolute",
-        display: isVerifying ? "flex" : "none",
-        zIndex: MAX_Z_INDEX + 2,
+        // display: isVerifying ? "flex" : "none",
+        zIndex: MAX_Z_INDEX + 3,
       }}>
       <div style={loadingStyle}>
         <div>
-          <h1 style={titleStyle}>Checking the proof...</h1>
+          <h1 style={titleStyle}>{text}</h1>
           <div className="pl pl-leapfrog"></div>
         </div>
       </div>

@@ -9,9 +9,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 interface MessageProps {
   message: Message;
   vaultId: string | null;
+  onDelete?: (message: Message) => void;
 }
 
-const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
+const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
   const [x, setX] = useState(message.positionX);
   const [y, setY] = useState(message.positionY);
 
@@ -39,7 +40,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
   };
 
   const deleteButtonStyle: CSSProperties = {
-    zIndex: MAX_Z_INDEX + 100,
+    zIndex: MAX_Z_INDEX + 1,
     backgroundColor: redColor,
     borderRadius: "50%",
     textAlign: "center",
@@ -127,7 +128,8 @@ const Message: React.FC<MessageProps> = ({ message, vaultId }) => {
         <div
           ref={deleteButtonRef}
           className="delete_button"
-          style={deleteButtonStyle}>
+          style={deleteButtonStyle}
+          onClick={onDelete ? () => onDelete(message) : undefined}>
           <DeleteIcon
             style={{
               color: "white",
