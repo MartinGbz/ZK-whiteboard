@@ -17,7 +17,7 @@ import {
 
 const prisma = new PrismaClient();
 
-export async function GET(req: Request) {
+export async function GET() {
   const messages = await prisma.message.findMany();
   return NextResponse.json(messages);
 }
@@ -46,7 +46,6 @@ async function addMessage(
 ): Promise<NextResponse> {
   const vaultId = await verifyResponseAddMessage(sismoConnectResponse);
   if (vaultId) {
-    // do something
     if (!sismoConnectResponse.signedMessage) {
       return NextResponse.json({ error: "No signedMessage" });
     }
@@ -74,32 +73,6 @@ async function deleteMessage(
   }
 }
 
-// export async function DELETE(req: NextApiRequest) {
-//   console.log("delete");
-//   console.log("req", req);
-//   console.log("req.url", req.url);
-//   let vaultId;
-//   if (req.url) {
-//     const url = new URL(req.url, `http://${req.headers.host}`);
-//     console.log("url", url);
-//     vaultId = url.searchParams.get("vaultId");
-//     console.log("vaultId", vaultId);
-//   }
-//   console.log(vaultId);
-//   if (!vaultId) return NextResponse.json({ error: "no vaultId" });
-//   try {
-//     const deletedMessage = await prisma.message.delete({
-//       where: {
-//         vaultId: vaultId,
-//       },
-//     });
-//     return NextResponse.json(deletedMessage);
-//   } catch (error) {
-//     console.error(error);
-//     return NextResponse.json(error);
-//   }
-// }
-
 async function addMessageToDB(
   vaultId: string,
   signedMessage: SignedMessage
@@ -117,7 +90,6 @@ async function addMessageToDB(
           text: signedMessage.message.text,
           positionX: signedMessage.message.positionX,
           positionY: signedMessage.message.positionY,
-          // order: message.order,
           color: signedMessage.message.color,
         },
       });
@@ -184,3 +156,29 @@ async function verifyResponseDeleteMessage(
   const vaultId = result.getUserId(AuthType.VAULT);
   return vaultId;
 }
+
+// export async function DELETE(req: NextApiRequest) {
+//   console.log("delete");
+//   console.log("req", req);
+//   console.log("req.url", req.url);
+//   let vaultId;
+//   if (req.url) {
+//     const url = new URL(req.url, `http://${req.headers.host}`);
+//     console.log("url", url);
+//     vaultId = url.searchParams.get("vaultId");
+//     console.log("vaultId", vaultId);
+//   }
+//   console.log(vaultId);
+//   if (!vaultId) return NextResponse.json({ error: "no vaultId" });
+//   try {
+//     const deletedMessage = await prisma.message.delete({
+//       where: {
+//         vaultId: vaultId,
+//       },
+//     });
+//     return NextResponse.json(deletedMessage);
+//   } catch (error) {
+//     console.error(error);
+//     return NextResponse.json(error);
+//   }
+// }

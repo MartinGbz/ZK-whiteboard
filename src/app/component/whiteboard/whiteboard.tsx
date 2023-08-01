@@ -42,7 +42,6 @@ const Whiteboard = () => {
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const messageInputRef = useRef<HTMLInputElement>(null);
   const messageModalRef = useRef<HTMLDivElement>(null);
@@ -56,17 +55,6 @@ const Whiteboard = () => {
   useEffect(() => {
     const postMessage = async (message: SismoConnectResponse) => {
       setIsVerifying(true);
-      // const body = {
-      //   type: "post",
-      //   message: message.signedMessage,
-      // };
-      // const response = await fetch("/api/sismo-connect-message", {
-      //   method: "POST",
-      //   body: JSON.stringify(message),
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
 
       const response = await fetch("/api/whiteboard", {
         method: "POST",
@@ -96,23 +84,6 @@ const Whiteboard = () => {
       postMessage(sismoConnectResponseMessage);
     }
   }, [redirectToRoot, sismoConnectResponseMessage]);
-
-  // const saveMessage = async (message: MessageType) => {
-  //   const response = await fetch("/api/whiteboard", {
-  //     method: "POST",
-  //     body: JSON.stringify(message),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-  //   const data = await response.json();
-  //   if (data.error) {
-  //     console.error(data);
-  //     alert(data.error);
-  //   } else {
-  //     setMessages(data);
-  //   }
-  // };
 
   useEffect(() => {
     const isUserMessageExists = messages.some(
@@ -245,42 +216,6 @@ const Whiteboard = () => {
     setIsModalOpen(true);
   };
 
-  // async function deleteMessage(message: MessageType): Promise<void> {
-  //   // delete message from the database
-  //   if (message.vaultId == vaultId) {
-  //     setIsDeleting(true);
-  //     await deleteMessageFromDatabase(message);
-  //     setIsDeleting(false);
-  //   }
-  // }
-
-  // const deleteMessageFromDatabase = async (message: MessageType) => {
-  //   console.log("deleting message");
-  //   console.log(message);
-  //   const queryParam = {
-  //     type: "delete",
-  //     message: message,
-  //   };
-  //   console.log(JSON.stringify(message));
-
-  //   const response = await fetch(`/api/whiteboard?vaultId=${message.vaultId}`, {
-  //     method: "DELETE",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-  //   const data = await response.json();
-  //   if (data.error) {
-  //     console.error(data);
-  //   } else {
-  //     // delete message from the state
-  //     const newMessages = messages.filter(
-  //       (message: MessageType) => message.vaultId !== data.vaultId
-  //     );
-  //     setMessages(newMessages);
-  //   }
-  // };
-
   return (
     <div className="whiteboard">
       <div className="header">
@@ -344,7 +279,6 @@ const Whiteboard = () => {
           />
         ))}
         {isVerifying && <Loading text="Checking the proof..." />}
-        {isDeleting && <Loading text="Message deletion..." />}
       </div>
       {isModalOpen && (
         <MessageModal
