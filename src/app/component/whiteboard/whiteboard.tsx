@@ -56,25 +56,28 @@ const Whiteboard = () => {
     const postMessage = async (message: SismoConnectResponse) => {
       setIsVerifying(true);
 
-      const response = await fetch("/api/whiteboard", {
-        method: "POST",
-        body: JSON.stringify(message),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const allMessageFromDB = await response.json();
+      let allMessageFromDB;
+      try {
+        const response = await fetch("/api/whiteboard", {
+          method: "POST",
+          body: JSON.stringify(message),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        allMessageFromDB = await response.json();
+      } catch (error) {
+        console.error(error);
+      }
 
       if (!allMessageFromDB.error) {
-        console.log("no error");
         setMessageInputValue("");
         setMessageInputColorValue(defaultInputColor);
         setIsModalOpen(false);
 
         setMessages(allMessageFromDB);
       } else {
-        console.log("ERROR");
+        alert("Error: " + allMessageFromDB.error);
       }
 
       setIsVerifying(false);
@@ -169,9 +172,6 @@ const Whiteboard = () => {
   };
 
   const requestDeleteMessage = async (message: MessageType) => {
-    console.log("deleting message");
-    console.log(message);
-    console.log(message.color);
     const sismoConnectSignedMessage: SignedMessage = {
       type: OperationType.DELETE,
       message: {

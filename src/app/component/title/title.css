@@ -2,11 +2,9 @@
   font-size: 20px;
 }
 .waviy span {
-  /* font-family: marker felt; */
   position: relative;
   display: inline-block;
   color: #fff;
-  /* text-transform: uppercase; */
   animation: waviy 8s infinite;
 }
 

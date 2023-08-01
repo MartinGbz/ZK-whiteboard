@@ -37,7 +37,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         return NextResponse.json({ error: "No type" });
     }
   } else {
-    return NextResponse.json({ error: "No signedMessage" });
+    return NextResponse.json({ error: "No signed message" });
   }
 }
 
@@ -47,7 +47,9 @@ async function addMessage(
   const vaultId = await verifyResponseAddMessage(sismoConnectResponse);
   if (vaultId) {
     if (!sismoConnectResponse.signedMessage) {
-      return NextResponse.json({ error: "No signedMessage" });
+      return NextResponse.json({
+        error: "No signedMessage found in the ZK Proof",
+      });
     }
     const message = JSON.parse(
       sismoConnectResponse.signedMessage
@@ -55,21 +57,19 @@ async function addMessage(
     const allMessagesInDB = await addMessageToDB(vaultId, message);
     return allMessagesInDB;
   } else {
-    return NextResponse.json({ error: "Proof incorrect" });
+    return NextResponse.json({ error: "ZK Proof incorrect" });
   }
 }
 
 async function deleteMessage(
   sismoConnectResponse: SismoConnectResponse
 ): Promise<NextResponse> {
-  console.log("--- deleteMessage ---");
   const vaultId = await verifyResponseDeleteMessage(sismoConnectResponse);
   if (vaultId) {
-    console.log("===> vaultId", vaultId);
     const deletedMessage = await deleteMessageFromDB(vaultId);
     return deletedMessage;
   } else {
-    return NextResponse.json({ error: "Proof incorrect" });
+    return NextResponse.json({ error: "ZK Proof incorrect" });
   }
 }
 
@@ -96,11 +96,11 @@ async function addMessageToDB(
       const messages = await prisma.message.findMany();
       return NextResponse.json(messages);
     } else {
-      console.error("Message already exists");
-      return NextResponse.json({ error: "user already posted message" });
+      return NextResponse.json({
+        error: "The user has already posted a message",
+      });
     }
   } catch (error) {
-    console.error(error);
     return NextResponse.json(error);
   }
 }
@@ -115,7 +115,6 @@ async function deleteMessageFromDB(vaultId: string): Promise<NextResponse> {
     const messages = await prisma.message.findMany();
     return NextResponse.json(messages);
   } catch (error) {
-    console.error(error);
     return NextResponse.json(error);
   }
 }
@@ -156,29 +155,3 @@ async function verifyResponseDeleteMessage(
   const vaultId = result.getUserId(AuthType.VAULT);
   return vaultId;
 }
-
-// export async function DELETE(req: NextApiRequest) {
-//   console.log("delete");
-//   console.log("req", req);
-//   console.log("req.url", req.url);
-//   let vaultId;
-//   if (req.url) {
-//     const url = new URL(req.url, `http://${req.headers.host}`);
-//     console.log("url", url);
-//     vaultId = url.searchParams.get("vaultId");
-//     console.log("vaultId", vaultId);
-//   }
-//   console.log(vaultId);
-//   if (!vaultId) return NextResponse.json({ error: "no vaultId" });
-//   try {
-//     const deletedMessage = await prisma.message.delete({
-//       where: {
-//         vaultId: vaultId,
-//       },
-//     });
-//     return NextResponse.json(deletedMessage);
-//   } catch (error) {
-//     console.error(error);
-//     return NextResponse.json(error);
-//   }
-// }

@@ -1,18 +1,14 @@
 .message {
   display: flex;
   flex-direction: column;
-
   padding: 10px;
-  /* position: absolute; */
   position: fixed;
   width: fit-content;
   max-width: 200px;
-  /* min-width: ; */
   border-radius: 10px;
   color: black;
   font-size: 18px;
   transition: transform 0.2s;
-  /* overflow: hidden; */
 }
 
 .message:hover {

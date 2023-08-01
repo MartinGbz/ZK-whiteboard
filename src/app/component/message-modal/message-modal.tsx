@@ -49,10 +49,8 @@ const MessageModal: React.FC<MessageModalProps> = ({
     border: "1px solid transparent",
     padding: "5px",
     marginRight: "5px",
-
     width: "100px",
     fontSize: "15px",
-    // whiteSpace: "nowrap",
   };
 
   const cancelButtonStyle: CSSProperties = {

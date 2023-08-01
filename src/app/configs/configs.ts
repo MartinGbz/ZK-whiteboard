@@ -7,6 +7,7 @@ export const sismoConnectConfig: SismoConnectConfig = {
   //     "dhadrien.sismo.eth",
   //     // "github:dhadrien",
   //     // "twitter:dhadrien_",
+  //     // "0x77d2ED1FDA0B34B049566aAd916C9ED9C9e8f19A",
   //   ],
   // },
 };
