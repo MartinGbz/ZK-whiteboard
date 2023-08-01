@@ -7,6 +7,16 @@ export interface Message {
   color: string;
 }
 
+export enum OperationType {
+  POST = "post",
+  DELETE = "delete",
+}
+
+export type SignedMessage = {
+  type: OperationType;
+  message: Omit<Message, "vaultId" | "order">;
+};
+
 export interface Position {
   x: number;
   y: number;

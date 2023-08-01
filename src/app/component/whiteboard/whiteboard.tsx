@@ -1,7 +1,12 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
-import { Position, Message as MessageType } from "../../types/whiteboard-types";
+import {
+  Position,
+  Message as MessageType,
+  SignedMessage,
+  OperationType,
+} from "../../types/whiteboard-types";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import {
@@ -49,9 +54,21 @@ const Whiteboard = () => {
   }, [router]);
 
   useEffect(() => {
-    const verifySaveMessage = async (message: SismoConnectResponse) => {
+    const postMessage = async (message: SismoConnectResponse) => {
       setIsVerifying(true);
-      const response = await fetch("/api/sismo-connect-message", {
+      // const body = {
+      //   type: "post",
+      //   message: message.signedMessage,
+      // };
+      // const response = await fetch("/api/sismo-connect-message", {
+      //   method: "POST",
+      //   body: JSON.stringify(message),
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      // });
+
+      const response = await fetch("/api/whiteboard", {
         method: "POST",
         body: JSON.stringify(message),
         headers: {
@@ -59,24 +76,43 @@ const Whiteboard = () => {
         },
       });
 
-      const messageSigned = await response.json();
+      const allMessageFromDB = await response.json();
 
-      if (messageSigned) {
-        const newMessage: MessageType = messageSigned;
+      if (!allMessageFromDB.error) {
+        console.log("no error");
         setMessageInputValue("");
         setMessageInputColorValue(defaultInputColor);
         setIsModalOpen(false);
 
-        saveMessage(newMessage);
+        setMessages(allMessageFromDB);
+      } else {
+        console.log("ERROR");
       }
 
       setIsVerifying(false);
       redirectToRoot();
     };
-    if (sismoConnectResponseMessage) {
-      verifySaveMessage(sismoConnectResponseMessage);
+    if (sismoConnectResponseMessage?.signedMessage) {
+      postMessage(sismoConnectResponseMessage);
     }
   }, [redirectToRoot, sismoConnectResponseMessage]);
+
+  // const saveMessage = async (message: MessageType) => {
+  //   const response = await fetch("/api/whiteboard", {
+  //     method: "POST",
+  //     body: JSON.stringify(message),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  //   const data = await response.json();
+  //   if (data.error) {
+  //     console.error(data);
+  //     alert(data.error);
+  //   } else {
+  //     setMessages(data);
+  //   }
+  // };
 
   useEffect(() => {
     const isUserMessageExists = messages.some(
@@ -139,37 +175,46 @@ const Whiteboard = () => {
     }
   }
 
-  const saveMessage = async (message: MessageType) => {
-    const response = await fetch("/api/whiteboard", {
-      method: "POST",
-      body: JSON.stringify(message),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    if (data.error) {
-      console.error(data);
-      alert(data.error);
-    } else {
-      setMessages(data);
-    }
-  };
-
   const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
-  const requestSaveMessage = async () => {
+  const requestAddMessage = async () => {
+    const sismoConnectSignedMessage: SignedMessage = {
+      type: OperationType.POST,
+      message: {
+        text: messageInputValue,
+        positionX: messagePosition.x,
+        positionY: messagePosition.y,
+        color: messageInputColorValue.substring(1),
+      },
+    };
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
       claim: { groupId: "0x0f800ff28a426924cbe66b67b9f837e2" },
       signature: {
-        message: JSON.stringify({
-          text: messageInputValue,
-          positionX: messagePosition.x,
-          positionY: messagePosition.y,
-          color: messageInputColorValue.substring(1),
-        }),
+        message: JSON.stringify(sismoConnectSignedMessage),
+      },
+    });
+  };
+
+  const requestDeleteMessage = async (message: MessageType) => {
+    console.log("deleting message");
+    console.log(message);
+    console.log(message.color);
+    const sismoConnectSignedMessage: SignedMessage = {
+      type: OperationType.DELETE,
+      message: {
+        text: message.text,
+        positionX: message.positionX,
+        positionY: message.positionY,
+        color: message.color,
+      },
+    };
+    sismoConnect.request({
+      namespace: "main",
+      auth: { authType: AuthType.VAULT },
+      signature: {
+        message: JSON.stringify(sismoConnectSignedMessage),
       },
     });
   };
@@ -200,37 +245,41 @@ const Whiteboard = () => {
     setIsModalOpen(true);
   };
 
-  async function deleteMessage(message: MessageType): Promise<void> {
-    // delete message from the database
-    if (message.vaultId == vaultId) {
-      setIsDeleting(true);
-      await deleteMessageFromDatabase(message);
-      setIsDeleting(false);
-    }
-  }
+  // async function deleteMessage(message: MessageType): Promise<void> {
+  //   // delete message from the database
+  //   if (message.vaultId == vaultId) {
+  //     setIsDeleting(true);
+  //     await deleteMessageFromDatabase(message);
+  //     setIsDeleting(false);
+  //   }
+  // }
 
-  const deleteMessageFromDatabase = async (message: MessageType) => {
-    console.log("deleting message");
-    console.log(message);
-    console.log(JSON.stringify(message));
+  // const deleteMessageFromDatabase = async (message: MessageType) => {
+  //   console.log("deleting message");
+  //   console.log(message);
+  //   const queryParam = {
+  //     type: "delete",
+  //     message: message,
+  //   };
+  //   console.log(JSON.stringify(message));
 
-    const response = await fetch(`/api/whiteboard?vaultId=${message.vaultId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    if (data.error) {
-      console.error(data);
-    } else {
-      // delete message from the state
-      const newMessages = messages.filter(
-        (message: MessageType) => message.vaultId !== data.vaultId
-      );
-      setMessages(newMessages);
-    }
-  };
+  //   const response = await fetch(`/api/whiteboard?vaultId=${message.vaultId}`, {
+  //     method: "DELETE",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  //   const data = await response.json();
+  //   if (data.error) {
+  //     console.error(data);
+  //   } else {
+  //     // delete message from the state
+  //     const newMessages = messages.filter(
+  //       (message: MessageType) => message.vaultId !== data.vaultId
+  //     );
+  //     setMessages(newMessages);
+  //   }
+  // };
 
   return (
     <div className="whiteboard">
@@ -291,7 +340,7 @@ const Whiteboard = () => {
             key={message.vaultId}
             message={message}
             vaultId={vaultId}
-            onDelete={(message) => deleteMessage(message)}
+            onDelete={(message) => requestDeleteMessage(message)}
           />
         ))}
         {isVerifying && <Loading text="Checking the proof..." />}
@@ -312,14 +361,14 @@ const Whiteboard = () => {
           onColorChange={(e) => setMessageInputColorValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              requestSaveMessage();
+              requestAddMessage();
             } else if (e.key === "Escape") {
               setIsModalOpen(false);
             }
           }}
           inputRef={messageInputRef}
           onClickCancel={(e) => setIsModalOpen(false)}
-          onClickSave={(e) => requestSaveMessage()}
+          onClickSave={(e) => requestAddMessage()}
         />
       )}
     </div>
