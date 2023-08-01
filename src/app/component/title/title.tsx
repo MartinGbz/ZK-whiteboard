@@ -16,7 +16,7 @@ const Title: React.FC<MessageProps> = ({ text, style }) => {
     transformedElements.push(
       <span
         key={i}
-        className={`waviy-char`}
+        className={`waviy-char` && i === 0 ? "first-font" : ""}
         style={{ animationDelay: `${animationDelay}s` }}>
         {char}
       </span>

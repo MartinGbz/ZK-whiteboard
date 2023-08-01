@@ -2,13 +2,19 @@
   font-size: 20px;
 }
 .waviy span {
-  font-family: marker felt;
+  /* font-family: marker felt; */
   position: relative;
   display: inline-block;
   color: #fff;
   /* text-transform: uppercase; */
   animation: waviy 8s infinite;
 }
+
+.first-font {
+  font-family: "Damion-Regular", sans-serif;
+  font-size: 25px;
+}
+
 @keyframes waviy {
   0%,
   8%,

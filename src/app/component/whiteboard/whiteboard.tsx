@@ -220,7 +220,7 @@ const Whiteboard = () => {
     <div className="whiteboard">
       <div className="header">
         <Title
-          text="whiteboard"
+          text="Whiteboard"
           style={{
             textAlign: "center",
             alignSelf: "center",
@@ -236,6 +236,7 @@ const Whiteboard = () => {
               height: "15px",
               backgroundColor: "lightgray",
               color: "black",
+              alignSelf: "center",
             }}
             config={sismoConnectConfig}
             auth={{ authType: AuthType.VAULT }}
