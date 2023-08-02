@@ -18,7 +18,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
   const [isHovering, setIsHovering] = useState(false);
 
   const messageRef = useRef<HTMLInputElement>(null);
-  const deleteButtonRef = useRef<HTMLInputElement>(null);
 
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color + TRANSPARENCY,
@@ -56,6 +55,12 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
     event.stopPropagation();
   };
 
+  const handleMessageDoubleClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    event.stopPropagation();
+  };
+
   const handleMouseEnter = () => {
     setIsHovering(true);
   };
@@ -74,7 +79,8 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
       style={messageStyle}
       onClick={(event) =>
         vaultId === message.vaultId && handleMessageClick(event)
-      }>
+      }
+      onDoubleClick={handleMessageDoubleClick}>
       <div>{message.text}</div>
       <div
         style={{
@@ -92,9 +98,8 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
         </div>
       </div>
       {vaultId === message.vaultId && (
-        <div
-          ref={deleteButtonRef}
-          className="delete_button"
+        <button
+          className="delete-button"
           style={deleteButtonStyle}
           onClick={onDelete ? () => onDelete(message) : undefined}>
           <DeleteIcon
@@ -103,7 +108,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
               fontSize: "small",
             }}
           />
-        </div>
+        </button>
       )}
     </div>
   );

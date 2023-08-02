@@ -15,7 +15,7 @@ export const sismoConnectConfig: SismoConnectConfig = {
 export const MAX_Z_INDEX = 1000;
 export const TRANSPARENCY = "E6";
 
-export const defaultInputColor = "#F5F5F5";
+export const defaultInputColor = "#22b587";
 
 export const greenColor = "#28cc28";
 export const redColor = "#ff5656";

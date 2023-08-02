@@ -286,10 +286,10 @@ const Whiteboard = () => {
           modalRef={messageModalRef}
           style={{
             position: "absolute",
-            top: messagePosition?.y,
-            left: messagePosition?.x,
             zIndex: MAX_Z_INDEX + 2,
           }}
+          initialPositionX={messagePosition?.x}
+          initialPositionY={messagePosition?.y}
           inputValue={messageInputValue}
           inputColorValue={messageInputColorValue}
           onChange={(e) => setMessageInputValue(e.target.value)}
