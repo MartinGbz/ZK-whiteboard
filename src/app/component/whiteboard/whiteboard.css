@@ -23,7 +23,7 @@
   background-color: #000000;
 }
 
-.user {
+.login {
   grid-column: 3;
   width: fit-content;
   justify-self: end;

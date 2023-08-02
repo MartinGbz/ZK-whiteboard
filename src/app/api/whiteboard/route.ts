@@ -15,7 +15,7 @@ import {
   SignedMessage,
 } from "@/app/types/whiteboard-types";
 
-const prisma = new PrismaClient();
+import { prisma } from "./db";
 
 export async function GET() {
   const messages = await prisma.message.findMany();

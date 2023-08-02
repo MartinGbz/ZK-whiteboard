@@ -95,12 +95,6 @@ const MessageModal: React.FC<MessageModalProps> = ({
 
       setX(newX);
       setY(newY);
-
-      console.log("divRect", divRect);
-      console.log("windowWidth", windowWidth);
-      console.log("windowHeight", windowHeight);
-      console.log("positionX", initialPositionX);
-      console.log("positionY", initialPositionY);
     }
   }, [modalRef, initialPositionX, initialPositionY]);
 

@@ -25,6 +25,7 @@ import Message from "../message/message";
 import Title from "../title/title";
 import { useRouter } from "next/navigation";
 import Loading from "../loading-modal/loading-modal";
+import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 
 const Whiteboard = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -40,6 +41,7 @@ const Whiteboard = () => {
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [isLoging, setIsLoging] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
 
@@ -134,6 +136,7 @@ const Whiteboard = () => {
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse does not come from the message creation
     if (sismoConnectResponse.proofs.length < 2) {
+      setIsLoging(true);
       const response = await fetch("/api/sismo-connect", {
         method: "POST",
         body: JSON.stringify(sismoConnectResponse),
@@ -146,6 +149,7 @@ const Whiteboard = () => {
       setVaultId(vaultId);
       localStorage.setItem("vaultId", vaultId);
       redirectToRoot();
+      setIsLoging(false);
     }
   }
 
@@ -227,7 +231,7 @@ const Whiteboard = () => {
             gridColumn: 2,
           }}
         />
-        {!vaultId && (
+        {!vaultId && !isLoging && (
           <SismoConnectButton
             overrideStyle={{
               gridColumn: "3",
@@ -246,8 +250,8 @@ const Whiteboard = () => {
             }}
           />
         )}
-        {vaultId && (
-          <div className="user">
+        {vaultId && !isLoging && (
+          <div className="login">
             <span className="user_id">
               {" "}
               {vaultId.substring(0, 10) + "..."}{" "}
@@ -263,6 +267,7 @@ const Whiteboard = () => {
             </button>
           </div>
         )}
+        {isLoging && <CircularProgress color="inherit" className="login" />}
       </div>
       <div
         className="messages_container"
@@ -270,7 +275,9 @@ const Whiteboard = () => {
           cursor: isUserMessageExists || !vaultId ? "default" : "pointer",
           position: "relative",
         }}
-        onDoubleClick={(e) => !isUserMessageExists && startMessageCreation(e)}>
+        onDoubleClick={(e) =>
+          !isUserMessageExists && vaultId && startMessageCreation(e)
+        }>
         {messages.map((message: MessageType) => (
           <Message
             key={message.vaultId}
