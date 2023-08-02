@@ -1,6 +1,5 @@
 "use client";
-import React, { CSSProperties, useEffect, useRef, useState } from "react";
-import Draggable from "react-draggable";
+import React, { CSSProperties, useRef, useState } from "react";
 import { Message } from "../../types/whiteboard-types";
 import { MAX_Z_INDEX, TRANSPARENCY, redColor } from "@/app/configs/configs";
 import "./message.css";
@@ -16,11 +15,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
   const [x, setX] = useState(message.positionX);
   const [y, setY] = useState(message.positionY);
 
-  const [startClientX, setStartClientX] = useState(0);
-  const [startClientY, setStartClientY] = useState(0);
-
-  const [isDragging, setIsDragging] = useState(false);
-
   const [isHovering, setIsHovering] = useState(false);
 
   const messageRef = useRef<HTMLInputElement>(null);
@@ -29,7 +23,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color + TRANSPARENCY,
     zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
-    // cursor: vaultId === message.vaultId ? "grab" : "default",
     animation:
       vaultId === message.vaultId && !isHovering
         ? `shine 5s infinite linear`
@@ -63,29 +56,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
     event.stopPropagation();
   };
 
-  const onDrag = (event: React.DragEvent<HTMLDivElement>) => {
-    setIsDragging(true);
-    if (startClientX === 0 && startClientY === 0) {
-      setStartClientX(event.clientX);
-      setStartClientY(event.clientY);
-    }
-    if (
-      startClientX !== 0 &&
-      startClientY !== 0 &&
-      event.clientX !== 0 &&
-      event.clientX !== 0
-    ) {
-      const diffX = startClientX - event.clientX;
-      const diffY = startClientY - event.clientY;
-      setX(message.positionX - diffX);
-      setY(message.positionY - diffY);
-    }
-  };
-
-  const onDragEnd = (event: React.DragEvent<HTMLDivElement>) => {
-    setIsDragging(false);
-  };
-
   const handleMouseEnter = () => {
     setIsHovering(true);
   };
@@ -98,9 +68,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
     <div
       ref={messageRef}
       key={message.vaultId}
-      // draggable={vaultId === message.vaultId}
-      onDrag={(event) => onDrag(event)}
-      onDragEnd={(event) => onDragEnd(event)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="message hoverable"
