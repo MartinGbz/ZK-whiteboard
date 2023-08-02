@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-import { PrismaClient } from "@prisma/client";
-import { NextApiRequest } from "next";
 import {
   SismoConnect,
   SismoConnectVerifiedResult,
@@ -9,13 +7,9 @@ import {
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-server";
 import { sismoConnectConfig } from "@/app/configs/configs";
-import {
-  Message,
-  OperationType,
-  SignedMessage,
-} from "@/app/types/whiteboard-types";
+import { OperationType, SignedMessage } from "@/app/types/whiteboard-types";
 
-import { prisma } from "./db";
+import { prisma } from "../db";
 
 export async function GET() {
   const messages = await prisma.message.findMany();
