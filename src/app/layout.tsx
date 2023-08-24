@@ -4,8 +4,8 @@ import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Whiteboard",
-  description: "Share a message anonymously to the world!",
+  title: "ZK-whiteboard",
+  description: "Express yourself freely & anonymously",
 };
 
 export default function RootLayout({

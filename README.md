@@ -1,10 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ZK-whiteboard
 
-## Getting Started
+## Express yourself freely & anonymously without bots spamming.
 
-First, run the development server:
+ZK-whiteboard is a space where each member of a specific group can post a single message. Messages are anonymous.
+
+Currently, the ZK-whiteboard app can be used by anyone who owns:
+
+- An [ENS](https://ens.domains/fr/)
+- A [Gitcoin Passport](https://passport.gitcoin.co/#/)
+
+ZK-whiteboard is an app built using [Sismo](https://github.com/orgs/sismo-core/repositories?type=all). The Sismo Data Vault allows you to prove that you have met the 2 requirements written above without disclosing the address(es) you used.
+
+To use ZK-whiteboard you will need to created a Sismo Data Vault. More information on Sismo [here](https://www.sismo.io/).
+
+## Usage
+
+### Install dependencies
 
 ```bash
+# install frontend / backend dependencies
+yarn
+```
+
+### Set your PostgreSQL databse url
+
+```bash
+cp .example.env .env
+# set the DATABASE_URL variable with your own databse url in the freshly created .env file
+```
+
+### Start the app
+
+```bash
+# this will start your Next.js app
+# the frontend is available on http://localhost:3000/
+# it also starts a local backend
+
 npm run dev
 # or
 yarn dev
@@ -12,23 +43,4 @@ yarn dev
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Then, the app will be running on http://localhost:3000.

@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <div className="header">
       <Title
-        text="Whiteboard"
+        text="ZK-whiteboard"
         style={{
           textAlign: "center",
           alignSelf: "center",
