@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "src/app/api/whiteboard/post/route.ts": {
+      "maxDuration": 30
+    }
+  }
+}
