@@ -67,8 +67,7 @@ const Header: React.FC<HeaderProps> = ({
               style={{
                 fontSize: "20px",
               }}
-            />{" "}
-            Logout
+            />
           </button>
         </div>
       )}
