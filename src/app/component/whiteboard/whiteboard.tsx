@@ -54,55 +54,65 @@ const Whiteboard = () => {
     router.push("/");
   }, [router]);
 
+  const API_BASE_URL = "/api/whiteboard";
+  const API_ENDPOINTS = {
+    POST: "/post",
+    DELETE: "/delete",
+  };
+
   useEffect(() => {
-    const postMessage = async (message: SismoConnectResponse) => {
-      setIsVerifying(true);
+    const constructUrlFromMessage = (message: SismoConnectResponse) => {
+      let url = API_BASE_URL;
+      const signedMessage = message.signedMessage
+        ? (JSON.parse(message.signedMessage) as SignedMessage)
+        : null;
 
-      let url = "/api/whiteboard";
-      let signedMessage;
-      if (message.signedMessage) {
-        signedMessage = JSON.parse(message.signedMessage) as SignedMessage;
+      if (signedMessage?.type === OperationType.POST) {
+        url += API_ENDPOINTS.POST;
+      } else if (signedMessage?.type === OperationType.DELETE) {
+        url += API_ENDPOINTS.DELETE;
       }
 
-      switch (signedMessage?.type) {
-        case OperationType.POST:
-          url += "/post";
-          break;
-        case OperationType.DELETE:
-          url += "/delete";
-          break;
-        default:
-          break;
-      }
+      return url;
+    };
 
-      let allMessageFromDB;
-      console.log("message", message);
-      console.log(
-        "sismoConnectResponseMessage.signedMessage",
-        sismoConnectResponseMessage?.signedMessage
-      );
-      console.log("url", url);
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          body: JSON.stringify(message),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        allMessageFromDB = await response.json();
-      } catch (error) {
-        console.error(error);
-      }
+    const performApiRequest = async (
+      url: string,
+      message: SismoConnectResponse
+    ) => {
+      const response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(message),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (!allMessageFromDB.error) {
+      return response.json();
+    };
+
+    const handleApiResponse = async (apiResponse: any) => {
+      if (!apiResponse.error) {
         setMessageInputValue("");
         setMessageInputColorValue(defaultInputColor);
         setIsModalOpen(false);
 
-        setMessages(allMessageFromDB);
+        setMessages(apiResponse);
       } else {
-        alert("Error: " + allMessageFromDB.error);
+        alert("Error: " + apiResponse.error);
+      }
+    };
+
+    const postMessage = async (message: SismoConnectResponse) => {
+      setIsVerifying(true);
+
+      const url = constructUrlFromMessage(message);
+
+      try {
+        const allMessageFromDB: any = await performApiRequest(url, message);
+        handleApiResponse(allMessageFromDB);
+      } catch (error) {
+        console.error("API request error:", error);
       }
 
       setIsVerifying(false);
@@ -111,7 +121,12 @@ const Whiteboard = () => {
     if (sismoConnectResponseMessage?.signedMessage) {
       postMessage(sismoConnectResponseMessage);
     }
-  }, [redirectToRoot, sismoConnectResponseMessage]);
+  }, [
+    API_ENDPOINTS.DELETE,
+    API_ENDPOINTS.POST,
+    redirectToRoot,
+    sismoConnectResponseMessage,
+  ]);
 
   useEffect(() => {
     const isUserMessageExists = messages.some(
