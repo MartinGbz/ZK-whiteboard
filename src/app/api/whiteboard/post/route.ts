@@ -91,7 +91,10 @@ async function verifyResponseAddMessage(
     sismoConnectResponse,
     {
       auths: [{ authType: AuthType.VAULT }],
-      claims: [{ groupId: "0x0f800ff28a426924cbe66b67b9f837e2" }],
+      claims: [
+        { groupId: "0x0f800ff28a426924cbe66b67b9f837e2" },
+        { groupId: "0x1cde61966decb8600dfd0749bd371f12" },
+      ],
       signature: { message: message },
     }
   );
