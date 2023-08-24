@@ -6,6 +6,7 @@ import {
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
 import Title from "../title/title";
+import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 

@@ -15,30 +15,3 @@
   width: 100%;
   background-color: white;
 }
-
-.header {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  padding: 10px;
-  background-color: #000000;
-}
-
-.login {
-  grid-column: 3;
-  width: max-content;
-  justify-self: end;
-  color: white;
-  align-self: center;
-}
-
-.user_id {
-  margin-right: 5px;
-  font-size: 12px;
-  color: "white";
-}
-
-.logout_button {
-  font-size: 15px;
-  font-weight: bold;
-  color: "black";
-}
