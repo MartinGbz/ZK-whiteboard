@@ -27,6 +27,14 @@ import { useRouter } from "next/navigation";
 import Loading from "../loading-modal/loading-modal";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 
+const sismoConnect = SismoConnect({ config: sismoConnectConfig });
+
+const API_BASE_URL = "/api/whiteboard";
+const API_ENDPOINTS = {
+  POST: "/post",
+  DELETE: "/delete",
+};
+
 const Whiteboard = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,12 +61,6 @@ const Whiteboard = () => {
   const redirectToRoot = useCallback(() => {
     router.push("/");
   }, [router]);
-
-  const API_BASE_URL = "/api/whiteboard";
-  const API_ENDPOINTS = {
-    POST: "/post",
-    DELETE: "/delete",
-  };
 
   useEffect(() => {
     const constructUrlFromMessage = (message: SismoConnectResponse) => {
@@ -121,12 +123,7 @@ const Whiteboard = () => {
     if (sismoConnectResponseMessage?.signedMessage) {
       postMessage(sismoConnectResponseMessage);
     }
-  }, [
-    API_ENDPOINTS.DELETE,
-    API_ENDPOINTS.POST,
-    redirectToRoot,
-    sismoConnectResponseMessage,
-  ]);
+  }, [redirectToRoot, sismoConnectResponseMessage]);
 
   useEffect(() => {
     const isUserMessageExists = messages.some(
@@ -146,7 +143,8 @@ const Whiteboard = () => {
   }, [isModalOpen, messagePosition]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    console.log("fetching data");
+    const fetchMessages = async () => {
       try {
         const response = await fetch("/api/whiteboard", {
           method: "GET",
@@ -160,15 +158,13 @@ const Whiteboard = () => {
         console.error(error);
       }
     };
-    if (!messages.length) {
-      fetchData();
-    }
+
+    fetchMessages();
 
     const storagedVaultId = localStorage.getItem("vaultId");
     if (storagedVaultId) {
       setVaultId(storagedVaultId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
@@ -190,8 +186,6 @@ const Whiteboard = () => {
       setIsLoging(false);
     }
   }
-
-  const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
   const requestAddMessage = async () => {
     const sismoConnectSignedMessage: SignedMessage = {
@@ -243,7 +237,6 @@ const Whiteboard = () => {
       };
       fetchData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startMessageCreation = (
