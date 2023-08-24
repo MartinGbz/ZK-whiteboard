@@ -58,9 +58,32 @@ const Whiteboard = () => {
     const postMessage = async (message: SismoConnectResponse) => {
       setIsVerifying(true);
 
+      let url = "/api/whiteboard";
+      let signedMessage;
+      if (message.signedMessage) {
+        signedMessage = JSON.parse(message.signedMessage) as SignedMessage;
+      }
+
+      switch (signedMessage?.type) {
+        case OperationType.POST:
+          url += "/post";
+          break;
+        case OperationType.DELETE:
+          url += "/delete";
+          break;
+        default:
+          break;
+      }
+
       let allMessageFromDB;
+      console.log("message", message);
+      console.log(
+        "sismoConnectResponseMessage.signedMessage",
+        sismoConnectResponseMessage?.signedMessage
+      );
+      console.log("url", url);
       try {
-        const response = await fetch("/api/whiteboard", {
+        const response = await fetch(url, {
           method: "POST",
           body: JSON.stringify(message),
           headers: {
@@ -137,7 +160,7 @@ const Whiteboard = () => {
     // if the reponse does not come from the message creation
     if (sismoConnectResponse.proofs.length < 2) {
       setIsLoging(true);
-      const response = await fetch("/api/sismo-connect", {
+      const response = await fetch("/api/whiteboard/login", {
         method: "POST",
         body: JSON.stringify(sismoConnectResponse),
         headers: {
