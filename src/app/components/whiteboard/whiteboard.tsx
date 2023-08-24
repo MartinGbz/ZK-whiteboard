@@ -7,12 +7,10 @@ import {
   SignedMessage,
   OperationType,
 } from "../../types/whiteboard-types";
-import LogoutIcon from "@mui/icons-material/Logout";
 
 import {
   AuthType,
   SismoConnect,
-  SismoConnectButton,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
 import {
@@ -22,10 +20,9 @@ import {
 } from "../../configs/configs";
 import MessageModal from "../message-modal/message-modal";
 import Message from "../message/message";
-import Title from "../title/title";
 import { useRouter } from "next/navigation";
 import Loading from "../loading-modal/loading-modal";
-import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
+import Header from "../header/header";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -143,7 +140,6 @@ const Whiteboard = () => {
   }, [isModalOpen, messagePosition]);
 
   useEffect(() => {
-    console.log("fetching data");
     const fetchMessages = async () => {
       try {
         const response = await fetch("/api/whiteboard", {
@@ -253,56 +249,12 @@ const Whiteboard = () => {
 
   return (
     <div className="whiteboard">
-      <div className="header">
-        <Title
-          text="Whiteboard"
-          style={{
-            textAlign: "center",
-            alignSelf: "center",
-            gridColumn: 2,
-            width: "max-content",
-          }}
-        />
-        {!vaultId && !isLoging && (
-          <SismoConnectButton
-            overrideStyle={{
-              gridColumn: "3",
-              width: "fit-content",
-              justifySelf: "end",
-              height: "15px",
-              backgroundColor: "lightgray",
-              color: "black",
-              alignSelf: "center",
-            }}
-            config={sismoConnectConfig}
-            auth={{ authType: AuthType.VAULT }}
-            namespace="main"
-            onResponse={(response: SismoConnectResponse) => {
-              loginWithSismo(response);
-            }}
-          />
-        )}
-        {vaultId && !isLoging && (
-          <div className="login">
-            <span className="user_id"> {vaultId.substring(0, 5) + "..."} </span>
-            <button
-              className="logout_button"
-              onClick={() => {
-                setVaultId(null);
-                localStorage.removeItem("vaultId");
-              }}>
-              {" "}
-              <LogoutIcon
-                style={{
-                  fontSize: "20px",
-                }}
-              />{" "}
-              Logout
-            </button>
-          </div>
-        )}
-        {isLoging && <CircularProgress color="inherit" className="login" />}
-      </div>
+      <Header
+        vaultId={vaultId}
+        isLoging={isLoging}
+        loginWithSismo={(response) => loginWithSismo(response)}
+        setVaultId={(vaultId) => setVaultId(vaultId)}
+      />
       <div
         className="messages_container"
         style={{
