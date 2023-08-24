@@ -1,6 +1,6 @@
 # ZK-whiteboard
 
-## Express yourself freely & anonymously without bots spamming.
+## Express yourself freely & anonymously without bots spamming
 
 ZK-whiteboard is a space where each member of a specific group can post a single message. Messages are anonymous.
 
@@ -27,6 +27,7 @@ yarn
 ```bash
 cp .example.env .env
 # set the DATABASE_URL variable with your own databse url in the freshly created .env file
+source .env
 ```
 
 ### Start the app
