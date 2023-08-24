@@ -263,7 +263,12 @@ const Whiteboard = () => {
                 localStorage.removeItem("vaultId");
               }}>
               {" "}
-              <LogoutIcon /> Logout
+              <LogoutIcon
+                style={{
+                  fontSize: "20px",
+                }}
+              />{" "}
+              Logout
             </button>
           </div>
         )}
