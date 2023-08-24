@@ -260,6 +260,7 @@ const Whiteboard = () => {
             textAlign: "center",
             alignSelf: "center",
             gridColumn: 2,
+            width: "max-content",
           }}
         />
         {!vaultId && !isLoging && (
@@ -283,10 +284,7 @@ const Whiteboard = () => {
         )}
         {vaultId && !isLoging && (
           <div className="login">
-            <span className="user_id">
-              {" "}
-              {vaultId.substring(0, 10) + "..."}{" "}
-            </span>
+            <span className="user_id"> {vaultId.substring(0, 5) + "..."} </span>
             <button
               className="logout_button"
               onClick={() => {
