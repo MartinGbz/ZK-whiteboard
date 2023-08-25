@@ -18,16 +18,16 @@ export async function POST(req: Request) {
   // const vaultId = await verifyResponse(SismoConnectResponse);
   console.log("--- console 1");
   try {
-    const result: SismoConnectVerifiedResult = await sismoConnect.verify(
-      sismoConnectResponse,
-      {
-        namespace: "main",
-        auths: [{ authType: AuthType.VAULT }],
-      }
-    );
-    console.log("--- console 2");
-    const vaultId = result.getUserId(AuthType.VAULT);
-    return NextResponse.json({ vaultId: vaultId }, { status: 200 });
+    // const result: SismoConnectVerifiedResult = await sismoConnect.verify(
+    //   sismoConnectResponse,
+    //   {
+    //     namespace: "main",
+    //     auths: [{ authType: AuthType.VAULT }],
+    //   }
+    // );
+    // console.log("--- console 2");
+    // const vaultId = result.getUserId(AuthType.VAULT);
+    return NextResponse.json({ vaultId: "123" }, { status: 200 });
   } catch (error) {
     console.log("--- console 3 ");
     return NextResponse.json({ error }, { status: 500 });
