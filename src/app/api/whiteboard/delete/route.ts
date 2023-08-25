@@ -43,12 +43,12 @@ async function deleteMessage(
 
 async function deleteMessageFromDB(vaultId: string): Promise<NextResponse> {
   try {
-    const deletedMessage = await prisma.message.delete({
+    const deletedMessage = await prisma.messages.delete({
       where: {
         vaultId: vaultId,
       },
     });
-    const messages = await prisma.message.findMany();
+    const messages = await prisma.messages.findMany();
     return NextResponse.json(messages);
   } catch (error) {
     return NextResponse.json(error);

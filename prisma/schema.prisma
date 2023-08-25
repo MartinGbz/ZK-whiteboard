@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Message {
+model Messages {
   vaultId   String @id
   text      String
   positionX Float
