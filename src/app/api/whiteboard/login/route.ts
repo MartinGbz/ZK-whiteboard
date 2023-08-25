@@ -20,12 +20,15 @@ export async function POST(req: Request) {
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
+  console.log("--- console 1");
   const result: SismoConnectVerifiedResult = await sismoConnect.verify(
     sismoConnectResponse,
     {
       auths: [{ authType: AuthType.VAULT }],
     }
   );
+  console.log("--- console 2");
   const vaultId = result.getUserId(AuthType.VAULT);
+  console.log("--- console 3");
   return vaultId;
 }

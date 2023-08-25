@@ -174,6 +174,7 @@ const Whiteboard = () => {
           "Content-Type": "application/json",
         },
       });
+      console.log("--- after call");
       const data = await response.json();
       const vaultId = data.vaultId;
       setVaultId(vaultId);
