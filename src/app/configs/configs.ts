@@ -2,14 +2,6 @@ import { SismoConnectConfig } from "@sismo-core/sismo-connect-react";
 
 export const sismoConnectConfig: SismoConnectConfig = {
   appId: "0xf4cdb005c588dfce6eae2dd4907390c7",
-  vault: {
-    impersonate: [
-      "dhadrien.sismo.eth",
-      // "github:dhadrien",
-      // "twitter:dhadrien_",
-      // "0x77d2ED1FDA0B34B049566aAd916C9ED9C9e8f19A",
-    ],
-  },
 };
 
 export const MAX_Z_INDEX = 1000;
