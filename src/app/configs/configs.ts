@@ -1,7 +1,7 @@
 import { SismoConnectConfig } from "@sismo-core/sismo-connect-react";
 
 export const sismoConnectConfig: SismoConnectConfig = {
-  appId: "0x123",
+  appId: "0xf4cdb005c588dfce6eae2dd4907390c7",
 };
 
 export const MAX_Z_INDEX = 1000;
