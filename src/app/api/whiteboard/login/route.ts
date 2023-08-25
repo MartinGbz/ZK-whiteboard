@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     const result: SismoConnectVerifiedResult = await sismoConnect.verify(
       sismoConnectResponse,
       {
+        namespace: "main",
         auths: [{ authType: AuthType.VAULT }],
       }
     );
