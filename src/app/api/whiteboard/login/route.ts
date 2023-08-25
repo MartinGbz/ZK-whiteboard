@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const SismoConnectResponse = await req.json();
   const vaultId = await verifyResponse(SismoConnectResponse);
-  return NextResponse.json({ vaultId: vaultId });
+  return NextResponse.json({ vaultId: vaultId }, { status: 200 });
 }
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
