@@ -1,4 +1,5 @@
 "use client";
+import { MAX_Z_INDEX } from "@/app/configs/configs";
 import { useEffect, useState } from "react";
 
 export const MobileModal = () => {
@@ -43,11 +44,12 @@ export const MobileModal = () => {
     <div
       style={{
         position: "fixed",
-        zIndex: 1000,
+        zIndex: MAX_Z_INDEX + 10,
         width: "100vw",
         height: "100vh",
         background: "rgb(170 170 170 / 50%)",
         backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
