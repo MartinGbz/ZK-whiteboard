@@ -147,6 +147,7 @@ const Whiteboard = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          cache: "no-cache",
         });
         const messages = await response.json();
         setMessages(messages);
