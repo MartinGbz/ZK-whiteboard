@@ -7,7 +7,7 @@
   max-width: 200px;
   border-radius: 10px;
   color: black;
-  font-size: 18px;
+  /* font-size: 18px; */
   cursor: default;
   transition: transform 0.2s;
 }
