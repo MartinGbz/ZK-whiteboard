@@ -67,7 +67,7 @@ export const MobileModal = () => {
         <p>
           {"Mobiles are not supported yet :("}
           <br />
-          {"Try it on dekstop 👍"}
+          {"Try it on desktop 👍"}
         </p>
       </div>
     </div>
