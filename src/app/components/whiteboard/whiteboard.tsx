@@ -269,7 +269,7 @@ const Whiteboard = () => {
             cursor: isUserMessageExists || !vaultId ? "default" : "pointer",
             position: "relative",
           }}
-          onDoubleClick={(e) =>
+          onClick={(e) =>
             !isUserMessageExists && vaultId && startMessageCreation(e)
           }>
           {messages.map((message: MessageType) => (
