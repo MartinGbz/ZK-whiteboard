@@ -29,6 +29,8 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
     top: y,
     left: x,
     ["--shadow-color" as string]: `#${message.color}`,
+    fontSize: -message.text.length * 0.05 + 20, // f(x)= -0,05x + 20 (fontSize = 20 for 0 char and 10 for 200 char)
+    overflowWrap: "break-word",
   };
 
   const deleteButtonStyle: CSSProperties = {
@@ -55,12 +57,6 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
     event.stopPropagation();
   };
 
-  const handleMessageDoubleClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    event.stopPropagation();
-  };
-
   const handleMouseEnter = () => {
     setIsHovering(true);
   };
@@ -77,10 +73,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
       onMouseLeave={handleMouseLeave}
       className="message hoverable"
       style={messageStyle}
-      onClick={(event) =>
-        vaultId === message.vaultId && handleMessageClick(event)
-      }
-      onDoubleClick={handleMessageDoubleClick}>
+      onClick={handleMessageClick}>
       <div>{message.text}</div>
       <div
         style={{
