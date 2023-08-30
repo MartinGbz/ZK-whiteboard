@@ -50,7 +50,7 @@ const Whiteboard = () => {
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
 
-  const messageInputRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const messageModalRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();

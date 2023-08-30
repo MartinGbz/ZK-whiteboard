@@ -12,7 +12,7 @@ interface MessageModalProps {
   inputColorValue?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onColorChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  inputRef?: React.RefObject<HTMLInputElement>;
+  inputRef?: React.RefObject<HTMLTextAreaElement>;
   onClickCancel?: () => void;
   onClickSave?: () => void;
   initialPositionX: number;
