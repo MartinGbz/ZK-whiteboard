@@ -30,6 +30,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
     left: x,
     ["--shadow-color" as string]: `#${message.color}`,
     fontSize: -message.text.length * 0.05 + 20, // f(x)= -0,05x + 20 (fontSize = 20 for 0 char and 10 for 200 char)
+    overflowWrap: "break-word",
   };
 
   const deleteButtonStyle: CSSProperties = {

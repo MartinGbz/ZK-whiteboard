@@ -278,31 +278,33 @@ const Whiteboard = () => {
         ))}
         {isVerifying && <Loading text="Checking the proof..." />}
       </div>
-      {isModalOpen && (
-        <MessageModal
-          modalRef={messageModalRef}
-          style={{
-            position: "absolute",
-            zIndex: MAX_Z_INDEX + 2,
-          }}
-          initialPositionX={messagePosition?.x}
-          initialPositionY={messagePosition?.y}
-          inputValue={messageInputValue}
-          inputColorValue={messageInputColorValue}
-          onChange={(e) => setMessageInputValue(e.target.value)}
-          onColorChange={(e) => setMessageInputColorValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              requestAddMessage();
-            } else if (e.key === "Escape") {
-              setIsModalOpen(false);
-            }
-          }}
-          inputRef={messageInputRef}
-          onClickCancel={(e) => setIsModalOpen(false)}
-          onClickSave={(e) => requestAddMessage()}
-        />
-      )}
+
+      <MessageModal
+        modalRef={messageModalRef}
+        style={{
+          position: "absolute",
+          zIndex: MAX_Z_INDEX + 2,
+          display: isModalOpen ? "flex" : "none",
+        }}
+        initialPositionX={messagePosition?.x}
+        initialPositionY={messagePosition?.y}
+        inputValue={messageInputValue}
+        inputColorValue={messageInputColorValue}
+        onChange={(e) => setMessageInputValue(e.target.value)}
+        onColorChange={(e) => setMessageInputColorValue(e.target.value)}
+        onKeyDown={(e) => {
+          console.log(e.key);
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            requestAddMessage();
+          } else if (e.key === "Escape") {
+            setIsModalOpen(false);
+          }
+        }}
+        inputRef={messageInputRef}
+        onClickCancel={(e) => setIsModalOpen(false)}
+        onClickSave={(e) => requestAddMessage()}
+      />
     </div>
   );
 };
