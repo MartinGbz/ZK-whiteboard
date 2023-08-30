@@ -49,6 +49,7 @@ const Whiteboard = () => {
   const [isLoging, setIsLoging] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
+  const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false);
 
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const messageModalRef = useRef<HTMLDivElement>(null);
@@ -141,6 +142,7 @@ const Whiteboard = () => {
 
   useEffect(() => {
     const fetchMessages = async () => {
+      setIsFetchingMessages(true);
       try {
         const response = await fetch("/api/whiteboard", {
           method: "GET",
@@ -154,6 +156,7 @@ const Whiteboard = () => {
       } catch (error) {
         console.error(error);
       }
+      setIsFetchingMessages(false);
     };
 
     fetchMessages();
@@ -259,26 +262,30 @@ const Whiteboard = () => {
         loginWithSismo={(response) => loginWithSismo(response)}
         setVaultId={(vaultId) => setVaultId(vaultId)}
       />
-      <div
-        className="messages_container"
-        style={{
-          cursor: isUserMessageExists || !vaultId ? "default" : "pointer",
-          position: "relative",
-        }}
-        onDoubleClick={(e) =>
-          !isUserMessageExists && vaultId && startMessageCreation(e)
-        }>
-        {messages.map((message: MessageType) => (
-          <Message
-            key={message.vaultId}
-            message={message}
-            vaultId={vaultId}
-            onDelete={(message) => requestDeleteMessage(message)}
-          />
-        ))}
-        {isVerifying && <Loading text="Checking the proof..." />}
-      </div>
-
+      {messages && (
+        <div
+          className="messages_container"
+          style={{
+            cursor: isUserMessageExists || !vaultId ? "default" : "pointer",
+            position: "relative",
+          }}
+          onDoubleClick={(e) =>
+            !isUserMessageExists && vaultId && startMessageCreation(e)
+          }>
+          {messages.map((message: MessageType) => (
+            <Message
+              key={message.vaultId}
+              message={message}
+              vaultId={vaultId}
+              onDelete={(message) => requestDeleteMessage(message)}
+            />
+          ))}
+          {isVerifying && <Loading text="Checking the proof..." />}
+        </div>
+      )}
+      {isFetchingMessages && !messages && (
+        <Loading text="Loading messages..." />
+      )}
       <MessageModal
         modalRef={messageModalRef}
         style={{
