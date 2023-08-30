@@ -4,7 +4,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { TextareaAutosize } from "@mui/base";
 import { MAX_CHARACTERS, greenColor, redColor } from "@/app/configs/configs";
-import "./message-modal.css";
 
 interface MessageModalProps {
   style?: CSSProperties;
@@ -13,10 +12,9 @@ interface MessageModalProps {
   inputColorValue?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onColorChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   inputRef?: React.RefObject<HTMLInputElement>;
-  onClickCancel?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  onClickSave?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClickCancel?: () => void;
+  onClickSave?: () => void;
   initialPositionX: number;
   initialPositionY: number;
 }
@@ -28,7 +26,6 @@ const MessageModal: React.FC<MessageModalProps> = ({
   inputColorValue,
   onChange,
   onColorChange,
-  onKeyDown,
   inputRef,
   onClickCancel,
   onClickSave,
@@ -38,14 +35,10 @@ const MessageModal: React.FC<MessageModalProps> = ({
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
   const [maxCharacters, setMaxCharacters] = useState(false);
-  // const [cancelButtonColor, setCancelButtonColor] = useState("rgb(216 206 207)")
-  // const [saveButtonColor, setSaveButtonColor] = useState("rgba(206, 216, 206)")
   const [saveButtonBrightness, setSaveButtonBrightness] =
     useState("brightness(1)");
   const [cancelButtonBrightness, setCancelButtonBrightness] =
     useState("brightness(1)");
-  // const [buttonNotHover, setButtonNotHover] = useState(1);
-  // const [buttonDisable, setButtonDisable] = useState(0.95);
 
   const baseStyle: CSSProperties = {
     backgroundColor: "rgb(200 200 200 / 30%)",
@@ -69,7 +62,6 @@ const MessageModal: React.FC<MessageModalProps> = ({
     borderRadius: "5px",
     border: "1px solid transparent",
     padding: "5px",
-    // marginRight: "5px",
     width: "100px",
     fontSize: "15px",
     display: "flex",
@@ -110,21 +102,31 @@ const MessageModal: React.FC<MessageModalProps> = ({
     }
   }, [modalRef, initialPositionX, initialPositionY]);
 
-  const onTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const textAreaOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {
       onChange(e);
     }
     if (e.target.value.length > MAX_CHARACTERS) {
-      console.log("too long");
-      // console.log(inputValue.length);
-      console.log(e.target.value.length);
       setMaxCharacters(true);
       setSaveButtonBrightness("brightness(0.8)");
-      console.log(setSaveButtonBrightness);
     } else {
       setMaxCharacters(false);
       setSaveButtonBrightness("brightness(1)");
-      console.log(setSaveButtonBrightness);
+    }
+  };
+
+  const textAreaOnKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!maxCharacters) {
+        if (onClickSave) {
+          onClickSave();
+        }
+      }
+    } else if (e.key === "Escape") {
+      if (onClickCancel) {
+        onClickCancel();
+      }
     }
   };
 
@@ -149,63 +151,11 @@ const MessageModal: React.FC<MessageModalProps> = ({
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-            // height: "30px",
-            // flex: "1 1 auto",
           }}>
-          {/* <input
-          type="text"
-          value={inputValue}
-          onChange={onChange ? (e) => onChange(e) : undefined}
-          onKeyDown={onKeyDown ? (e) => onKeyDown(e) : undefined}
-          ref={inputRef}
-          style={{
-            borderRadius: "5px",
-            border: "1px solid",
-            padding: "5px",
-            height: "100%",
-            width: "100%",
-            fontSize: "15px",
-          }}
-        /> */}
-          {/* <TextareaAutosize
-          value={inputValue}
-          onChange={onChange ? (e) => onChange(e) : undefined}
-          onKeyDown={onKeyDown ? (e) => onKeyDown(e) : undefined}
-          ref={inputRef}
-          style={{
-            borderRadius: "5px",
-            border: "1px solid",
-            padding: "5px",
-            display: "block",
-            // height: "100%",
-            // width: "100%",
-            fontSize: "15px",
-          }}
-        /> */}
-          {/* <div
-          style={{
-            width: "100%",
-            alignSelf: "center",
-            margin: "10px",
-            display: "flex",
-            flexDirection: "column",
-          }}> */}
-          {/* <textarea
-            value={inputValue}
-            onChange={(e) => onTextAreaChange(e)}
-            onKeyDown={onKeyDown ? (e) => onKeyDown(e) : undefined}
-            ref={inputRef}
-            style={{
-              borderRadius: "5px",
-              border: "1px solid",
-              padding: "5px",
-              fontSize: "15px",
-            }}
-          /> */}
           <TextareaAutosize
             value={inputValue}
-            onChange={(e) => onTextAreaChange(e)}
-            onKeyDown={onKeyDown ? (e) => onKeyDown(e) : undefined}
+            onChange={(e) => textAreaOnChange(e)}
+            onKeyDown={(e) => textAreaOnKeyDown(e)}
             ref={inputRef}
             style={{
               borderRadius: "5px",
@@ -214,11 +164,9 @@ const MessageModal: React.FC<MessageModalProps> = ({
               fontSize: "15px",
             }}
           />
-          {/* </div> */}
           <input
             style={{
               borderRadius: "5px",
-              // height: "100%",
               backgroundColor: "transparent",
               cursor: "pointer",
               alignSelf: "center",
@@ -248,7 +196,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
           justifyContent: "space-evenly",
         }}>
         <button
-          onClick={onClickCancel ? (e) => onClickCancel(e) : undefined}
+          onClick={onClickCancel ? (e) => onClickCancel() : undefined}
           onMouseEnter={() => setCancelButtonBrightness("brightness(1.05)")}
           onMouseLeave={() => setCancelButtonBrightness("brightness(1)")}
           style={{ ...cancelButtonStyle, ...buttonStyle }}
@@ -262,7 +210,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
           Cancel
         </button>
         <button
-          onClick={onClickSave ? (e) => onClickSave(e) : undefined}
+          onClick={onClickSave ? () => onClickSave() : undefined}
           onMouseEnter={() => setSaveButtonBrightness("brightness(1.05)")}
           onMouseLeave={() => setSaveButtonBrightness("brightness(1)")}
           style={{ ...saveButtonStyle, ...buttonStyle }}

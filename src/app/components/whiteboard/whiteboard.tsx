@@ -292,18 +292,9 @@ const Whiteboard = () => {
         inputColorValue={messageInputColorValue}
         onChange={(e) => setMessageInputValue(e.target.value)}
         onColorChange={(e) => setMessageInputColorValue(e.target.value)}
-        onKeyDown={(e) => {
-          console.log(e.key);
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            requestAddMessage();
-          } else if (e.key === "Escape") {
-            setIsModalOpen(false);
-          }
-        }}
         inputRef={messageInputRef}
-        onClickCancel={(e) => setIsModalOpen(false)}
-        onClickSave={(e) => requestAddMessage()}
+        onClickCancel={() => setIsModalOpen(false)}
+        onClickSave={() => requestAddMessage()}
       />
     </div>
   );
