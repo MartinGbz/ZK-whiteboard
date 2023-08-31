@@ -193,6 +193,7 @@ const Whiteboard = () => {
         positionY: messagePosition.y,
         color: messageInputColorValue.substring(1),
       },
+      whiteboardId: 0,
     };
     sismoConnect.request({
       namespace: "main",
@@ -216,6 +217,7 @@ const Whiteboard = () => {
         positionY: message.positionY,
         color: message.color,
       },
+      whiteboardId: 0,
     };
     sismoConnect.request({
       namespace: "main",

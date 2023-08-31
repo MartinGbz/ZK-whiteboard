@@ -7,11 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Messages {
-  vaultId   String @id
-  text      String
-  positionX Float
-  positionY Float
-  order     Int    @default(autoincrement())
-  color     String
+model Message {
+  id            Int        @id @default(autoincrement())
+  author        User       @relation(fields: [authorVaultId], references: [vaultId])
+  text          String
+  positionX     Float
+  positionY     Float
+  order         Int        @default(autoincrement())
+  color         String
+  whiteboard    Whiteboard @relation(fields: [whiteboardId], references: [id])
+  whiteboardId  Int
+  authorVaultId String
+}
+
+model Whiteboard {
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String
+  groupIds      String[]
+  author        User      @relation(fields: [authorVaultId], references: [vaultId])
+  messages      Message[]
+  curated       Boolean
+  joinedUsers   User[]    @relation("joinedWhiteboards")
+  favoriteUsers User[]    @relation("favoriteWhiteboards")
+  authorVaultId String
+}
+
+model User {
+  vaultId             String       @id
+  createdWhiteboards  Whiteboard[]
+  joinedWhiteboards   Whiteboard[] @relation("joinedWhiteboards")
+  favoriteWhiteboards Whiteboard[] @relation("favoriteWhiteboards")
+  Message             Message[]
 }

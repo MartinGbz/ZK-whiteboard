@@ -34,21 +34,41 @@ async function deleteMessage(
 ): Promise<NextResponse> {
   const vaultId = await verifyResponseDeleteMessage(sismoConnectResponse);
   if (vaultId) {
-    const deletedMessage = await deleteMessageFromDB(vaultId);
+    if (!sismoConnectResponse.signedMessage) {
+      return NextResponse.json({
+        error: "No signedMessage found in the ZK Proof",
+      });
+    }
+    const message = JSON.parse(
+      sismoConnectResponse.signedMessage
+    ) as SignedMessage;
+    const deletedMessage = await deleteMessageFromDB(vaultId, message);
     return deletedMessage;
   } else {
     return NextResponse.json({ error: "ZK Proof incorrect" });
   }
 }
 
-async function deleteMessageFromDB(vaultId: string): Promise<NextResponse> {
+async function deleteMessageFromDB(
+  vaultId: string,
+  signedMessage: SignedMessage
+): Promise<NextResponse> {
   try {
-    const deletedMessage = await prisma.messages.delete({
+    const messageToDelete = await prisma.message.findFirst({
       where: {
-        vaultId: vaultId,
+        authorVaultId: vaultId,
+        whiteboardId: signedMessage.whiteboardId,
       },
     });
-    const messages = await prisma.messages.findMany();
+    if (!messageToDelete) {
+      return NextResponse.json({ error: "No message found" });
+    }
+    const deletedMessage = await prisma.message.delete({
+      where: {
+        id: messageToDelete.id,
+      },
+    });
+    const messages = await prisma.message.findMany();
     return NextResponse.json(messages);
   } catch (error) {
     return NextResponse.json(error);

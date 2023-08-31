@@ -15,6 +15,7 @@ export enum OperationType {
 export type SignedMessage = {
   type: OperationType;
   message: Omit<Message, "vaultId" | "order">;
+  whiteboardId: number;
 };
 
 export interface Position {
