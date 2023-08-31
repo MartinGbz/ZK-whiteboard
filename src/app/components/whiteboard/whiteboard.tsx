@@ -87,6 +87,7 @@ const Whiteboard = () => {
           "Content-Type": "application/json",
         },
       });
+      console.log("--> response", response);
 
       return response.json();
     };
@@ -125,7 +126,7 @@ const Whiteboard = () => {
 
   useEffect(() => {
     const isUserMessageExists = messages.some(
-      (message: MessageType) => message.vaultId === vaultId
+      (message: MessageType) => message.authorVaultId === vaultId
     );
     setIsUserMessageExists(isUserMessageExists);
   }, [messages, vaultId]);
@@ -195,8 +196,8 @@ const Whiteboard = () => {
         positionX: messagePosition.x,
         positionY: messagePosition.y,
         color: messageInputColorValue.substring(1),
+        whiteboardId: 0,
       },
-      whiteboardId: 0,
     };
     sismoConnect.request({
       namespace: "main",
@@ -219,8 +220,8 @@ const Whiteboard = () => {
         positionX: message.positionX,
         positionY: message.positionY,
         color: message.color,
+        whiteboardId: 0,
       },
-      whiteboardId: 0,
     };
     sismoConnect.request({
       namespace: "main",
@@ -276,7 +277,7 @@ const Whiteboard = () => {
           }>
           {messages.map((message: MessageType) => (
             <Message
-              key={message.vaultId}
+              key={message.authorVaultId}
               message={message}
               vaultId={vaultId}
               onDelete={(message) => requestDeleteMessage(message)}

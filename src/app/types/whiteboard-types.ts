@@ -1,10 +1,12 @@
 export interface Message {
-  vaultId: string;
+  id: number;
   text: string;
   positionX: number;
   positionY: number;
   order: number;
   color: string;
+  whiteboardId: number;
+  authorVaultId: string;
 }
 
 export enum OperationType {
@@ -14,8 +16,7 @@ export enum OperationType {
 
 export type SignedMessage = {
   type: OperationType;
-  message: Omit<Message, "vaultId" | "order">;
-  whiteboardId: number;
+  message: Omit<Message, "id" | "authorVaultId" | "order">;
 };
 
 export interface Position {

@@ -57,7 +57,7 @@ async function deleteMessageFromDB(
     const messageToDelete = await prisma.message.findFirst({
       where: {
         authorVaultId: vaultId,
-        whiteboardId: signedMessage.whiteboardId,
+        whiteboardId: signedMessage.message.whiteboardId,
       },
     });
     if (!messageToDelete) {

@@ -23,7 +23,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
     backgroundColor: "#" + message.color + TRANSPARENCY,
     zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
     animation:
-      vaultId === message.vaultId && !isHovering
+      vaultId === message.authorVaultId && !isHovering
         ? `shine 5s infinite linear`
         : "",
     top: y,
@@ -68,7 +68,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
   return (
     <div
       ref={messageRef}
-      key={message.vaultId}
+      key={message.authorVaultId}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="message hoverable"
@@ -87,10 +87,10 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
             fontFamily: "Inter-Regular",
             whiteSpace: "nowrap",
           }}>
-          {"from: " + message.vaultId.substring(0, 10) + "..."}
+          {"from: " + message.authorVaultId.substring(0, 10) + "..."}
         </div>
       </div>
-      {vaultId === message.vaultId && (
+      {vaultId === message.authorVaultId && (
         <button
           className="delete-button"
           style={deleteButtonStyle}
