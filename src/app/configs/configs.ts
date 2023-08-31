@@ -11,3 +11,5 @@ export const defaultInputColor = "#dddddd";
 
 export const greenColor = "#28cc28";
 export const redColor = "#ff5656";
+
+export const MAX_CHARACTERS = 100;

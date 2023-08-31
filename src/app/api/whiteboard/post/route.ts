@@ -7,7 +7,7 @@ import {
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
-import { sismoConnectConfig } from "@/app/configs/configs";
+import { MAX_CHARACTERS, sismoConnectConfig } from "@/app/configs/configs";
 
 export async function POST(req: Request): Promise<NextResponse> {
   const sismoConnectResponse: SismoConnectResponse = await req.json();
@@ -15,6 +15,12 @@ export async function POST(req: Request): Promise<NextResponse> {
     const signedMessage = JSON.parse(
       sismoConnectResponse.signedMessage
     ) as SignedMessage;
+    if (signedMessage.message.text.length > MAX_CHARACTERS) {
+      return NextResponse.json({
+        error:
+          "The number of characters in the message exceeds the maximum allowed (100 characters max.)",
+      });
+    }
     if (signedMessage.type === OperationType.POST) {
       return await addMessage(sismoConnectResponse);
     } else if (!signedMessage.type) {
