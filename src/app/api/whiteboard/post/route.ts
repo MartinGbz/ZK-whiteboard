@@ -60,18 +60,13 @@ async function addMessageToDB(
   signedMessage: SignedMessage
 ): Promise<NextResponse> {
   try {
-    console.log("vaultId: ", vaultId);
     const existingMessage = await prisma.message.findFirst({
       where: {
         authorVaultId: vaultId,
         whiteboardId: signedMessage.message.whiteboardId,
       },
     });
-    console.log("existingMessage: ", existingMessage);
     if (!existingMessage) {
-      console.log("IN");
-      console.log("signedMessage: ", signedMessage);
-      console.log("vaultId: ", vaultId);
       const newMessage = await prisma.message.create({
         data: {
           authorVaultId: vaultId,
@@ -82,9 +77,7 @@ async function addMessageToDB(
           color: signedMessage.message.color,
         },
       });
-      console.log("New message created: ", newMessage);
       const messages = await prisma.message.findMany();
-      console.log("All messages: ", messages);
       return NextResponse.json(messages);
     } else {
       return NextResponse.json({

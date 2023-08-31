@@ -87,21 +87,14 @@ const Whiteboard = () => {
           "Content-Type": "application/json",
         },
       });
-      console.log("--> response", response);
-
-      return response.json();
+      return response.json() as Promise<MessageType[]>;
     };
 
-    const handleApiResponse = async (apiResponse: any) => {
-      if (!apiResponse.error) {
-        setMessageInputValue("");
-        setMessageInputColorValue(defaultInputColor);
-        setIsModalOpen(false);
-
-        setMessages(apiResponse);
-      } else {
-        alert("Error: " + apiResponse.error);
-      }
+    const handleApiResponse = async (apiResponse: MessageType[]) => {
+      setMessageInputValue("");
+      setMessageInputColorValue(defaultInputColor);
+      setIsModalOpen(false);
+      setMessages(apiResponse);
     };
 
     const postMessage = async (message: SismoConnectResponse) => {
@@ -110,7 +103,10 @@ const Whiteboard = () => {
       const url = constructUrlFromMessage(message);
 
       try {
-        const allMessageFromDB: any = await performApiRequest(url, message);
+        const allMessageFromDB: MessageType[] = await performApiRequest(
+          url,
+          message
+        );
         handleApiResponse(allMessageFromDB);
       } catch (error) {
         console.error("API request error:", error);
