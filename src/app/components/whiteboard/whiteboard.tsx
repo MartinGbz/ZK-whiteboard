@@ -173,7 +173,7 @@ const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
     if (storagedVaultId) {
       setVaultId(storagedVaultId);
     }
-  }, []);
+  }, [whiteboardId]);
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse does not come from the message creation
