@@ -272,6 +272,7 @@ const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
         loginWithSismo={(response) => loginWithSismo(response)}
         setVaultId={(vaultId) => setVaultId(vaultId)}
         signInButton={true}
+        whiteboardName={whiteboard?.name}
       />
       {messages && (
         <div

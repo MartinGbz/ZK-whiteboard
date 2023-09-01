@@ -16,6 +16,7 @@ interface HeaderProps {
   loginWithSismo?: (response: SismoConnectResponse) => void;
   setVaultId?: (vaultId: string | null) => void;
   signInButton: boolean;
+  whiteboardName?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -24,18 +25,31 @@ const Header: React.FC<HeaderProps> = ({
   loginWithSismo,
   setVaultId,
   signInButton,
+  whiteboardName,
 }) => {
   return (
     <div className="header">
-      <Title
-        text="ZK-whiteboard"
+      <div
         style={{
           textAlign: "center",
           alignSelf: "center",
           gridColumn: 2,
           width: "max-content",
-        }}
-      />
+          display: "inline-flex",
+        }}>
+        <Title text="ZK-whiteboard" />
+        {whiteboardName && (
+          <div
+            style={{
+              color: "gray",
+              alignSelf: "center",
+              marginLeft: "5px",
+            }}>
+            {" "}
+            / {whiteboardName}
+          </div>
+        )}
+      </div>
       {signInButton && !vaultId && !isLoging && (
         <SismoConnectButton
           overrideStyle={{

@@ -1,14 +1,14 @@
 "use client";
 import React, { CSSProperties, useRef, useState } from "react";
-import { Message } from "../../types/whiteboard-types";
 import { MAX_Z_INDEX, TRANSPARENCY, redColor } from "@/app/configs/configs";
 import "./message.css";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Message as MessageType } from "@prisma/client";
 
 interface MessageProps {
-  message: Message;
+  message: MessageType;
   vaultId: string | null;
-  onDelete?: (message: Message) => void;
+  onDelete?: (message: MessageType) => void;
 }
 
 const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
