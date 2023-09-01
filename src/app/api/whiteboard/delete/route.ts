@@ -8,6 +8,7 @@ import {
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
+import { getWhiteboardById } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {
   const sismoConnectResponse: SismoConnectResponse = await req.json();
@@ -54,10 +55,13 @@ async function deleteMessageFromDB(
   signedMessage: SignedMessage
 ): Promise<NextResponse> {
   try {
+    const whiteboardId = parseInt(
+      signedMessage.message.whiteboardId.toString()
+    );
     const messageToDelete = await prisma.message.findFirst({
       where: {
         authorVaultId: vaultId,
-        whiteboardId: signedMessage.message.whiteboardId,
+        whiteboardId: whiteboardId,
       },
     });
     if (!messageToDelete) {
@@ -68,8 +72,12 @@ async function deleteMessageFromDB(
         id: messageToDelete.id,
       },
     });
-    const messages = await prisma.message.findMany();
-    return NextResponse.json(messages);
+    const whiteboard = await getWhiteboardById(whiteboardId);
+    if (whiteboard?.messages) {
+      return NextResponse.json(whiteboard?.messages);
+    } else {
+      return NextResponse.json("Messages not found");
+    }
   } catch (error) {
     return NextResponse.json(error);
   }

@@ -23,3 +23,13 @@ export interface Position {
   x: number;
   y: number;
 }
+
+export interface Whiteboard {
+  id: number;
+  name: string;
+  description: number;
+  curated: number;
+  authorVaultId: string;
+  groupIds: string[];
+  messages?: Message[];
+}

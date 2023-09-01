@@ -1,4 +1,8 @@
-import { OperationType, SignedMessage } from "@/app/types/whiteboard-types";
+import {
+  OperationType,
+  SignedMessage,
+  Whiteboard,
+} from "@/app/types/whiteboard-types";
 import {
   AuthType,
   SismoConnect,
@@ -8,6 +12,7 @@ import {
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import { MAX_CHARACTERS, sismoConnectConfig } from "@/app/configs/configs";
+import { getWhiteboardById } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {
   const sismoConnectResponse: SismoConnectResponse = await req.json();
@@ -49,6 +54,7 @@ async function addMessage(
       sismoConnectResponse.signedMessage
     ) as SignedMessage;
     const allMessagesInDB = await addMessageToDB(vaultId, message);
+    console.log("allMessagesInDB", allMessagesInDB);
     return allMessagesInDB;
   } else {
     return NextResponse.json({ error: "ZK Proof incorrect" });
@@ -60,31 +66,44 @@ async function addMessageToDB(
   signedMessage: SignedMessage
 ): Promise<NextResponse> {
   try {
+    console.log(">>> signedMessage", signedMessage);
+    const whiteboardId = parseInt(
+      signedMessage.message.whiteboardId.toString()
+    );
     const existingMessage = await prisma.message.findFirst({
       where: {
         authorVaultId: vaultId,
-        whiteboardId: signedMessage.message.whiteboardId,
+        whiteboardId: whiteboardId,
       },
     });
+    console.log(">>> existingMessage", existingMessage);
     if (!existingMessage) {
       const newMessage = await prisma.message.create({
         data: {
           authorVaultId: vaultId,
-          whiteboardId: signedMessage.message.whiteboardId,
+          whiteboardId: whiteboardId,
           text: signedMessage.message.text,
           positionX: signedMessage.message.positionX,
           positionY: signedMessage.message.positionY,
           color: signedMessage.message.color,
         },
       });
-      const messages = await prisma.message.findMany();
-      return NextResponse.json(messages);
+      const whiteboard = await getWhiteboardById(whiteboardId);
+      console.log("--- messages", whiteboard?.messages);
+      if (whiteboard?.messages) {
+        return NextResponse.json(whiteboard?.messages);
+      } else {
+        return NextResponse.json("Messages not found");
+      }
     } else {
+      console.log("AAAAH");
       return NextResponse.json({
         error: "The user has already posted a message",
       });
     }
   } catch (error) {
+    console.log("EEEH");
+    console.log(error);
     return NextResponse.json(error);
   }
 }
@@ -95,17 +114,26 @@ async function verifyResponseAddMessage(
   const message = sismoConnectResponse.signedMessage
     ? sismoConnectResponse.signedMessage
     : "";
-  const result: SismoConnectVerifiedResult = await sismoConnect.verify(
-    sismoConnectResponse,
-    {
-      auths: [{ authType: AuthType.VAULT }],
-      claims: [
-        { groupId: "0x0f800ff28a426924cbe66b67b9f837e2" },
-        { groupId: "0x1cde61966decb8600dfd0749bd371f12" },
-      ],
-      signature: { message: message },
-    }
-  );
-  const vaultId = result.getUserId(AuthType.VAULT);
-  return vaultId;
+  if (sismoConnectResponse.signedMessage) {
+    const signedMessage = JSON.parse(
+      sismoConnectResponse.signedMessage
+    ) as SignedMessage;
+    const whiteboard = await getWhiteboardById(
+      parseInt(signedMessage.message.whiteboardId.toString())
+    );
+    const claims = whiteboard?.groupIds?.map((groupId) => ({
+      groupId: groupId,
+    }));
+    console.log("claims", claims);
+    const result: SismoConnectVerifiedResult = await sismoConnect.verify(
+      sismoConnectResponse,
+      {
+        auths: [{ authType: AuthType.VAULT }],
+        claims: claims,
+        signature: { message: message },
+      }
+    );
+    const vaultId = result.getUserId(AuthType.VAULT);
+    return vaultId;
+  }
 }

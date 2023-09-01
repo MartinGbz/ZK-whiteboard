@@ -11,10 +11,11 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 
 interface HeaderProps {
-  vaultId: string | null;
-  isLoging: boolean | null;
+  vaultId?: string | null;
+  isLoging?: boolean | null;
   loginWithSismo?: (response: SismoConnectResponse) => void;
   setVaultId?: (vaultId: string | null) => void;
+  signInButton: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -22,6 +23,7 @@ const Header: React.FC<HeaderProps> = ({
   isLoging,
   loginWithSismo,
   setVaultId,
+  signInButton,
 }) => {
   return (
     <div className="header">
@@ -34,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({
           width: "max-content",
         }}
       />
-      {!vaultId && !isLoging && (
+      {signInButton && !vaultId && !isLoging && (
         <SismoConnectButton
           overrideStyle={{
             gridColumn: "3",
@@ -53,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({
           }}
         />
       )}
-      {vaultId && !isLoging && (
+      {signInButton && vaultId && !isLoging && (
         <div className="login">
           <span className="user_id"> {vaultId.substring(0, 5) + "..."} </span>
           <button
@@ -71,7 +73,9 @@ const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
       )}
-      {isLoging && <CircularProgress color="inherit" className="login" />}
+      {signInButton && isLoging && (
+        <CircularProgress color="inherit" className="login" />
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import {
   Message as MessageType,
   SignedMessage,
   OperationType,
+  Whiteboard,
 } from "../../types/whiteboard-types";
 
 import {
@@ -32,7 +33,12 @@ const API_ENDPOINTS = {
   DELETE: "/delete",
 };
 
-const Whiteboard = () => {
+interface HeaderProps {
+  whiteboardId: number;
+}
+
+const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
+  const [whiteboard, setWhiteboard] = useState<Whiteboard>();
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageInputValue, setMessageInputValue] = useState("");
@@ -57,8 +63,8 @@ const Whiteboard = () => {
   const router = useRouter();
 
   const redirectToRoot = useCallback(() => {
-    router.push("/");
-  }, [router]);
+    router.push("/whiteboard/" + whiteboardId);
+  }, [router, whiteboardId]);
 
   useEffect(() => {
     const constructUrlFromMessage = (message: SismoConnectResponse) => {
@@ -107,6 +113,7 @@ const Whiteboard = () => {
           url,
           message
         );
+        console.log("allMessageFromDB", allMessageFromDB);
         handleApiResponse(allMessageFromDB);
       } catch (error) {
         console.error("API request error:", error);
@@ -141,15 +148,22 @@ const Whiteboard = () => {
     const fetchMessages = async () => {
       setIsFetchingMessages(true);
       try {
-        const response = await fetch("/api/whiteboard", {
-          method: "GET",
+        const response = await fetch("/api/whiteboards", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify(whiteboardId),
           cache: "no-cache",
         });
-        const messages = await response.json();
-        setMessages(messages);
+
+        const whiteboard: Whiteboard = await response.json();
+        console.log("whiteboard", whiteboard);
+        console.log("whiteboard.messages", whiteboard.messages);
+        setWhiteboard(whiteboard);
+        if (whiteboard.messages) {
+          setMessages(whiteboard.messages);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -192,16 +206,17 @@ const Whiteboard = () => {
         positionX: messagePosition.x,
         positionY: messagePosition.y,
         color: messageInputColorValue.substring(1),
-        whiteboardId: 0,
+        whiteboardId: whiteboardId,
       },
     };
+    const claims = whiteboard?.groupIds?.map((groupId) => ({
+      groupId: groupId,
+    }));
+    console.log("claims", claims);
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
-      claims: [
-        { groupId: "0x0f800ff28a426924cbe66b67b9f837e2" },
-        { groupId: "0x1cde61966decb8600dfd0749bd371f12" },
-      ],
+      claims: claims,
       signature: {
         message: JSON.stringify(sismoConnectSignedMessage),
       },
@@ -216,7 +231,7 @@ const Whiteboard = () => {
         positionX: message.positionX,
         positionY: message.positionY,
         color: message.color,
-        whiteboardId: 0,
+        whiteboardId: whiteboardId,
       },
     };
     sismoConnect.request({
@@ -260,6 +275,7 @@ const Whiteboard = () => {
         isLoging={isLoging}
         loginWithSismo={(response) => loginWithSismo(response)}
         setVaultId={(vaultId) => setVaultId(vaultId)}
+        signInButton={true}
       />
       {messages && (
         <div
