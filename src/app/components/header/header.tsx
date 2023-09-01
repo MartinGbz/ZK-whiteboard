@@ -11,6 +11,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 interface HeaderProps {
   currentRoute: string;
@@ -61,6 +62,20 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <div className="header">
+      {currentRoute !== "/" && (
+        <ArrowBackIcon
+          style={{
+            gridColumn: 1,
+            // backgroundColor: "lightgray",
+            justifySelf: "start",
+            alignSelf: "center",
+            cursor: "pointer",
+            color: "white",
+          }}
+          fontSize="medium"
+          onClick={() => router.push("/")}
+        />
+      )}
       <div
         style={{
           textAlign: "center",
