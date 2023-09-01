@@ -113,7 +113,6 @@ const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
           url,
           message
         );
-        console.log("allMessageFromDB", allMessageFromDB);
         handleApiResponse(allMessageFromDB);
       } catch (error) {
         console.error("API request error:", error);
@@ -158,8 +157,6 @@ const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
         });
 
         const whiteboard: Whiteboard = await response.json();
-        console.log("whiteboard", whiteboard);
-        console.log("whiteboard.messages", whiteboard.messages);
         setWhiteboard(whiteboard);
         if (whiteboard.messages) {
           setMessages(whiteboard.messages);
@@ -212,7 +209,6 @@ const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
     const claims = whiteboard?.groupIds?.map((groupId) => ({
       groupId: groupId,
     }));
-    console.log("claims", claims);
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },

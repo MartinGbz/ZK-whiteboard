@@ -1,3 +1,5 @@
+import { Whiteboard as WhiteboardPrisma } from "@prisma/client";
+
 export interface Message {
   id: number;
   text: string;
@@ -24,12 +26,6 @@ export interface Position {
   y: number;
 }
 
-export interface Whiteboard {
-  id: number;
-  name: string;
-  description: number;
-  curated: number;
-  authorVaultId: string;
-  groupIds: string[];
-  messages?: Message[];
+export interface Whiteboard extends WhiteboardPrisma {
+  messages: Message[];
 }

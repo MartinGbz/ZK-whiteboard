@@ -2,7 +2,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "./whiteboards-index.css";
 import { useRouter } from "next/navigation";
-import Title from "../title/title";
 import Header from "../header/header";
 import { Whiteboard } from "@/app/types/whiteboard-types";
 import Loading from "../loading-modal/loading-modal";
@@ -14,10 +13,6 @@ const WhiteboardsIndex = () => {
   const [whiteboards, setWhiteboards] = useState<Whiteboard[]>([]);
   const [isFetchingWhiteboards, setIsFetchingWhiteboards] =
     useState<boolean>(false);
-
-  const redirectToRoot = useCallback(() => {
-    router.push("/");
-  }, [router]);
 
   useEffect(() => {
     const fetchWhiteboards = async () => {
@@ -70,20 +65,6 @@ const WhiteboardsIndex = () => {
             ))}
           </div>
         )}
-        {/* <div
-          style={{
-            flex: "1",
-          }}>
-          {!isFetchingWhiteboards && (
-            <CircularProgress
-              className="login"
-              color="secondary"
-              style={{
-                backgroundColor: "lightgrey",
-              }}
-            />
-          )}
-        </div> */}
         <div className="create_whiteboard">
           <h1> Create </h1>
           <button

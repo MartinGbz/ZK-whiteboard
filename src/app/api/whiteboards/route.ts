@@ -7,7 +7,6 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const whiteboards = await prisma.whiteboard.findMany();
-  // console.log(whiteboards);
   return NextResponse.json(whiteboards);
 }
 
