@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
 import {
   Position,
-  Message as MessageType,
   SignedMessage,
   OperationType,
   Whiteboard,
@@ -24,6 +23,7 @@ import Message from "../message/message";
 import { useRouter } from "next/navigation";
 import Loading from "../loading-modal/loading-modal";
 import Header from "../header/header";
+import { Message as MessageType } from "@prisma/client";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 

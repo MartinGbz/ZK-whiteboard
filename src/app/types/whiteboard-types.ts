@@ -1,15 +1,4 @@
-import { Whiteboard as WhiteboardPrisma } from "@prisma/client";
-
-export interface Message {
-  id: number;
-  text: string;
-  positionX: number;
-  positionY: number;
-  order: number;
-  color: string;
-  whiteboardId: number;
-  authorVaultId: string;
-}
+import { Message, Whiteboard as WhiteboardPrisma } from "@prisma/client";
 
 export enum OperationType {
   POST = "post",
