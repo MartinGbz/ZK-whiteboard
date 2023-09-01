@@ -42,7 +42,7 @@ const WhiteboardsIndex = () => {
 
   return (
     <div className="container">
-      <Header signInButton={true} />
+      <Header currentRoute="/" />
       <div className="whiteboards_container">
         {!isFetchingWhiteboards && (
           <div className="whiteboards_list">

@@ -52,7 +52,7 @@ const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  const [isLoging, setIsLoging] = useState<boolean>(false);
+  // const [isLoging, setIsLoging] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
   const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false);
@@ -168,32 +168,7 @@ const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
     };
 
     fetchMessages();
-
-    const storagedVaultId = localStorage.getItem("vaultId");
-    if (storagedVaultId) {
-      setVaultId(storagedVaultId);
-    }
   }, [whiteboardId]);
-
-  async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
-    // if the reponse does not come from the message creation
-    if (sismoConnectResponse.proofs.length < 2) {
-      setIsLoging(true);
-      const response = await fetch("/api/whiteboard/login", {
-        method: "POST",
-        body: JSON.stringify(sismoConnectResponse),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      const vaultId = data.vaultId;
-      setVaultId(vaultId);
-      localStorage.setItem("vaultId", vaultId);
-      redirectToRoot();
-      setIsLoging(false);
-    }
-  }
 
   const requestAddMessage = async () => {
     const sismoConnectSignedMessage: SignedMessage = {
@@ -267,11 +242,8 @@ const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
   return (
     <div className="whiteboard">
       <Header
-        vaultId={vaultId}
-        isLoging={isLoging}
-        loginWithSismo={(response) => loginWithSismo(response)}
-        setVaultId={(vaultId) => setVaultId(vaultId)}
-        signInButton={true}
+        currentRoute={"/whiteboard/" + whiteboardId}
+        onChangeVaultId={(vaultId) => setVaultId(vaultId)}
         whiteboardName={whiteboard?.name}
       />
       {messages && (

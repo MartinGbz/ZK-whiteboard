@@ -9,24 +9,56 @@ import Title from "../title/title";
 import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
-  vaultId?: string | null;
-  isLoging?: boolean | null;
-  loginWithSismo?: (response: SismoConnectResponse) => void;
-  setVaultId?: (vaultId: string | null) => void;
-  signInButton: boolean;
+  currentRoute: string;
+  onChangeVaultId?: (vaultId: string | null) => void;
   whiteboardName?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  vaultId,
-  isLoging,
-  loginWithSismo,
-  setVaultId,
-  signInButton,
+  onChangeVaultId,
   whiteboardName,
+  currentRoute,
 }) => {
+  const router = useRouter();
+  const [isLoging, setIsLoging] = useState<boolean>(false);
+  const [vaultId, setVaultId] = useState<string | null>();
+
+  useEffect(() => {
+    const storagedVaultId = localStorage.getItem("vaultId");
+    if (storagedVaultId) {
+      setVaultId(storagedVaultId);
+      onChangeVaultId ? onChangeVaultId(storagedVaultId) : undefined;
+    }
+    console.log("storagedVaultId", storagedVaultId);
+    console.log("vaultId", vaultId);
+    console.log("isLoging", isLoging);
+  }, []);
+
+  async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
+    // if the reponse does not come from the message creation
+    if (sismoConnectResponse.proofs.length < 2) {
+      setIsLoging(true);
+      const response = await fetch("/api/whiteboard/login", {
+        method: "POST",
+        body: JSON.stringify(sismoConnectResponse),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      const vaultId = data.vaultId;
+      setVaultId(vaultId);
+      onChangeVaultId ? onChangeVaultId(vaultId) : undefined;
+      localStorage.setItem("vaultId", vaultId);
+      router.push(currentRoute);
+      setIsLoging(false);
+    }
+  }
+
   return (
     <div className="header">
       <div
@@ -50,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         )}
       </div>
-      {signInButton && !vaultId && !isLoging && (
+      {!vaultId && !isLoging && (
         <SismoConnectButton
           overrideStyle={{
             gridColumn: "3",
@@ -65,17 +97,18 @@ const Header: React.FC<HeaderProps> = ({
           auth={{ authType: AuthType.VAULT }}
           namespace="main"
           onResponse={(response: SismoConnectResponse) => {
-            loginWithSismo ? loginWithSismo(response) : undefined;
+            loginWithSismo(response);
           }}
         />
       )}
-      {signInButton && vaultId && !isLoging && (
+      {vaultId && !isLoging && (
         <div className="login">
           <span className="user_id"> {vaultId.substring(0, 5) + "..."} </span>
           <button
             className="logout_button"
             onClick={() => {
-              setVaultId ? setVaultId(null) : undefined;
+              setVaultId(null);
+              onChangeVaultId ? onChangeVaultId(null) : undefined;
               localStorage.removeItem("vaultId");
             }}>
             {" "}
@@ -87,9 +120,7 @@ const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
       )}
-      {signInButton && isLoging && (
-        <CircularProgress color="inherit" className="login" />
-      )}
+      {isLoging && <CircularProgress color="inherit" className="login" />}
     </div>
   );
 };
