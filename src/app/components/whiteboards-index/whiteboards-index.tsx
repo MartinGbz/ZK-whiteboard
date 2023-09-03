@@ -7,6 +7,7 @@ import { Whiteboard } from "@/app/types/whiteboard-types";
 import Loading from "../loading-modal/loading-modal";
 import { CircularProgress } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { greenColor } from "@/app/configs/configs";
 
 const WhiteboardsIndex = () => {
   const router = useRouter();
@@ -65,7 +66,7 @@ const WhiteboardsIndex = () => {
       <div className="whiteboards_container">
         {!isFetchingWhiteboards && (
           <div className="whiteboards_list">
-            <h1> Whiteboards </h1>
+            <h1 className="title"> Whiteboards </h1>
             {whiteboards.map((whiteboard: Whiteboard) => (
               <div
                 key={whiteboard.id}
@@ -120,18 +121,21 @@ const WhiteboardsIndex = () => {
           </div>
         )}
         <div className="create_whiteboard">
-          <h1> Create </h1>
+          <h1 className="title"> Create </h1>
           <button
             className="whiteboards_create_button"
             style={{
               color: "black",
-              backgroundColor: "lightgreen",
+              backgroundColor: greenColor,
               padding: "10px",
               borderRadius: "10px",
               margin: "10px",
               marginTop: "0px",
               cursor: "pointer",
               flex: "1",
+            }}
+            onClick={() => {
+              router.push("/create-whiteboard");
             }}>
             Create +
           </button>

@@ -27,17 +27,17 @@ import { Message as MessageType } from "@prisma/client";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
-const API_BASE_URL = "/api/whiteboard";
+const API_BASE_URL = "/api/messages";
 const API_ENDPOINTS = {
   POST: "/post",
   DELETE: "/delete",
 };
 
-interface HeaderProps {
+interface WhiteboardProps {
   whiteboardId: number;
 }
 
-const Whiteboard: React.FC<HeaderProps> = ({ whiteboardId }) => {
+const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   const [whiteboard, setWhiteboard] = useState<Whiteboard>();
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

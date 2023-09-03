@@ -9,7 +9,9 @@ export const TRANSPARENCY = "E6";
 
 export const defaultInputColor = "#dddddd";
 
-export const greenColor = "#28cc28";
+export const greenColor = "#5eca7e";
 export const redColor = "#ff5656";
+
+//#5eca7e
 
 export const MAX_CHARACTERS = 100;

@@ -1,11 +1,3 @@
-.header {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  padding: 10px;
-  background-color: #000000;
-  justify-items: center;
-}
-
 .whiteboards_container {
   position: relative;
   height: 100%;
@@ -33,6 +25,6 @@
   flex: 1;
 }
 
-h1 {
+.title {
   margin: 10px;
 }

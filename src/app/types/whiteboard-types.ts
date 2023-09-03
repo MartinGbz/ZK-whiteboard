@@ -18,3 +18,5 @@ export interface Position {
 export interface Whiteboard extends WhiteboardPrisma {
   messages: Message[];
 }
+
+export type WhiteboardCreation = Omit<WhiteboardPrisma, "id" | "curated">;
