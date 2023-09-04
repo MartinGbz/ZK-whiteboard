@@ -267,7 +267,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
           {isVerifying && <Loading text="Checking the proof..." />}
         </div>
       )}
-      {isFetchingMessages && !messages && (
+      {isFetchingMessages && messages.length == 0 && (
         <Loading text="Loading messages..." />
       )}
       <MessageModal

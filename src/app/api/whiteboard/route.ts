@@ -23,7 +23,6 @@ export async function POST(req: Request): Promise<NextResponse> {
       { status: 404 }
     );
   }
-  console.log(user);
   if (user?.createdWhiteboards.length >= 3) {
     return NextResponse.json(
       {
@@ -42,6 +41,5 @@ export async function POST(req: Request): Promise<NextResponse> {
       curated: false,
     },
   });
-  console.log(whiteboard);
   return NextResponse.json(whiteboard);
 }

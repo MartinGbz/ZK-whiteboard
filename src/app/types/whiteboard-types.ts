@@ -20,3 +20,7 @@ export interface Whiteboard extends WhiteboardPrisma {
 }
 
 export type WhiteboardCreation = Omit<WhiteboardPrisma, "id" | "curated">;
+
+export type WhiteboardIndex = Omit<WhiteboardPrisma, "groupIds"> & {
+  groupNames: string[];
+};

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "../db";
 import { getWhiteboardById } from "../common";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 export async function GET() {
   const whiteboards = await prisma.whiteboard.findMany();

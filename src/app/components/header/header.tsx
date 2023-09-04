@@ -12,6 +12,7 @@ import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Home } from "@mui/icons-material";
 
 interface HeaderProps {
   currentRoute: string;
@@ -34,9 +35,6 @@ const Header: React.FC<HeaderProps> = ({
       setVaultId(storagedVaultId);
       onChangeVaultId ? onChangeVaultId(storagedVaultId) : undefined;
     }
-    console.log("storagedVaultId", storagedVaultId);
-    console.log("vaultId", vaultId);
-    console.log("isLoging", isLoging);
   }, []);
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
@@ -63,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <div className="header">
       {currentRoute !== "/" && (
-        <ArrowBackIcon
+        <Home
           style={{
             gridColumn: 1,
             // backgroundColor: "lightgray",

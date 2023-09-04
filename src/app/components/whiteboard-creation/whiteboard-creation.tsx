@@ -3,10 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { WhiteboardCreation } from "@/app/types/whiteboard-types";
 import Header from "../header/header";
-// import Select from "@mui/base/Select";
-// import Option from "@mui/base/Option";
-// import { Input } from "@mui/base";
-// import { useAutocomplete } from "@mui/base";
 
 import "./whiteboard-creation.css";
 import { Autocomplete, Chip, TextField } from "@mui/material";
@@ -43,7 +39,6 @@ const WhiteboardCreation = () => {
   const [vaultId, setVaultId] = useState<string | null>(null);
 
   useEffect(() => {
-    // get all groups from this URL: https://hub.sismo.io/group-generators
     const fetchGroups = async () => {
       try {
         const response = await fetch("https://hub.sismo.io/groups/latests", {
@@ -51,22 +46,15 @@ const WhiteboardCreation = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          // cache: "no-cache",
         });
-        console.log(response);
         const responseDecoded = await response.json();
-        console.log(responseDecoded);
         const groups: Group[] = responseDecoded.items;
-        console.log(groups);
-        // const groupNames = groups.map((group: Group) => group.name);
-        // console.log(groupNames);
         setGroups(groups);
       } catch (error) {
         console.error(error);
       }
     };
     fetchGroups();
-    console.log(groups);
   }, []);
 
   async function createWhiteboard() {
@@ -88,7 +76,6 @@ const WhiteboardCreation = () => {
         },
         body: JSON.stringify(whiteboardRequest),
       });
-      console.log(response);
       const whiteboard: Whiteboard = await response.json();
       router.push("/whiteboard/" + whiteboard.id);
     } catch (error) {
@@ -109,26 +96,44 @@ const WhiteboardCreation = () => {
           margin: "10px",
           width: "fit-content",
         }}>
-        <h1
+        <div
           style={{
             color: "black",
             fontSize: "20px",
           }}>
-          {" "}
-          Create a new whiteboard{" "}
-        </h1>
+          <span>Create a new whiteboard</span>
+          <span
+            style={{
+              color: "grey",
+              fontSize: "11px",
+            }}>
+            {" "}
+            {"(Currently only 3 max per person)"}{" "}
+          </span>
+        </div>
         <p className="p"> Name </p>
         <TextField
           className="inputs"
           size="small"
+          InputProps={{
+            style: {
+              borderRadius: "5px",
+              backgroundColor: "#e9e9e9",
+            },
+          }}
           onChange={(event) => {
             setWhiteboardName(event.target.value);
           }}
         />
         <p className="p"> Description </p>
         <TextField
-          className="inputs"
           size="small"
+          InputProps={{
+            style: {
+              borderRadius: "5px",
+              backgroundColor: "#e9e9e9",
+            },
+          }}
           onChange={(event) => {
             setWhiteboardDescription(event.target.value);
           }}
@@ -137,13 +142,29 @@ const WhiteboardCreation = () => {
         <Autocomplete
           className="inputs"
           ListboxProps={{ style: { fontSize: "15px" } }}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              InputProps={{
+                ...params.InputProps,
+                style: {
+                  borderRadius: "5px",
+                  backgroundColor: "#e9e9e9",
+                },
+              }}
+            />
+          )}
           options={groups}
           multiple={true}
           size="small"
           getOptionLabel={(option) => option.name}
           renderOption={(props, option) => (
-            <li {...props} key={option.id}>
+            <li
+              style={{
+                backgroundColor: "#e9e9e9",
+              }}
+              {...props}
+              key={option.id}>
               {option.name}
             </li>
           )}
@@ -173,12 +194,11 @@ const WhiteboardCreation = () => {
         </p>
         <button
           style={{
-            // margin: "10px",
             padding: "10px",
             borderRadius: "10px",
             backgroundColor: greenColor,
             cursor: "pointer",
-            // alignSelf: "center",
+            alignSelf: "flex-end",
             width: "fit-content",
             color: "black",
             marginTop: "20px",
