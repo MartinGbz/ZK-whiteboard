@@ -135,7 +135,6 @@ const WhiteboardsIndex = () => {
             justifyContent: "space-between",
             alignItems: "center",
             margin: "20px 20px 0px 20px",
-            // height: "400px",
           }}>
           <h1 className="title"> Whiteboards </h1>
           <div
@@ -171,14 +170,23 @@ const WhiteboardsIndex = () => {
           </div>
         </div>
       </div>
-      <div className="whiteboards_list">
+      <div
+        className="whiteboards_list"
+        style={
+          {
+            // overflowY: "auto",
+          }
+        }>
         <div
           style={{
-            maxHeight: "500px",
-            overflow: "visible",
-            backgroundColor: "transparent",
-            // paddingTop: "25px",
-            // paddingRight: "25px",
+            // maxHeight: "500px",
+            // overflow: "scroll",
+            // backgroundColor: "transparent",
+            paddingTop: "20px",
+            paddingRight: "20px",
+            // overflow: "visible",
+            maxHeight: "700px",
+            overflow: "auto",
           }}>
           {!isFetchingWhiteboards &&
             whiteboards.map((whiteboard: WhiteboardIndex) => (
@@ -190,6 +198,7 @@ const WhiteboardsIndex = () => {
                   boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
                   color: "black",
                   backgroundColor: "lightgrey",
+                  overflow: "visible",
                 }}
                 onClick={() => whiteboardClick(whiteboard)}
                 onMouseEnter={() => handleMouseEnter(whiteboard.id)}
