@@ -1,8 +1,5 @@
 .whiteboards_container {
   position: relative;
-  /* height: 100%;
-  width: 100%; */
-  /* background-color: white; */
   display: flex;
 }
 
@@ -24,30 +21,17 @@
 }
 
 .title {
-  /* margin: 10px; */
   font-size: 20px;
 }
 
 .whiteboard-item {
   max-height: 40px;
   transition: max-height 0.7s ease;
-  /* transition: max-height 0.5s ease, transform 0.5s ease 0.2s; */
 }
 
 .whiteboard-item:hover {
   max-height: 200px;
-  /* transform: scale(1); */
-  /* animation: grow 0.5s ease; */
 }
-
-/* @keyframes grow {
-  from {
-    max-height: 50px;
-  }
-  to {
-    max-height: fit-content;
-  }
-} */
 
 .whiteboards_create_button:hover {
   filter: brightness(1.1);

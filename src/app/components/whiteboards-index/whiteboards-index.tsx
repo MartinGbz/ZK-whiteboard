@@ -14,7 +14,6 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 const WhiteboardsIndex = () => {
   const router = useRouter();
 
-  // const [whiteboards, setWhiteboards] = useState<Whiteboard[]>([]);
   const [whiteboards, setWhiteboards] = useState<WhiteboardIndex[]>([]);
 
   const [isFetchingWhiteboards, setIsFetchingWhiteboards] =
@@ -36,23 +35,17 @@ const WhiteboardsIndex = () => {
           cache: "no-cache",
         });
         const whiteboards: Whiteboard[] = await response.json();
-        console.log("response", response);
-        // for each whiteboard, resolve the groupId
-        console.log("whiteboards", whiteboards.length);
+
         const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =
           await Promise.all(
             whiteboards.map(async (whiteboard: Whiteboard) => {
-              // console.log("whiteboard", whiteboard);
-              console.log("groupIds", whiteboard.groupIds);
               const resolvedGroupNames = await Promise.all(
                 whiteboard.groupIds.map(async (groupId: string) => {
                   const groupName = await resolveGroupId(groupId);
-                  console.log("groupName", groupName);
                   return groupName;
                 })
               );
               return {
-                // ...whiteboard,
                 id: whiteboard.id,
                 name: whiteboard.name,
                 description: whiteboard.description,
@@ -62,13 +55,7 @@ const WhiteboardsIndex = () => {
               };
             })
           );
-        console.log(
-          "--- whiteboardsWithResolvedGroupIds",
-          whiteboardsWithResolvedGroupIds
-        );
         setWhiteboards(whiteboardsWithResolvedGroupIds);
-
-        // setWhiteboards(whiteboards);
       } catch (error) {
         console.error(error);
       }
@@ -89,9 +76,6 @@ const WhiteboardsIndex = () => {
           }
         );
         const groupSnapshots = await response.json();
-        // console.log("groupSnapshots", groupSnapshots);
-        // console.log("groupSnapshots 0", groupSnapshots.items[0]);
-        // console.log("groupSnapshots name", groupSnapshots.items[0].name);
         setIsResolveGroupId(false);
         return groupSnapshots.items[0].name;
       } catch (error) {
@@ -137,18 +121,7 @@ const WhiteboardsIndex = () => {
             margin: "20px 20px 0px 20px",
           }}>
           <h1 className="title"> Whiteboards </h1>
-          <div
-            className="create_whiteboard"
-            style={
-              {
-                // flex: 1,
-                // display: "flex",
-                // flexDirection: "column",
-                // justifyContent: "center",
-                // alignItems: "center",
-                // height: "400px",
-              }
-            }>
+          <div className="create_whiteboard">
             <button
               className="whiteboards_create_button"
               style={{
@@ -156,10 +129,7 @@ const WhiteboardsIndex = () => {
                 backgroundColor: greenColor,
                 padding: "10px",
                 borderRadius: "10px",
-                // margin: "0px 10px",
                 cursor: "pointer",
-                // display: "flex",
-                // alignItems: "center",
               }}
               onClick={() => {
                 router.push("/create-whiteboard");
@@ -170,21 +140,11 @@ const WhiteboardsIndex = () => {
           </div>
         </div>
       </div>
-      <div
-        className="whiteboards_list"
-        style={
-          {
-            // overflowY: "auto",
-          }
-        }>
+      <div className="whiteboards_list">
         <div
           style={{
-            // maxHeight: "500px",
-            // overflow: "scroll",
-            // backgroundColor: "transparent",
             paddingTop: "20px",
             paddingRight: "20px",
-            // overflow: "visible",
             maxHeight: "700px",
             overflow: "auto",
           }}>
@@ -208,19 +168,13 @@ const WhiteboardsIndex = () => {
                   style={{
                     position: "relative",
                     padding: "10px",
-                    // margin: "10px",
                     marginBottom: "10px",
                     cursor: "pointer",
                     flex: "1",
                     fontSize: "15px",
                     display: "flex",
                     flexDirection: "column",
-                    // overflow: "hidden",
                     overflowY: "hidden",
-                    // transform: isHovering ? "scaleY(1.1)" : "scaleY(1)",
-                    // animation: isHovering ? "shake 0.5s" : "",
-                    // height: "fit-content",
-                    // transition: "height 0.5s",
                   }}>
                   <div
                     style={{
@@ -244,13 +198,8 @@ const WhiteboardsIndex = () => {
                     <div
                       title={whiteboard.authorVaultId}
                       style={{
-                        // alignSelf: "flex-end",
-                        // justifyContent: "flex-end",
                         color: "gray",
                         fontSize: "10px",
-                        // position: "sticky",
-                        // bottom: "10px",
-                        // right: "10px",
                       }}>
                       {" "}
                       from: {whiteboard.authorVaultId.substring(0, 7)}{" "}
@@ -286,7 +235,6 @@ const WhiteboardsIndex = () => {
                   <button
                     className="delete-button"
                     style={{
-                      // backgroundColor: "#7181E5",
                       backgroundColor: "black",
                       borderRadius: "50%",
                       textAlign: "center",
