@@ -9,6 +9,7 @@ import { CircularProgress } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { greenColor } from "@/app/configs/configs";
 import AddIcon from "@mui/icons-material/Add";
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 const WhiteboardsIndex = () => {
   const router = useRouter();
@@ -126,161 +127,185 @@ const WhiteboardsIndex = () => {
         onChangeVaultId={(vaultId) => setVaultId(vaultId)}
       />
       <div className="whiteboards_container">
-        <div className="whiteboards_list">
-          <h1 className="title"> Whiteboards </h1>
-          <div
-            style={{
-              maxHeight: "500px",
-              overflow: "auto",
-              backgroundColor: "transparent",
-              paddingTop: "25px",
-              paddingRight: "25px",
-            }}>
-            {!isFetchingWhiteboards &&
-              whiteboards.map((whiteboard: WhiteboardIndex) => (
-                <div
-                  key={whiteboard.id}
-                  style={{
-                    position: "relative",
-                  }}
-                  onClick={() => whiteboardClick(whiteboard)}
-                  onMouseEnter={() => handleMouseEnter(whiteboard.id)}
-                  onMouseLeave={() => handleMouseLeave()}>
-                  <div
-                    className="whiteboard-item"
-                    style={{
-                      position: "relative",
-                      color: "black",
-                      backgroundColor: "lightgrey",
-                      padding: "10px",
-                      borderRadius: "10px",
-                      // margin: "10px",
-                      marginBottom: "10px",
-                      cursor: "pointer",
-                      flex: "1",
-                      fontSize: "15px",
-                      display: "flex",
-                      flexDirection: "column",
-                      // overflow: "hidden",
-                      overflowY: "hidden",
-                      // transform: isHovering ? "scaleY(1.1)" : "scaleY(1)",
-                      // animation: isHovering ? "shake 0.5s" : "",
-                      // height: "fit-content",
-                      // transition: "height 0.5s",
-                    }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: "15px",
-                      }}>
-                      {" "}
-                      <div>{whiteboard.name}</div>
-                      <div
-                        style={{
-                          // alignSelf: "flex-end",
-                          // justifyContent: "flex-end",
-                          color: "gray",
-                          fontSize: "10px",
-                          // position: "sticky",
-                          // bottom: "10px",
-                          // right: "10px",
-                        }}>
-                        {" "}
-                        from: {whiteboard.authorVaultId.substring(0, 5)}{" "}
-                      </div>{" "}
-                    </div>
-                    <div
-                      style={{
-                        color: "gray",
-                        fontSize: "12px",
-                      }}>
-                      <div>
-                        <span
-                          style={{
-                            color: "black",
-                          }}>
-                          Description:
-                        </span>{" "}
-                        {whiteboard.description}
-                      </div>
-                      <div
-                        style={{
-                          color: "black",
-                        }}>
-                        {" "}
-                        Group names:{" "}
-                      </div>
-                      {whiteboard.groupNames.map((groupName: string) => (
-                        <div key={groupName}> {groupName} </div>
-                      ))}
-                    </div>
-                  </div>
-                  {vaultId === whiteboard.authorVaultId && (
-                    <button
-                      className="delete-button"
-                      style={{
-                        // backgroundColor: "#7181E5",
-                        backgroundColor: "black",
-                        borderRadius: "50%",
-                        textAlign: "center",
-                        position: "absolute",
-
-                        top: "-10px",
-                        right: "-10px",
-                        transition:
-                          "opacity 0.2s, transform 0.2s, translate 0.2s",
-                        opacity: isHovering == whiteboard.id ? "1" : "0",
-                        transform:
-                          isHovering == whiteboard.id
-                            ? "scale(1.1)"
-                            : "scale(1)",
-                        cursor: "pointer",
-                        display: "inline-flex",
-                        padding: "5px",
-                        boxShadow: "rgba(0, 0, 0, 0.25) -5px 5px 15px 3px",
-                      }}
-                      onClick={() => onSettings(whiteboard)}>
-                      <SettingsIcon
-                        style={{
-                          color: "white",
-                          fontSize: "small",
-                        }}
-                      />
-                    </button>
-                  )}
-                </div>
-              ))}
-          </div>
-        </div>
         <div
-          className="create_whiteboard"
           style={{
             flex: 1,
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
+            flexDirection: "row",
+            justifyContent: "space-between",
             alignItems: "center",
-            height: "400px",
+            margin: "20px 20px 0px 20px",
+            // height: "400px",
           }}>
-          <button
-            className="whiteboards_create_button"
-            style={{
-              color: "black",
-              backgroundColor: greenColor,
-              padding: "10px",
-              borderRadius: "10px",
-              margin: "0px 10px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-            }}
-            onClick={() => {
-              router.push("/create-whiteboard");
-            }}>
-            <AddIcon />
-            <span> Create </span>
-          </button>
+          <h1 className="title"> Whiteboards </h1>
+          <div
+            className="create_whiteboard"
+            style={
+              {
+                // flex: 1,
+                // display: "flex",
+                // flexDirection: "column",
+                // justifyContent: "center",
+                // alignItems: "center",
+                // height: "400px",
+              }
+            }>
+            <button
+              className="whiteboards_create_button"
+              style={{
+                color: "black",
+                backgroundColor: greenColor,
+                padding: "10px",
+                borderRadius: "10px",
+                // margin: "0px 10px",
+                cursor: "pointer",
+                // display: "flex",
+                // alignItems: "center",
+              }}
+              onClick={() => {
+                router.push("/create-whiteboard");
+              }}>
+              <AddIcon />
+              <span> Create </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="whiteboards_list">
+        <div
+          style={{
+            maxHeight: "500px",
+            overflow: "visible",
+            backgroundColor: "transparent",
+            // paddingTop: "25px",
+            // paddingRight: "25px",
+          }}>
+          {!isFetchingWhiteboards &&
+            whiteboards.map((whiteboard: WhiteboardIndex) => (
+              <div
+                key={whiteboard.id}
+                style={{
+                  position: "relative",
+                  borderRadius: "10px",
+                  boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                  color: "black",
+                  backgroundColor: "lightgrey",
+                }}
+                onClick={() => whiteboardClick(whiteboard)}
+                onMouseEnter={() => handleMouseEnter(whiteboard.id)}
+                onMouseLeave={() => handleMouseLeave()}>
+                <div
+                  className="whiteboard-item"
+                  style={{
+                    position: "relative",
+                    padding: "10px",
+                    // margin: "10px",
+                    marginBottom: "10px",
+                    cursor: "pointer",
+                    flex: "1",
+                    fontSize: "15px",
+                    display: "flex",
+                    flexDirection: "column",
+                    // overflow: "hidden",
+                    overflowY: "hidden",
+                    // transform: isHovering ? "scaleY(1.1)" : "scaleY(1)",
+                    // animation: isHovering ? "shake 0.5s" : "",
+                    // height: "fit-content",
+                    // transition: "height 0.5s",
+                  }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "15px",
+                      fontSize: "15px",
+                    }}>
+                    {" "}
+                    <div>
+                      {whiteboard.name}{" "}
+                      {whiteboard.curated && (
+                        <VerifiedIcon
+                          style={{
+                            fontSize: "12px",
+                          }}
+                          color="primary"
+                        />
+                      )}
+                    </div>
+                    <div
+                      title={whiteboard.authorVaultId}
+                      style={{
+                        // alignSelf: "flex-end",
+                        // justifyContent: "flex-end",
+                        color: "gray",
+                        fontSize: "10px",
+                        // position: "sticky",
+                        // bottom: "10px",
+                        // right: "10px",
+                      }}>
+                      {" "}
+                      from: {whiteboard.authorVaultId.substring(0, 7)}{" "}
+                    </div>{" "}
+                  </div>
+                  <div
+                    style={{
+                      color: "gray",
+                      fontSize: "12px",
+                    }}>
+                    <div>
+                      <span
+                        style={{
+                          color: "black",
+                        }}>
+                        Description:
+                      </span>{" "}
+                      {whiteboard.description}
+                    </div>
+                    <div
+                      style={{
+                        color: "black",
+                      }}>
+                      {" "}
+                      Group names:{" "}
+                    </div>
+                    {whiteboard.groupNames.map((groupName: string) => (
+                      <div key={groupName}> {groupName} </div>
+                    ))}
+                  </div>
+                </div>
+                {vaultId === whiteboard.authorVaultId && (
+                  <button
+                    className="delete-button"
+                    style={{
+                      // backgroundColor: "#7181E5",
+                      backgroundColor: "black",
+                      borderRadius: "50%",
+                      textAlign: "center",
+                      position: "absolute",
+
+                      top: "-10px",
+                      right: "-10px",
+                      transition:
+                        "opacity 0.2s, transform 0.2s, translate 0.2s",
+                      opacity: isHovering == whiteboard.id ? "1" : "0",
+                      transform:
+                        isHovering == whiteboard.id ? "scale(1.1)" : "scale(1)",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      padding: "5px",
+                      boxShadow: "rgba(0, 0, 0, 0.25) -5px 5px 15px 3px",
+                    }}
+                    onClick={() => onSettings(whiteboard)}>
+                    <SettingsIcon
+                      style={{
+                        color: "white",
+                        fontSize: "small",
+                      }}
+                    />
+                  </button>
+                )}
+              </div>
+            ))}
         </div>
       </div>
       {whiteboards.length == 0 && <Loading text="Loading whiteboards..." />}

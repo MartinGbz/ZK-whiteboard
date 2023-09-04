@@ -1,8 +1,8 @@
 .whiteboards_container {
   position: relative;
-  height: 100%;
-  width: 100%;
-  background-color: white;
+  /* height: 100%;
+  width: 100%; */
+  /* background-color: white; */
   display: flex;
 }
 
@@ -14,7 +14,8 @@
   width: 100%;
   max-width: 10000px;
   max-height: 7000px;
-  background-color: #e9e9e9;
+  /* background-color: #e9e9e9; */
+  background-color: white;
 }
 
 .whiteboards_list {
@@ -47,3 +48,7 @@
     max-height: fit-content;
   }
 } */
+
+.whiteboards_create_button:hover {
+  filter: brightness(1.1);
+}
