@@ -205,7 +205,7 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
           "Content-Type": "application/json",
         },
       });
-      return response.json() as Promise<Whiteboard[]>;
+      return await response.json();
     };
 
     const postWhiteboard = async (message: SismoConnectResponse) => {

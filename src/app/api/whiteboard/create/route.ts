@@ -56,7 +56,7 @@ export async function POST(req: Request): Promise<NextResponse> {
           "The number of characters in the description name exceeds the maximum allowed (300 characters max.)",
       });
     }
-    if (signedMessage.message.name.length > MAX_WHITEBOARD_GROUPS) {
+    if (signedMessage.message.groupIds.length > MAX_WHITEBOARD_GROUPS) {
       return NextResponse.json({
         error:
           "The number of groups of the whiteboard exceeds the maximum allowed (10 groups max.)",

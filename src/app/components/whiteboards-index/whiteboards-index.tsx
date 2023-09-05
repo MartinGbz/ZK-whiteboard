@@ -265,7 +265,9 @@ const WhiteboardsIndex = () => {
             ))}
         </div>
       </div>
-      {whiteboards.length == 0 && <Loading text="Loading whiteboards..." />}
+      {whiteboards.length == 0 && isFetchingWhiteboards && (
+        <Loading text="Loading whiteboards..." />
+      )}
     </div>
   );
 };
