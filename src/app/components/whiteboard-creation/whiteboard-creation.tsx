@@ -1,13 +1,32 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { WhiteboardCreation } from "@/app/types/whiteboard-types";
+import {
+  WhiteboardOperationType,
+  WhiteboardCreateSignedMessage,
+  // WhiteboardCreation,
+  WhiteboardEditSignedMessage,
+} from "@/app/types/whiteboard-types";
 import Header from "../header/header";
 
 import "./whiteboard-creation.css";
 import { Autocomplete, Chip, TextField } from "@mui/material";
 import { Whiteboard } from "@prisma/client";
-import { greenColor } from "@/app/configs/configs";
+import { greenColor, sismoConnectConfig } from "@/app/configs/configs";
+import Loading from "../loading-modal/loading-modal";
+import {
+  AuthType,
+  SismoConnect,
+  SismoConnectResponse,
+} from "@sismo-core/sismo-connect-react";
+
+const sismoConnect = SismoConnect({ config: sismoConnectConfig });
+
+const API_BASE_URL = "/api/whiteboard";
+const API_ENDPOINTS = {
+  CREATE: "/create",
+  EDIT: "/edit",
+};
 
 interface Group {
   id: string;
@@ -29,7 +48,15 @@ interface Group {
   dataUrl: string;
 }
 
-const WhiteboardCreation = () => {
+interface WhiteboardCreationProps {
+  isEdition?: boolean;
+  whiteboardId?: number;
+}
+
+const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
+  isEdition,
+  whiteboardId,
+}) => {
   const router = useRouter();
   const [groups, setGroups] = useState<Group[]>([]);
   const [whiteboardName, setWhiteboardName] = useState<string>("");
@@ -37,9 +64,17 @@ const WhiteboardCreation = () => {
     useState<string>("");
   const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
   const [vaultId, setVaultId] = useState<string | null>(null);
+  const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
+  const [isWhiteboardDataLoading, setIsWhiteboardDataLoading] =
+    useState<boolean>(true);
+  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
+    useState<SismoConnectResponse | null>(null);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  // const [whiteboard, setWhiteboard] = useState<Whiteboard>();
 
   useEffect(() => {
     const fetchGroups = async () => {
+      setIsWhiteboardDataLoading(true);
       try {
         const response = await fetch("https://hub.sismo.io/groups/latests", {
           method: "GET",
@@ -53,35 +88,181 @@ const WhiteboardCreation = () => {
       } catch (error) {
         console.error(error);
       }
+      if (!isEdition) {
+        setIsWhiteboardDataLoading(false);
+      }
     };
     fetchGroups();
   }, []);
 
+  useEffect(() => {
+    const fetchWhiteboard = async (id: number) => {
+      try {
+        const response = await fetch("/api/whiteboards", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(id),
+          cache: "no-cache",
+        });
+
+        const whiteboard: Whiteboard = await response.json();
+        setInitalWhiteboard(whiteboard);
+        console.log(whiteboard);
+        // setWhiteboard(whiteboard);
+        setWhiteboardName(whiteboard?.name || "");
+        setWhiteboardDescription(whiteboard?.description || "");
+        console.log("groups 333", groups);
+        console.log(whiteboard?.groupIds);
+        setSelectedGroups(
+          groups.filter((group: Group) =>
+            whiteboard?.groupIds?.includes(group.id)
+          )
+        );
+        console.log(whiteboardName);
+        console.log(whiteboardDescription);
+        console.log(selectedGroups);
+      } catch (error) {
+        console.error(error);
+      }
+      setIsWhiteboardDataLoading(false);
+    };
+    if (isEdition && whiteboardId) {
+      fetchWhiteboard(whiteboardId);
+    }
+  }, [groups]);
+
   async function createWhiteboard() {
-    if (!vaultId) {
-      console.error("No vaultId");
+    // if (!vaultId) {
+    //   console.error("No vaultId");
+    //   return;
+    // }
+    // const whiteboardRequest: WhiteboardCreation = {
+    //   name: whiteboardName,
+    //   description: whiteboardDescription,
+    //   groupIds: selectedGroups.map((group: Group) => group.id),
+    //   authorVaultId: vaultId,
+    // };
+    // try {
+    //   const response = await fetch("/api/whiteboard/create", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(whiteboardRequest),
+    //   });
+    //   const whiteboard: Whiteboard = await response.json();
+    //   router.push("/whiteboard/" + whiteboard.id);
+    // } catch (error) {
+    //   console.error(error);
+    // }
+    const sismoConnectSignedMessage: WhiteboardCreateSignedMessage = {
+      type: WhiteboardOperationType.CREATE,
+      message: {
+        name: whiteboardName,
+        description: whiteboardDescription,
+        groupIds: selectedGroups.map((group: Group) => group.id),
+      },
+    };
+    sismoConnect.request({
+      namespace: "main",
+      auth: { authType: AuthType.VAULT },
+      signature: {
+        message: JSON.stringify(sismoConnectSignedMessage),
+      },
+    });
+  }
+
+  async function saveWhiteboard() {
+    if (!initalWhiteboard) {
+      console.error("No initial whiteboard");
       return;
     }
-    const whiteboardRequest: WhiteboardCreation = {
-      name: whiteboardName,
-      description: whiteboardDescription,
-      groupIds: selectedGroups.map((group: Group) => group.id),
-      authorVaultId: vaultId,
+    const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
+      type: WhiteboardOperationType.EDIT,
+      message: {
+        ...initalWhiteboard,
+        name: whiteboardName,
+        description: whiteboardDescription,
+        groupIds: selectedGroups.map((group: Group) => group.id),
+      },
     };
-    try {
-      const response = await fetch("/api/whiteboard", {
+    sismoConnect.request({
+      namespace: "main",
+      auth: { authType: AuthType.VAULT },
+      signature: {
+        message: JSON.stringify(sismoConnectSignedMessage),
+      },
+    });
+  }
+
+  // --- SISMO CONNECT ---
+
+  useEffect(() => {
+    const responseMessage: SismoConnectResponse | null =
+      sismoConnect.getResponse();
+    if (responseMessage) {
+      const fetchData = async () => {
+        if (responseMessage.signedMessage) {
+          setSismoConnectResponseMessage(responseMessage);
+        }
+      };
+      fetchData();
+    }
+  }, []);
+
+  useEffect(() => {
+    const constructUrlFromMessage = (message: SismoConnectResponse) => {
+      let url = API_BASE_URL;
+      const signedMessage = message.signedMessage
+        ? (JSON.parse(message.signedMessage) as WhiteboardCreateSignedMessage)
+        : null;
+
+      if (signedMessage?.type === WhiteboardOperationType.CREATE) {
+        url += API_ENDPOINTS.CREATE;
+      } else if (signedMessage?.type === WhiteboardOperationType.EDIT) {
+        url += API_ENDPOINTS.EDIT;
+      }
+
+      return url;
+    };
+
+    const performApiRequest = async (
+      url: string,
+      message: SismoConnectResponse
+    ) => {
+      console.log("performApiRequest", url, message);
+      const response = await fetch(url, {
         method: "POST",
+        body: JSON.stringify(message),
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(whiteboardRequest),
       });
-      const whiteboard: Whiteboard = await response.json();
-      router.push("/whiteboard/" + whiteboard.id);
-    } catch (error) {
-      console.error(error);
+      return response.json() as Promise<Whiteboard[]>;
+    };
+
+    const postWhiteboard = async (message: SismoConnectResponse) => {
+      setIsVerifying(true);
+
+      const url = constructUrlFromMessage(message);
+
+      try {
+        await performApiRequest(url, message);
+      } catch (error) {
+        console.error("API request error:", error);
+      }
+
+      setIsVerifying(false);
+      router.push("/");
+    };
+    if (sismoConnectResponseMessage?.signedMessage) {
+      postWhiteboard(sismoConnectResponseMessage);
     }
-  }
+  }, [sismoConnectResponseMessage]);
+
+  // --- END SISMO CONNECT ---
 
   return (
     <div className="container">
@@ -107,8 +288,7 @@ const WhiteboardCreation = () => {
               color: "grey",
               fontSize: "11px",
             }}>
-            {" "}
-            {"(Currently only 3 max per person)"}{" "}
+            {!isEdition && " (Currently only 3 max per person)"}
           </span>
         </div>
         <p className="p"> Name </p>
@@ -124,6 +304,7 @@ const WhiteboardCreation = () => {
           onChange={(event) => {
             setWhiteboardName(event.target.value);
           }}
+          value={whiteboardName}
         />
         <p className="p"> Description </p>
         <TextField
@@ -137,6 +318,7 @@ const WhiteboardCreation = () => {
           onChange={(event) => {
             setWhiteboardDescription(event.target.value);
           }}
+          value={whiteboardDescription}
         />
         <p className="p"> Group(s) </p>
         <Autocomplete
@@ -168,6 +350,7 @@ const WhiteboardCreation = () => {
               {option.name}
             </li>
           )}
+          value={selectedGroups}
           renderTags={(tagValue, getTagProps) =>
             tagValue.map((option, index) => (
               <Chip
@@ -189,7 +372,7 @@ const WhiteboardCreation = () => {
           <a
             target="_blank"
             href="https://docs.sismo.io/sismo-docs/data-groups/data-groups-and-creation">
-            What are Groups?{" "}
+            What are Groups?
           </a>
         </p>
         <button
@@ -203,11 +386,16 @@ const WhiteboardCreation = () => {
             color: "black",
             marginTop: "20px",
           }}
-          onClick={() => createWhiteboard()}>
-          {" "}
-          Create{" "}
+          onClick={() => {
+            if (!isEdition) createWhiteboard();
+            if (isEdition) saveWhiteboard();
+          }}>
+          {!isEdition && "Create"}
+          {isEdition && "Save"}
         </button>
       </div>
+      {isWhiteboardDataLoading && <Loading text="Loading whiteboard" />}
+      {isVerifying && <Loading text="Checking the proof..." />}
     </div>
   );
 };

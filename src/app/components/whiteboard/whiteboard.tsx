@@ -4,7 +4,7 @@ import "./whiteboard.css";
 import {
   Position,
   SignedMessage,
-  OperationType,
+  MessageOperationType,
   Whiteboard,
 } from "../../types/whiteboard-types";
 
@@ -73,9 +73,9 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
         ? (JSON.parse(message.signedMessage) as SignedMessage)
         : null;
 
-      if (signedMessage?.type === OperationType.POST) {
+      if (signedMessage?.type === MessageOperationType.POST) {
         url += API_ENDPOINTS.POST;
-      } else if (signedMessage?.type === OperationType.DELETE) {
+      } else if (signedMessage?.type === MessageOperationType.DELETE) {
         url += API_ENDPOINTS.DELETE;
       }
 
@@ -172,7 +172,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
   const requestAddMessage = async () => {
     const sismoConnectSignedMessage: SignedMessage = {
-      type: OperationType.POST,
+      type: MessageOperationType.POST,
       message: {
         text: messageInputValue,
         positionX: messagePosition.x,
@@ -196,7 +196,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
   const requestDeleteMessage = async (message: MessageType) => {
     const sismoConnectSignedMessage: SignedMessage = {
-      type: OperationType.DELETE,
+      type: MessageOperationType.DELETE,
       message: {
         text: message.text,
         positionX: message.positionX,

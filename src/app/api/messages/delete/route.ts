@@ -1,5 +1,8 @@
 import { sismoConnectConfig } from "@/app/configs/configs";
-import { OperationType, SignedMessage } from "@/app/types/whiteboard-types";
+import {
+  MessageOperationType,
+  SignedMessage,
+} from "@/app/types/whiteboard-types";
 import {
   AuthType,
   SismoConnect,
@@ -16,7 +19,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     const signedMessage = JSON.parse(
       sismoConnectResponse.signedMessage
     ) as SignedMessage;
-    if (signedMessage.type === OperationType.DELETE) {
+    if (signedMessage.type === MessageOperationType.DELETE) {
       return await deleteMessage(sismoConnectResponse);
     } else if (!signedMessage.type) {
       return NextResponse.json({ error: "No type" });

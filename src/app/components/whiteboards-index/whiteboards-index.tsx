@@ -2,6 +2,7 @@
 import React, { CSSProperties, useCallback, useEffect, useState } from "react";
 import "./whiteboards-index.css";
 import { useRouter } from "next/navigation";
+// import { useRouter } from "next/router";
 import Header from "../header/header";
 import { Whiteboard, WhiteboardIndex } from "@/app/types/whiteboard-types";
 import Loading from "../loading-modal/loading-modal";
@@ -102,6 +103,11 @@ const WhiteboardsIndex = () => {
 
   function onSettings(whiteboard: WhiteboardIndex): void {
     router.push("/whiteboard/" + whiteboard.id + "/settings");
+    // router.push();
+    // router.push({
+    //   pathname: "/whiteboard/" + whiteboard.id + "/settings",
+    //   query: JSON.stringify(whiteboard),
+    // });
   }
 
   return (
@@ -160,7 +166,6 @@ const WhiteboardsIndex = () => {
                   backgroundColor: "lightgrey",
                   overflow: "visible",
                 }}
-                onClick={() => whiteboardClick(whiteboard)}
                 onMouseEnter={() => handleMouseEnter(whiteboard.id)}
                 onMouseLeave={() => handleMouseLeave()}>
                 <div
@@ -175,7 +180,8 @@ const WhiteboardsIndex = () => {
                     display: "flex",
                     flexDirection: "column",
                     overflowY: "hidden",
-                  }}>
+                  }}
+                  onClick={() => whiteboardClick(whiteboard)}>
                   <div
                     style={{
                       display: "flex",
