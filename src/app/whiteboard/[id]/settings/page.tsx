@@ -14,14 +14,6 @@ interface pageProps {
 }
 
 const page = ({ params }: pageProps) => {
-  // const router = useRouter();
-
-  // useEffect(() => {
-  //   console.log("hey");
-  //   // const whiteboard = router.query;
-  //   console.log(whiteboard);
-  // });
-
   return (
     <div>
       <MobileModal />

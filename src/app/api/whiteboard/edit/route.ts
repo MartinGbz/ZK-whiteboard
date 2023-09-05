@@ -13,7 +13,13 @@ import {
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
-import { MAX_CHARACTERS, sismoConnectConfig } from "@/app/configs/configs";
+import {
+  MAX_CHARACTERS,
+  MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
+  MAX_CHARACTERS_WHITEBOARD_NAME,
+  MAX_WHITEBOARD_GROUPS,
+  sismoConnectConfig,
+} from "@/app/configs/configs";
 import { getWhiteboardById, verifyResponseMessage } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -40,13 +46,26 @@ async function saveWhiteboard(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
-  console.log("----- saveWhiteboard");
-  // if (signedMessage.message.text.length > MAX_CHARACTERS) {
-  //   return NextResponse.json({
-  //     error:
-  //       "The number of characters in the message exceeds the maximum allowed (100 characters max.)",
-  //   });
-  // }
+  if (signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_NAME) {
+    return NextResponse.json({
+      error:
+        "The number of characters in the whiteboard name exceeds the maximum allowed (50 characters max.)",
+    });
+  }
+  if (
+    signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
+  ) {
+    return NextResponse.json({
+      error:
+        "The number of characters in the description name exceeds the maximum allowed (300 characters max.)",
+    });
+  }
+  if (signedMessage.message.name.length > MAX_WHITEBOARD_GROUPS) {
+    return NextResponse.json({
+      error:
+        "The number of groups of the whiteboard exceeds the maximum allowed (10 groups max.)",
+    });
+  }
   const vaultId = await verifyResponseMessage(
     sismoConnect,
     sismoConnectResponse
@@ -64,45 +83,25 @@ async function saveWhiteboardToDB(
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
   try {
-    console.log("----- saveWhiteboardToDB");
-
-    // const whiteboardId = signedMessage.message.id
-    //   ? parseInt(signedMessage.message.id.toString())
-    //   : undefined;
-
     const whiteboardId = parseInt(signedMessage.message.id.toString());
-
-    // const whiteboardId =
-    //   signedMessage.message && "id" in signedMessage.message
-    //     ? parseInt(signedMessage.message.id.toString())
-    //     : undefined;
 
     if (!whiteboardId) {
       return NextResponse.json({
         error: "No whiteboard id",
       });
     }
-    // const whiteboardId = parseInt(signedMessage.message.id.toString());
 
     const existingWhiteboard = await prisma.whiteboard.findUnique({
       where: {
-        // authorVaultId: vaultId,
         id: whiteboardId,
       },
     });
-    console.log("existingWhiteboard", existingWhiteboard);
-    // if (!existingWhiteboard) {
-    //   return NextResponse.json({
-    //     error: "You are not the author of this whiteboard",
-    //   });
-    // }
+
     if (existingWhiteboard?.authorVaultId !== vaultId) {
       return NextResponse.json({
         error: "You are not the author of this whiteboard",
       });
     }
-
-    console.log("signedMessage.message", signedMessage.message);
 
     const editedWhiteboard = await prisma.whiteboard.update({
       where: {
@@ -114,7 +113,6 @@ async function saveWhiteboardToDB(
         groupIds: signedMessage.message.groupIds,
       },
     });
-    console.log("editedWhiteboard", editedWhiteboard);
     return NextResponse.json(editedWhiteboard);
   } catch (error) {
     return NextResponse.json(error);

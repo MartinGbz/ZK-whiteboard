@@ -19,3 +19,7 @@
   width: 200px;
   margin-right: 10px;
 }
+
+.create-edit-button:hover {
+  filter: brightness(1.1);
+}

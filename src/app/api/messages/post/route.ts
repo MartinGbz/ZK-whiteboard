@@ -73,7 +73,6 @@ async function addMessageToDB(
         whiteboardId: whiteboardId,
       },
     });
-    // If the user has not already posted a message, we add it to the database
     if (!existingMessage) {
       const newMessage = await prisma.message.create({
         data: {

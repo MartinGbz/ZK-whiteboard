@@ -11,7 +11,6 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Home } from "@mui/icons-material";
 
 interface HeaderProps {
@@ -64,7 +63,6 @@ const Header: React.FC<HeaderProps> = ({
         <Home
           style={{
             gridColumn: 1,
-            // backgroundColor: "lightgray",
             justifySelf: "start",
             alignSelf: "center",
             cursor: "pointer",

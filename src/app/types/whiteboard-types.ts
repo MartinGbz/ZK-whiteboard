@@ -31,11 +31,6 @@ export type WhiteboardEditSignedMessage = {
   message: WhiteboardPrisma;
 };
 
-// export type SignedMessageWhiteboard = {
-//   type: OperationType;
-//   whiteboard: WhiteboardPrisma;
-// };
-
 export interface Position {
   x: number;
   y: number;
@@ -44,8 +39,6 @@ export interface Position {
 export interface Whiteboard extends WhiteboardPrisma {
   messages: Message[];
 }
-
-// export type WhiteboardCreation = Omit<WhiteboardPrisma, "id" | "curated">;
 
 export type WhiteboardIndex = Omit<WhiteboardPrisma, "groupIds"> & {
   groupNames: string[];

@@ -1,4 +1,3 @@
-// import { Whiteboard } from "@prisma/client";
 import {
   AuthType,
   SismoConnectResponse,

@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import {
   WhiteboardCreateSignedMessage,
-  // WhiteboardCreation,
   WhiteboardOperationType,
 } from "@/app/types/whiteboard-types";
 import {
@@ -11,7 +10,12 @@ import {
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-server";
 import { verifyResponseMessage } from "../../common";
-import { sismoConnectConfig } from "@/app/configs/configs";
+import {
+  MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
+  MAX_CHARACTERS_WHITEBOARD_NAME,
+  MAX_WHITEBOARD_GROUPS,
+  sismoConnectConfig,
+} from "@/app/configs/configs";
 
 export const dynamic = "force-dynamic";
 
@@ -38,13 +42,26 @@ export async function POST(req: Request): Promise<NextResponse> {
     sismoConnectResponse: SismoConnectResponse,
     signedMessage: WhiteboardCreateSignedMessage
   ): Promise<NextResponse> {
-    console.log("----- saveWhiteboard");
-    // if (signedMessage.message.text.length > MAX_CHARACTERS) {
-    //   return NextResponse.json({
-    //     error:
-    //       "The number of characters in the message exceeds the maximum allowed (100 characters max.)",
-    //   });
-    // }
+    if (signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_NAME) {
+      return NextResponse.json({
+        error:
+          "The number of characters in the whiteboard name exceeds the maximum allowed (50 characters max.)",
+      });
+    }
+    if (
+      signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
+    ) {
+      return NextResponse.json({
+        error:
+          "The number of characters in the description name exceeds the maximum allowed (300 characters max.)",
+      });
+    }
+    if (signedMessage.message.name.length > MAX_WHITEBOARD_GROUPS) {
+      return NextResponse.json({
+        error:
+          "The number of groups of the whiteboard exceeds the maximum allowed (10 groups max.)",
+      });
+    }
     const vaultId = await verifyResponseMessage(
       sismoConnect,
       sismoConnectResponse
@@ -61,13 +78,12 @@ export async function POST(req: Request): Promise<NextResponse> {
     vaultId: string,
     signedMessage: WhiteboardCreateSignedMessage
   ): Promise<NextResponse> {
-    // const whiteboardRequest: WhiteboardCreation = await req.json();
     const user = await prisma.user.findUnique({
       where: {
         vaultId: vaultId,
       },
       include: {
-        createdWhiteboards: true, // Inclure les whiteboards créés par l'utilisateur
+        createdWhiteboards: true,
       },
     });
     if (!user) {

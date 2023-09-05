@@ -12,6 +12,7 @@ export const defaultInputColor = "#dddddd";
 export const greenColor = "#5eca7e";
 export const redColor = "#ff5656";
 
-//#5eca7e
-
 export const MAX_CHARACTERS = 100;
+export const MAX_CHARACTERS_WHITEBOARD_NAME = 50;
+export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION = 300;
+export const MAX_WHITEBOARD_GROUPS = 10;

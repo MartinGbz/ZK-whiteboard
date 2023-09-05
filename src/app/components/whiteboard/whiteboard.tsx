@@ -52,7 +52,6 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  // const [isLoging, setIsLoging] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
   const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false);

@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import {
   WhiteboardOperationType,
   WhiteboardCreateSignedMessage,
-  // WhiteboardCreation,
   WhiteboardEditSignedMessage,
 } from "@/app/types/whiteboard-types";
 import Header from "../header/header";
@@ -70,7 +69,6 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  // const [whiteboard, setWhiteboard] = useState<Whiteboard>();
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -109,20 +107,13 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
 
         const whiteboard: Whiteboard = await response.json();
         setInitalWhiteboard(whiteboard);
-        console.log(whiteboard);
-        // setWhiteboard(whiteboard);
         setWhiteboardName(whiteboard?.name || "");
         setWhiteboardDescription(whiteboard?.description || "");
-        console.log("groups 333", groups);
-        console.log(whiteboard?.groupIds);
         setSelectedGroups(
           groups.filter((group: Group) =>
             whiteboard?.groupIds?.includes(group.id)
           )
         );
-        console.log(whiteboardName);
-        console.log(whiteboardDescription);
-        console.log(selectedGroups);
       } catch (error) {
         console.error(error);
       }
@@ -134,29 +125,6 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
   }, [groups]);
 
   async function createWhiteboard() {
-    // if (!vaultId) {
-    //   console.error("No vaultId");
-    //   return;
-    // }
-    // const whiteboardRequest: WhiteboardCreation = {
-    //   name: whiteboardName,
-    //   description: whiteboardDescription,
-    //   groupIds: selectedGroups.map((group: Group) => group.id),
-    //   authorVaultId: vaultId,
-    // };
-    // try {
-    //   const response = await fetch("/api/whiteboard/create", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(whiteboardRequest),
-    //   });
-    //   const whiteboard: Whiteboard = await response.json();
-    //   router.push("/whiteboard/" + whiteboard.id);
-    // } catch (error) {
-    //   console.error(error);
-    // }
     const sismoConnectSignedMessage: WhiteboardCreateSignedMessage = {
       type: WhiteboardOperationType.CREATE,
       message: {
@@ -197,8 +165,6 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
     });
   }
 
-  // --- SISMO CONNECT ---
-
   useEffect(() => {
     const responseMessage: SismoConnectResponse | null =
       sismoConnect.getResponse();
@@ -232,7 +198,6 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
       url: string,
       message: SismoConnectResponse
     ) => {
-      console.log("performApiRequest", url, message);
       const response = await fetch(url, {
         method: "POST",
         body: JSON.stringify(message),
@@ -261,8 +226,6 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
       postWhiteboard(sismoConnectResponseMessage);
     }
   }, [sismoConnectResponseMessage]);
-
-  // --- END SISMO CONNECT ---
 
   return (
     <div className="container">
@@ -376,6 +339,7 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
           </a>
         </p>
         <button
+          className="create-edit-button"
           style={{
             padding: "10px",
             borderRadius: "10px",
