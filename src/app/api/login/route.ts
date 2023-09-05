@@ -6,7 +6,7 @@ import {
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
-import { prisma } from "../../db";
+import { prisma } from "../db";
 
 export async function GET(req: Request) {
   return NextResponse.json("test");

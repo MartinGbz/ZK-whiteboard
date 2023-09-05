@@ -27,7 +27,7 @@ import { Message as MessageType } from "@prisma/client";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
-const API_BASE_URL = "/api/messages";
+const API_BASE_URL = "/api/message";
 const API_ENDPOINTS = {
   POST: "/post",
   DELETE: "/delete",
@@ -146,7 +146,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     const fetchMessages = async () => {
       setIsFetchingMessages(true);
       try {
-        const response = await fetch("/api/whiteboards", {
+        const response = await fetch("/api/whiteboard", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

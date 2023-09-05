@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({
     // if the reponse does not come from the message creation
     if (sismoConnectResponse.proofs.length < 2) {
       setIsLoging(true);
-      const response = await fetch("/api/whiteboard/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         body: JSON.stringify(sismoConnectResponse),
         headers: {

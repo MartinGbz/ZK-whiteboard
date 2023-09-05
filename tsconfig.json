@@ -28,7 +28,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/api/messages/whiteboard.ts"
+    "src/app/api/message/whiteboard.ts"
   ],
   "exclude": ["node_modules"]
 }

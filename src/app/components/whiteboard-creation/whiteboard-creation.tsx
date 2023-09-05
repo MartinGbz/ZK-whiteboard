@@ -96,7 +96,7 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
   useEffect(() => {
     const fetchWhiteboard = async (id: number) => {
       try {
-        const response = await fetch("/api/whiteboards", {
+        const response = await fetch("/api/whiteboard", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

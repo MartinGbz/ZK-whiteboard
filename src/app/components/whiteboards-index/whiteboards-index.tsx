@@ -27,7 +27,7 @@ const WhiteboardsIndex = () => {
     const fetchWhiteboards = async () => {
       setIsFetchingWhiteboards(true);
       try {
-        const response = await fetch("/api/whiteboards", {
+        const response = await fetch("/api/whiteboard", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
