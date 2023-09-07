@@ -38,7 +38,8 @@ const WhiteboardsIndex = () => {
 
   const [isHovering, setIsHovering] = useState<number | null>(null);
 
-  const baseMaxHeight = 55;
+  // icon size 30px =so> button 40px =so> div 60px (because padding 10px)
+  const baseMaxHeight = 60;
   const maxMaxHeight = 200;
   // const [maxHeight, setMaxHeight] = useState(baseMaxHeight);
 
@@ -275,35 +276,24 @@ const WhiteboardsIndex = () => {
                         className="button-option"
                         onClick={(e) => {
                           e.stopPropagation();
-                          copyWhiteboardUrlToClipboard(whiteboard);
-                        }}>
-                        <ShareIcon />
-                      </button>
-                      <button
-                        className="button-option"
-                        onClick={(e) => {
-                          e.stopPropagation();
                           handleDivClick(index);
                         }}>
                         {maxHeights[index] === baseMaxHeight && (
-                          <ExpandMoreIcon />
+                          <ExpandMoreIcon
+                            sx={{
+                              fontSize: "30px",
+                            }}
+                          />
                         )}
                         {maxHeights[index] === maxMaxHeight && (
-                          <ExpandLessIcon />
+                          <ExpandLessIcon
+                            sx={{
+                              fontSize: "30px",
+                            }}
+                          />
                         )}
                       </button>
                     </div>
-                    {/* <button
-                      className="button-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDivClick(index);
-                      }}>
-                      {maxHeights[index] === baseMaxHeight && (
-                        <ExpandMoreIcon />
-                      )}
-                      {maxHeights[index] === maxMaxHeight && <ExpandLessIcon />}
-                    </button> */}
                   </div>
                   <div
                     style={{
