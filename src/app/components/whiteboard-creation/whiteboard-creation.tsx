@@ -349,6 +349,7 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
             width: "fit-content",
             color: "black",
             marginTop: "20px",
+            boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
           }}
           onClick={() => {
             if (!isEdition) createWhiteboard();

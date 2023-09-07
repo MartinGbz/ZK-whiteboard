@@ -5,11 +5,26 @@ import { useRouter } from "next/navigation";
 import Header from "../header/header";
 import { Whiteboard, WhiteboardIndex } from "@/app/types/whiteboard-types";
 import Loading from "../loading-modal/loading-modal";
-import { CircularProgress } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  MenuItem,
+  menuItemClasses,
+  styled,
+} from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { greenColor } from "@/app/configs/configs";
 import AddIcon from "@mui/icons-material/Add";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ShareIcon from "@mui/icons-material/Share";
+
+import { Dropdown } from "@mui/base/Dropdown";
+import { Menu } from "@mui/base/Menu";
+import { blue, grey } from "@mui/material/colors";
+import { MenuButton } from "@mui/base/MenuButton";
+// import { MenuItem, menuItemClasses } from "@mui/base/MenuItem";
 
 const WhiteboardsIndex = () => {
   const router = useRouter();
@@ -22,6 +37,24 @@ const WhiteboardsIndex = () => {
   const [vaultId, setVaultId] = useState<string | null>(null);
 
   const [isHovering, setIsHovering] = useState<number | null>(null);
+
+  const baseMaxHeight = 55;
+  const maxMaxHeight = 200;
+  // const [maxHeight, setMaxHeight] = useState(baseMaxHeight);
+
+  const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
+
+  const handleDivClick = (index: number) => {
+    const newMaxHeights = [...maxHeights];
+    newMaxHeights[index] =
+      maxHeights[index] === baseMaxHeight ? maxMaxHeight : baseMaxHeight;
+    setMaxHeights(newMaxHeights);
+    console.log(maxHeights);
+  };
+
+  useEffect(() => {
+    setMaxHeights(Array(whiteboards.length).fill(baseMaxHeight));
+  }, [whiteboards]);
 
   useEffect(() => {
     const fetchWhiteboards = async () => {
@@ -104,6 +137,23 @@ const WhiteboardsIndex = () => {
     router.push("/whiteboard/" + whiteboard.id + "/settings");
   }
 
+  const copyWhiteboardUrlToClipboard = (whiteboard: WhiteboardIndex) => {
+    const whiteboardUrl = `${window.location.origin}/whiteboard/${whiteboard.id}`;
+
+    navigator.clipboard.writeText(whiteboardUrl);
+
+    // // Create a temporary input element to copy the URL to the clipboard
+    // const tempInput = document.createElement("input");
+    // tempInput.value = whiteboardUrl;
+    // document.body.appendChild(tempInput);
+    // tempInput.select();
+    // document.execCommand("copy");
+    // document.body.removeChild(tempInput);
+
+    // Optionally, provide some user feedback that the URL has been copied
+    // alert("Whiteboard URL copied to clipboard: " + whiteboardUrl);
+  };
+
   return (
     <div className="container">
       <Header
@@ -130,6 +180,7 @@ const WhiteboardsIndex = () => {
                 padding: "10px",
                 borderRadius: "10px",
                 cursor: "pointer",
+                boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
               }}
               onClick={() => {
                 router.push("/create-whiteboard");
@@ -149,7 +200,7 @@ const WhiteboardsIndex = () => {
             overflow: "auto",
           }}>
           {!isFetchingWhiteboards &&
-            whiteboards.map((whiteboard: WhiteboardIndex) => (
+            whiteboards.map((whiteboard: WhiteboardIndex, index) => (
               <div
                 key={whiteboard.id}
                 style={{
@@ -174,17 +225,23 @@ const WhiteboardsIndex = () => {
                     display: "flex",
                     flexDirection: "column",
                     overflowY: "hidden",
+                    maxHeight: maxHeights[index],
                   }}
                   onClick={() => whiteboardClick(whiteboard)}>
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
+                      // display: "flex",
+                      // justifyContent: "space-between",
                       marginBottom: "15px",
                       fontSize: "15px",
+                      display: "grid",
                     }}>
                     {" "}
-                    <div>
+                    <div
+                      style={{
+                        gridRow: 1,
+                        gridColumn: 1,
+                      }}>
                       {whiteboard.name}{" "}
                       {whiteboard.curated && (
                         <VerifiedIcon
@@ -200,15 +257,60 @@ const WhiteboardsIndex = () => {
                       style={{
                         color: "gray",
                         fontSize: "10px",
+                        gridRow: 2,
+                        gridColumn: 1,
+                        // justifySelf: "flex-end",
                       }}>
                       {" "}
                       from: {whiteboard.authorVaultId.substring(0, 7)}{" "}
                     </div>{" "}
+                    <div
+                      style={{
+                        gridRow: "1 / 3",
+                        gridColumn: "2",
+                        justifySelf: "end",
+                        display: "flex",
+                      }}>
+                      <button
+                        className="button-option"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyWhiteboardUrlToClipboard(whiteboard);
+                        }}>
+                        <ShareIcon />
+                      </button>
+                      <button
+                        className="button-option"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDivClick(index);
+                        }}>
+                        {maxHeights[index] === baseMaxHeight && (
+                          <ExpandMoreIcon />
+                        )}
+                        {maxHeights[index] === maxMaxHeight && (
+                          <ExpandLessIcon />
+                        )}
+                      </button>
+                    </div>
+                    {/* <button
+                      className="button-option"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDivClick(index);
+                      }}>
+                      {maxHeights[index] === baseMaxHeight && (
+                        <ExpandMoreIcon />
+                      )}
+                      {maxHeights[index] === maxMaxHeight && <ExpandLessIcon />}
+                    </button> */}
                   </div>
                   <div
                     style={{
                       color: "gray",
                       fontSize: "12px",
+                      gridRow: 3,
+                      gridColumn: 3,
                     }}>
                     <div>
                       <span
