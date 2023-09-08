@@ -5,6 +5,7 @@ import {
   WhiteboardOperationType,
   WhiteboardCreateSignedMessage,
   WhiteboardEditSignedMessage,
+  User,
 } from "@/app/types/whiteboard-types";
 import Header from "../header/header";
 
@@ -62,7 +63,7 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
   const [whiteboardDescription, setWhiteboardDescription] =
     useState<string>("");
   const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
-  const [vaultId, setVaultId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
   const [isWhiteboardDataLoading, setIsWhiteboardDataLoading] =
     useState<boolean>(true);
@@ -231,7 +232,7 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
     <div className="container">
       <Header
         currentRoute="/create-whiteboard"
-        onChangeVaultId={(vaultId) => setVaultId(vaultId)}
+        onChangeUser={(user) => setUser(user)}
       />
       <div
         style={{

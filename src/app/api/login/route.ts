@@ -18,19 +18,28 @@ export async function POST(req: Request) {
   if (!vaultId) {
     return NextResponse.json({ error: "ZK Proof incorrect" });
   }
+  let userLogged;
   const userAlreadyRecorded = await prisma.user.findUnique({
     where: {
       vaultId: vaultId,
     },
+    include: {
+      createdWhiteboards: true,
+    },
   });
+  userLogged = userAlreadyRecorded;
   if (!userAlreadyRecorded) {
     const user = await prisma.user.create({
       data: {
         vaultId: vaultId,
       },
+      include: {
+        createdWhiteboards: true,
+      },
     });
+    userLogged = user;
   }
-  return NextResponse.json({ vaultId: vaultId });
+  return NextResponse.json({ user: userLogged });
 }
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });

@@ -6,6 +6,7 @@ import {
   SignedMessage,
   MessageOperationType,
   Whiteboard,
+  User,
 } from "../../types/whiteboard-types";
 
 import {
@@ -58,7 +59,8 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     x: 0,
     y: 0,
   });
-  const [vaultId, setVaultId] = useState<string | null>(null);
+  // const [vaultId, setVaultId] = useState<string | null>(null);
+  const [user, setUser] = useState<User>();
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
@@ -143,10 +145,10 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
   useEffect(() => {
     const isUserMessageExists = messages.some(
-      (message: MessageType) => message.authorVaultId === vaultId
+      (message: MessageType) => message.authorVaultId === user?.vaultId
     );
     setIsUserMessageExists(isUserMessageExists);
-  }, [messages, vaultId]);
+  }, [messages, user]);
 
   useEffect(() => {
     if (isModalOpen && messageInputRef.current) {
@@ -323,24 +325,26 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     <div className="whiteboard">
       <Header
         currentRoute={"/whiteboard/" + whiteboardId}
-        onChangeVaultId={(vaultId) => setVaultId(vaultId)}
+        // onChangeVaultId={(vaultId) => setVaultId(vaultId)}
+        onChangeUser={(user) => setUser(user)}
         whiteboardName={whiteboard?.name}
       />
       {messages && (
         <div
           className="messages_container"
           style={{
-            cursor: isUserMessageExists || !vaultId ? "default" : "pointer",
+            cursor:
+              isUserMessageExists || !user?.vaultId ? "default" : "pointer",
             position: "relative",
           }}
           onClick={(e) =>
-            !isUserMessageExists && vaultId && startMessageCreation(e)
+            !isUserMessageExists && user?.vaultId && startMessageCreation(e)
           }>
           {messages.map((message: MessageType) => (
             <Message
               key={message.authorVaultId}
               message={message}
-              vaultId={vaultId}
+              vaultId={user?.vaultId ?? ""}
               onDelete={(message) => requestDeleteMessage(message)}
             />
           ))}

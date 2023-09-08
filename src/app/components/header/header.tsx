@@ -12,29 +12,50 @@ import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Home } from "@mui/icons-material";
+import { User } from "@/app/types/whiteboard-types";
 
 interface HeaderProps {
   currentRoute: string;
-  onChangeVaultId?: (vaultId: string | null) => void;
+  onChangeUser?: (user: User) => void;
+  // onChangeVaultId?: (vaultId: string | null) => void;
   whiteboardName?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  onChangeVaultId,
+  onChangeUser,
+  // onChangeVaultId,
   whiteboardName,
   currentRoute,
 }) => {
   const router = useRouter();
   const [isLoging, setIsLoging] = useState<boolean>(false);
-  const [vaultId, setVaultId] = useState<string | null>();
+  // const [vaultId, setVaultId] = useState<string | null>();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const storagedVaultId = localStorage.getItem("vaultId");
     if (storagedVaultId) {
-      setVaultId(storagedVaultId);
-      onChangeVaultId ? onChangeVaultId(storagedVaultId) : undefined;
+      setIsLoging(true);
+      getUser(storagedVaultId);
+      // setVaultId(storagedVaultId);
+      setIsLoging(false);
     }
   }, []);
+
+  async function getUser(vaultId: string) {
+    const response = await fetch("/api/user", {
+      method: "POST",
+      body: JSON.stringify(vaultId),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const res = await response.json();
+    const user = res.user;
+    setUser(user);
+    onChangeUser ? onChangeUser(user) : undefined;
+    router.push(currentRoute);
+  }
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse does not come from the message creation
@@ -47,11 +68,13 @@ const Header: React.FC<HeaderProps> = ({
           "Content-Type": "application/json",
         },
       });
-      const data = await response.json();
-      const vaultId = data.vaultId;
-      setVaultId(vaultId);
-      onChangeVaultId ? onChangeVaultId(vaultId) : undefined;
-      localStorage.setItem("vaultId", vaultId);
+      const res = await response.json();
+      const user: User = res.user;
+      setUser(user);
+      onChangeUser ? onChangeUser(user) : undefined;
+      // setVaultId(vaultId);
+      // onChangeVaultId ? onChangeVaultId(vaultId) : undefined;
+      localStorage.setItem("vaultId", user.vaultId);
       router.push(currentRoute);
       setIsLoging(false);
     }
@@ -93,7 +116,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         )}
       </div>
-      {!vaultId && !isLoging && (
+      {!user && !isLoging && (
         <SismoConnectButton
           overrideStyle={{
             gridColumn: "3",
@@ -112,14 +135,18 @@ const Header: React.FC<HeaderProps> = ({
           }}
         />
       )}
-      {vaultId && !isLoging && (
+      {user && !isLoging && (
         <div className="login">
-          <span className="user_id"> {vaultId.substring(0, 5) + "..."} </span>
+          <span className="user_id">
+            {" "}
+            {user.vaultId.substring(0, 5) + "..."}{" "}
+          </span>
           <button
             className="logout_button"
             onClick={() => {
-              setVaultId(null);
-              onChangeVaultId ? onChangeVaultId(null) : undefined;
+              setUser(null);
+              // setVaultId(null);
+              // onChangeVaultId ? onChangeVaultId(null) : undefined;
               localStorage.removeItem("vaultId");
             }}>
             {" "}

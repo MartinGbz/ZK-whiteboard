@@ -3,7 +3,11 @@ import React, { useEffect, useState } from "react";
 import "./whiteboards-index.css";
 import { useRouter } from "next/navigation";
 import Header from "../header/header";
-import { Whiteboard, WhiteboardIndex } from "@/app/types/whiteboard-types";
+import {
+  User,
+  Whiteboard,
+  WhiteboardIndex,
+} from "@/app/types/whiteboard-types";
 import Loading from "../loading-modal/loading-modal";
 import { greenColor } from "@/app/configs/configs";
 import AddIcon from "@mui/icons-material/Add";
@@ -17,7 +21,8 @@ const WhiteboardsIndex = () => {
   const [isFetchingWhiteboards, setIsFetchingWhiteboards] =
     useState<boolean>(false);
   const [isResolveGroupId, setIsResolveGroupId] = useState<boolean>(false);
-  const [vaultId, setVaultId] = useState<string | null>(null);
+  const [user, setUser] = useState<User>();
+  // const [vaultId, setVaultId] = useState<string | null>(null);
 
   // icon size 30px =so> button 40px =so> div 60px (because padding 10px)
   const baseMaxHeight = 60;
@@ -96,10 +101,7 @@ const WhiteboardsIndex = () => {
 
   return (
     <div className="container">
-      <Header
-        currentRoute="/"
-        onChangeVaultId={(vaultId) => setVaultId(vaultId)}
-      />
+      <Header currentRoute="/" onChangeUser={(user) => setUser(user)} />
       <div className="whiteboards_container">
         <div
           style={{
@@ -111,24 +113,26 @@ const WhiteboardsIndex = () => {
             margin: "20px 20px 0px 20px",
           }}>
           <h1 className="title"> Whiteboards </h1>
-          <div className="create_whiteboard">
-            <button
-              className="whiteboards_create_button"
-              style={{
-                color: "black",
-                backgroundColor: greenColor,
-                padding: "10px",
-                borderRadius: "10px",
-                cursor: "pointer",
-                boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
-              }}
-              onClick={() => {
-                router.push("/create-whiteboard");
-              }}>
-              <AddIcon />
-              <span> Create </span>
-            </button>
-          </div>
+          {user && (
+            <div className="create_whiteboard">
+              <button
+                className="whiteboards_create_button"
+                style={{
+                  color: "black",
+                  backgroundColor: greenColor,
+                  padding: "10px",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                }}
+                onClick={() => {
+                  router.push("/create-whiteboard");
+                }}>
+                <AddIcon />
+                <span> Create </span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div className="whiteboards_list">
@@ -143,7 +147,7 @@ const WhiteboardsIndex = () => {
             whiteboards.map((whiteboard: WhiteboardIndex, index) => (
               <WhiteboardCard
                 key={whiteboard.id}
-                vaultId={vaultId}
+                vaultId={user?.vaultId ?? ""}
                 whiteboard={whiteboard}
                 index={index}
                 maxHeightsList={maxHeights}

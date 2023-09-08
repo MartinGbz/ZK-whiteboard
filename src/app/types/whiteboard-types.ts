@@ -1,4 +1,8 @@
-import { Message, Whiteboard as WhiteboardPrisma } from "@prisma/client";
+import {
+  Message,
+  Whiteboard as WhiteboardPrisma,
+  User as UserPrisma,
+} from "@prisma/client";
 
 export enum MessageOperationType {
   POST = "post",
@@ -43,3 +47,7 @@ export interface Whiteboard extends WhiteboardPrisma {
 export type WhiteboardIndex = Omit<WhiteboardPrisma, "groupIds"> & {
   groupNames: string[];
 };
+
+export interface User extends UserPrisma {
+  createdWhiteboards: Whiteboard[];
+}
