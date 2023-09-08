@@ -262,7 +262,6 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     <div className="whiteboard">
       <Header
         currentRoute={"/whiteboard/" + whiteboardId}
-        // onChangeVaultId={(vaultId) => setVaultId(vaultId)}
         onChangeUser={(user) => setUser(user)}
         whiteboardName={whiteboard?.name}
       />

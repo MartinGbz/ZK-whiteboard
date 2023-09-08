@@ -12,13 +12,18 @@ import Header from "../header/header";
 import "./whiteboard-creation-edition.css";
 import { Autocomplete, Chip, TextField } from "@mui/material";
 import { Whiteboard } from "@prisma/client";
-import { greenColor, sismoConnectConfig } from "@/app/configs/configs";
+import {
+  greenColor,
+  purpleColor,
+  sismoConnectConfig,
+} from "@/app/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
   AuthType,
   SismoConnect,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -267,6 +272,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             style: {
               borderRadius: "5px",
               backgroundColor: "#e9e9e9",
+              width: "300px",
             },
           }}
           onChange={(event) => {
@@ -281,6 +287,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             style: {
               borderRadius: "5px",
               backgroundColor: "#e9e9e9",
+              width: "300px",
             },
           }}
           onChange={(event) => {
@@ -289,60 +296,101 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           value={whiteboardDescription}
         />
         <p className="p"> Group(s) </p>
-        <Autocomplete
-          className="inputs"
-          ListboxProps={{ style: { fontSize: "15px" } }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              InputProps={{
-                ...params.InputProps,
-                style: {
-                  borderRadius: "5px",
-                  backgroundColor: "#e9e9e9",
-                },
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+          }}>
+          <div>
+            <Autocomplete
+              className="inputs"
+              ListboxProps={{ style: { fontSize: "15px" } }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  InputProps={{
+                    ...params.InputProps,
+                    style: {
+                      borderRadius: "5px",
+                      backgroundColor: "#e9e9e9",
+                      width: "300px",
+                    },
+                  }}
+                />
+              )}
+              options={groups}
+              multiple={true}
+              size="small"
+              getOptionLabel={(option) => option.name}
+              renderOption={(props, option) => (
+                <li
+                  style={{
+                    backgroundColor: "#e9e9e9",
+                  }}
+                  {...props}
+                  key={option.id}>
+                  {option.name}
+                </li>
+              )}
+              value={selectedGroups}
+              renderTags={(tagValue, getTagProps) =>
+                tagValue.map((option, index) => (
+                  <Chip
+                    {...getTagProps({ index })}
+                    key={option.id}
+                    label={option.name}
+                  />
+                ))
+              }
+              onChange={(event, value) => {
+                setSelectedGroups(value);
               }}
             />
-          )}
-          options={groups}
-          multiple={true}
-          size="small"
-          getOptionLabel={(option) => option.name}
-          renderOption={(props, option) => (
-            <li
+            <a
               style={{
-                backgroundColor: "#e9e9e9",
+                fontSize: "10px",
+                color: "grey",
               }}
-              {...props}
-              key={option.id}>
-              {option.name}
-            </li>
-          )}
-          value={selectedGroups}
-          renderTags={(tagValue, getTagProps) =>
-            tagValue.map((option, index) => (
-              <Chip
-                {...getTagProps({ index })}
-                key={option.id}
-                label={option.name}
-              />
-            ))
-          }
-          onChange={(event, value) => {
-            setSelectedGroups(value);
-          }}
-        />
-        <p
-          style={{
-            fontSize: "10px",
-            color: "grey",
-          }}>
-          <a
-            target="_blank"
-            href="https://docs.sismo.io/sismo-docs/data-groups/data-groups-and-creation">
-            What are Groups?
-          </a>
-        </p>
+              target="_blank"
+              href="https://docs.sismo.io/sismo-docs/data-groups/data-groups-and-creation">
+              What are Groups?
+            </a>
+          </div>
+          <div
+            style={{
+              marginLeft: "20px",
+            }}>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "black",
+                backgroundColor: "#e9e9e9",
+              }}>
+              No groups fit your needs? Create one here!
+            </p>
+            <a target="_blank" href="https://factory.sismo.io/create-group">
+              <div
+                style={{
+                  fontSize: "12px",
+                  padding: "10px",
+                  borderRadius: "10px",
+                  backgroundColor: purpleColor,
+                  cursor: "pointer",
+                  width: "fit-content",
+                  color: "black",
+                  marginTop: "5px",
+                  boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                }}>
+                <OpenInNewIcon
+                  sx={{
+                    fontSize: "15px",
+                  }}
+                />{" "}
+                Create a group
+              </div>
+            </a>
+          </div>
+        </div>
         <button
           className="create-edit-button"
           style={{
@@ -350,11 +398,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             borderRadius: "10px",
             backgroundColor: greenColor,
             cursor: "pointer",
-            alignSelf: "flex-end",
+            alignSelf: "start",
             width: "fit-content",
             color: "black",
             marginTop: "20px",
             boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+            fontSize: "15px",
           }}
           onClick={() => {
             if (!isEdition) createWhiteboard();
