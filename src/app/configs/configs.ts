@@ -16,3 +16,12 @@ export const MAX_CHARACTERS = 100;
 export const MAX_CHARACTERS_WHITEBOARD_NAME = 50;
 export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION = 300;
 export const MAX_WHITEBOARD_GROUPS = 10;
+
+export const preWrittenPostXSlug = "http://twitter.com/intent/tweet?text=";
+export const preWrittenPostLensSlug = "https://lenster.xyz/?text=";
+export const preWrittenPostFarcasterSlug =
+  "https://warpcast.com/~/compose?text=";
+
+export const creatorXName = "0xMartinGbz";
+export const creatorLensName = "martingbz.lens";
+export const creatorFarcasterName = "martinbbz";
