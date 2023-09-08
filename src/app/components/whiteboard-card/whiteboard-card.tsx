@@ -39,7 +39,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
     newMaxHeights[index] =
       maxHeights[index] === baseMaxHeight ? maxMaxHeight : baseMaxHeight;
     setMaxHeights(newMaxHeights);
-    console.log(maxHeights);
   };
 
   const whiteboardClick = (whiteboard: WhiteboardIndex) => {
