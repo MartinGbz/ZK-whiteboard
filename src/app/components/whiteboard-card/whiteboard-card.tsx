@@ -180,8 +180,23 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             {" "}
             Group names:{" "}
           </div>
-          {whiteboard.groupNames.map((groupName: string) => (
-            <div key={groupName}> {groupName} </div>
+          {whiteboard.groupNames.map((groupName: string, index) => (
+            <span key={groupName}>
+              <a
+                style={{
+                  textDecoration: "underline",
+                }}
+                target="_blank"
+                href={
+                  "https://factory.sismo.io/groups-explorer?search=" + groupName
+                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}>
+                {groupName}
+              </a>
+              {index < whiteboard.groupNames.length - 1 && ", "}
+            </span>
           ))}
         </div>
       </div>
