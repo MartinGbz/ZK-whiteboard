@@ -1,12 +1,12 @@
 import { MobileModal } from "../components/mobile-modal/mobile-modal";
-import WhiteboardCreation from "../components/whiteboard-creation/whiteboard-creation";
+import WhiteboardCreationEdition from "../components/whiteboard-creation-edition/whiteboard-creation-edition";
 import "../page.css";
 
 const page = () => {
   return (
     <div>
       <MobileModal />
-      <WhiteboardCreation />
+      <WhiteboardCreationEdition />
     </div>
   );
 };

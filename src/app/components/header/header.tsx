@@ -54,12 +54,13 @@ const Header: React.FC<HeaderProps> = ({
     const user = res.user;
     setUser(user);
     onChangeUser ? onChangeUser(user) : undefined;
-    router.push(currentRoute);
+    // router.push(currentRoute);
   }
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
-    // if the reponse does not come from the message creation
-    if (sismoConnectResponse.proofs.length < 2) {
+    // if the reponse does not have a signed message, it means there is no action to perform, only a login
+    if (!sismoConnectResponse.signedMessage) {
+      console.log("IN");
       setIsLoging(true);
       const response = await fetch("/api/login", {
         method: "POST",

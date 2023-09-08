@@ -9,7 +9,7 @@ import {
 } from "@/app/types/whiteboard-types";
 import Header from "../header/header";
 
-import "./whiteboard-creation.css";
+import "./whiteboard-creation-edition.css";
 import { Autocomplete, Chip, TextField } from "@mui/material";
 import { Whiteboard } from "@prisma/client";
 import { greenColor, sismoConnectConfig } from "@/app/configs/configs";
@@ -48,12 +48,12 @@ interface Group {
   dataUrl: string;
 }
 
-interface WhiteboardCreationProps {
+interface WhiteboardCreationEditionProps {
   isEdition?: boolean;
   whiteboardId?: number;
 }
 
-const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
+const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   isEdition,
   whiteboardId,
 }) => {
@@ -231,7 +231,11 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
   return (
     <div className="container">
       <Header
-        currentRoute="/create-whiteboard"
+        currentRoute={
+          isEdition
+            ? "/whiteboard/settings/" + whiteboardId
+            : "/create-whiteboard"
+        }
         onChangeUser={(user) => setUser(user)}
       />
       <div
@@ -366,4 +370,4 @@ const WhiteboardCreation: React.FC<WhiteboardCreationProps> = ({
   );
 };
 
-export default WhiteboardCreation;
+export default WhiteboardCreationEdition;
