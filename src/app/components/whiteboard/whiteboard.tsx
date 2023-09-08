@@ -24,6 +24,16 @@ import { useRouter } from "next/navigation";
 import Loading from "../loading-modal/loading-modal";
 import Header from "../header/header";
 import { Message as MessageType } from "@prisma/client";
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
+import FileCopyIcon from "@mui/icons-material/FileCopyOutlined";
+import SaveIcon from "@mui/icons-material/Save";
+import PrintIcon from "@mui/icons-material/Print";
+import ShareIcon from "@mui/icons-material/Share";
+import Image from "next/image";
+import xTwitterIcon from "../../medias/icons/x-twitter.svg";
+import lensIcon from "../../medias/icons/lens-icon-T-Green.svg";
+import farcasterIcon from "../../medias/icons/farcaster-icon.png";
+import Link from "next/link";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -59,11 +69,17 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const messageModalRef = useRef<HTMLDivElement>(null);
 
+  const [currentURL, setCurrentURL] = useState("");
+
   const router = useRouter();
 
   const redirectToRoot = useCallback(() => {
     router.push("/whiteboard/" + whiteboardId);
   }, [router, whiteboardId]);
+
+  useEffect(() => {
+    setCurrentURL(`${window.location.origin}/whiteboard/${whiteboardId}`);
+  }, [whiteboardId]);
 
   useEffect(() => {
     const constructUrlFromMessage = (message: SismoConnectResponse) => {
@@ -238,6 +254,71 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     setIsModalOpen(true);
   };
 
+  const actions = [
+    {
+      icon: (
+        <a
+          target="_blank"
+          href={
+            "http://twitter.com/intent/tweet?text=Access%20this%20whiteboard%2C%20and%20post%20your%20message%20anonymously%21%20%F0%9F%8E%AD%0A%E2%9E%A1%EF%B8%8F%20" +
+            currentURL +
+            "%0A%0Aby.%20%400xMartinGbz"
+          }>
+          <Image
+            src={xTwitterIcon}
+            alt={""}
+            style={{
+              padding: "7px",
+            }}
+          />
+        </a>
+        // </Link>
+      ),
+      name: "X",
+    },
+    {
+      icon: (
+        <a
+          target="_blank"
+          href={
+            "https://lenster.xyz/?text=Access%20this%20whiteboard%2C%20and%20post%20your%20message%20anonymously%21%20%F0%9F%8E%AD%0A%E2%9E%A1%EF%B8%8F%20" +
+            currentURL +
+            "%0A%0Aby.%20%40martingbz.lens"
+          }>
+          <Image src={lensIcon} alt={""} />
+        </a>
+      ),
+      name: "Lens",
+    },
+    {
+      icon: (
+        <a
+          target="_blank"
+          href={
+            "https://warpcast.com/~/compose?text=Access%20this%20whiteboard%2C%20and%20post%20your%20message%20anonymously%21%20%F0%9F%8E%AD%0A%E2%9E%A1%EF%B8%8F%20" +
+            currentURL +
+            "%0A%0Aby.%20%40martingbz"
+          }>
+          <Image
+            src={farcasterIcon}
+            alt={""}
+            style={{
+              padding: "7px",
+            }}
+          />
+        </a>
+      ),
+      name: "Farcaster",
+    },
+    {
+      icon: <FileCopyIcon sx={{ color: "black", padding: "3px" }} />,
+      name: "Copy link",
+      onclick: () => {
+        navigator.clipboard.writeText(currentURL);
+      },
+    },
+  ];
+
   return (
     <div className="whiteboard">
       <Header
@@ -286,6 +367,33 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
         onClickCancel={() => setIsModalOpen(false)}
         onClickSave={() => requestAddMessage()}
       />
+      <SpeedDial
+        ariaLabel="SpeedDial basic example"
+        sx={{
+          position: "absolute",
+          bottom: 16,
+          right: 16,
+        }}
+        FabProps={{
+          sx: {
+            color: "black",
+            bgcolor: "white",
+            "&:hover": {
+              color: "white",
+              bgcolor: "black",
+            },
+          },
+        }}
+        icon={<ShareIcon />}>
+        {actions.map((action) => (
+          <SpeedDialAction
+            key={action.name}
+            icon={action.icon}
+            tooltipTitle={action.name}
+            onClick={action.onclick}
+          />
+        ))}
+      </SpeedDial>
     </div>
   );
 };
