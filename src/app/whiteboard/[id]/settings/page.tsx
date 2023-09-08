@@ -14,7 +14,6 @@ const page = ({ params }: pageProps) => {
     <div>
       <MobileModal />
       <WhiteboardCreationEdition isEdition={true} whiteboardId={params.id} />
-      {/* <div> AHHHHHH blfiur"bveîùvfbrejkm</div> */}
     </div>
   );
 };

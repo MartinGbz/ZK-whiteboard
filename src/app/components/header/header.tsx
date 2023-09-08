@@ -17,19 +17,16 @@ import { User } from "@/app/types/whiteboard-types";
 interface HeaderProps {
   currentRoute: string;
   onChangeUser?: (user: User) => void;
-  // onChangeVaultId?: (vaultId: string | null) => void;
   whiteboardName?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
   onChangeUser,
-  // onChangeVaultId,
   whiteboardName,
   currentRoute,
 }) => {
   const router = useRouter();
   const [isLoging, setIsLoging] = useState<boolean>(false);
-  // const [vaultId, setVaultId] = useState<string | null>();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -37,7 +34,6 @@ const Header: React.FC<HeaderProps> = ({
     if (storagedVaultId) {
       setIsLoging(true);
       getUser(storagedVaultId);
-      // setVaultId(storagedVaultId);
       setIsLoging(false);
     }
   }, []);
@@ -54,7 +50,6 @@ const Header: React.FC<HeaderProps> = ({
     const user = res.user;
     setUser(user);
     onChangeUser ? onChangeUser(user) : undefined;
-    // router.push(currentRoute);
   }
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
@@ -73,8 +68,6 @@ const Header: React.FC<HeaderProps> = ({
       const user: User = res.user;
       setUser(user);
       onChangeUser ? onChangeUser(user) : undefined;
-      // setVaultId(vaultId);
-      // onChangeVaultId ? onChangeVaultId(vaultId) : undefined;
       localStorage.setItem("vaultId", user.vaultId);
       router.push(currentRoute);
       setIsLoging(false);
@@ -146,8 +139,6 @@ const Header: React.FC<HeaderProps> = ({
             className="logout_button"
             onClick={() => {
               setUser(null);
-              // setVaultId(null);
-              // onChangeVaultId ? onChangeVaultId(null) : undefined;
               localStorage.removeItem("vaultId");
             }}>
             {" "}

@@ -8,7 +8,7 @@ import {
   preWrittenPostLensSlug,
   preWrittenPostXSlug,
 } from "../../configs/configs";
-import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
+import { SpeedDial, SpeedDialAction } from "@mui/material";
 import FileCopyIcon from "@mui/icons-material/FileCopyOutlined";
 import ShareIcon from "@mui/icons-material/Share";
 import Image from "next/image";

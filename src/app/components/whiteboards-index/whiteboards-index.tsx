@@ -22,7 +22,6 @@ const WhiteboardsIndex = () => {
     useState<boolean>(false);
   const [isResolveGroupId, setIsResolveGroupId] = useState<boolean>(false);
   const [user, setUser] = useState<User>();
-  // const [vaultId, setVaultId] = useState<string | null>(null);
 
   // icon size 30px =so> button 40px =so> div 60px (because padding 10px)
   const baseMaxHeight = 60;

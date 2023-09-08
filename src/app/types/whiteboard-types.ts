@@ -18,13 +18,6 @@ export type SignedMessage = {
   message: Omit<Message, "id" | "authorVaultId" | "order">;
 };
 
-// type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-// export type WhiteboardSignedMessage = {
-//   type: WhiteboardOperationType;
-//   message: PartialBy<WhiteboardPrisma, "id" | "authorVaultId" | "curated">;
-// };
-
 export type WhiteboardCreateSignedMessage = {
   type: WhiteboardOperationType;
   message: Omit<WhiteboardPrisma, "id" | "authorVaultId" | "curated">;
