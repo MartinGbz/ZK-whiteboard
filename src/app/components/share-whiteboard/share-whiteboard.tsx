@@ -15,6 +15,7 @@ import Image from "next/image";
 import xTwitterIcon from "../../medias/icons/x-twitter.svg";
 import lensIcon from "../../medias/icons/lens-icon-T-Green.svg";
 import farcasterIcon from "../../medias/icons/farcaster-icon.png";
+import "./share-whiteboard.css";
 
 interface ShareWhiteboard {
   currentURL: string;
@@ -29,6 +30,7 @@ const ShareWhiteboard: React.FC<ShareWhiteboard> = ({
 }) => {
   const [shareMessageAuthor, setShareMessageAuthor] = useState("");
   const [shareMessageDefault, setShareMessageDefault] = useState("");
+  const [isHovering, setIsHovering] = useState<boolean>(false);
 
   useEffect(() => {
     setShareMessageDefault(
@@ -45,7 +47,6 @@ const ShareWhiteboard: React.FC<ShareWhiteboard> = ({
         currentURL +
         "%0A%0Aby.%20%40"
     );
-    console.log("isAuthor", isAuthor);
   }, [currentURL]);
 
   const actions = [
@@ -126,15 +127,18 @@ const ShareWhiteboard: React.FC<ShareWhiteboard> = ({
       }}
       FabProps={{
         sx: {
-          color: "black",
-          bgcolor: "white",
+          color: "white",
+          bgcolor: "black",
           "&:hover": {
-            color: "white",
-            bgcolor: "black",
+            color: "black",
+            bgcolor: "white",
           },
         },
       }}
-      icon={<ShareIcon />}>
+      icon={<ShareIcon />}
+      onMouseOver={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      open={isHovering}>
       {actions.map((action) => (
         <SpeedDialAction
           key={action.name}

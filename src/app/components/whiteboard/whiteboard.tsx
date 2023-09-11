@@ -75,14 +75,9 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   }, [whiteboardId]);
 
   useEffect(() => {
-    console.log("whiteboard", whiteboard);
-    console.log("user", user);
-    console.log("whiteboard?.authorVaultId", whiteboard?.authorVaultId);
-    console.log("user?.vaultId", user?.vaultId);
     whiteboard?.authorVaultId === user?.vaultId
       ? setIsWhiteboardAuthor(true)
       : setIsWhiteboardAuthor(false);
-    console.log("isWhiteboardAuthor", isWhiteboardAuthor);
   }, [user, whiteboard]);
 
   useEffect(() => {
