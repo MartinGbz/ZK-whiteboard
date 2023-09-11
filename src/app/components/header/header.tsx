@@ -16,7 +16,7 @@ import { User } from "@/app/types/whiteboard-types";
 
 interface HeaderProps {
   currentRoute: string;
-  onChangeUser?: (user: User) => void;
+  onChangeUser?: (user: User | null) => void;
   whiteboardName?: string;
 }
 
@@ -71,6 +71,12 @@ const Header: React.FC<HeaderProps> = ({
       router.push(currentRoute);
       setIsLoging(false);
     }
+  }
+
+  async function logout() {
+    setUser(null);
+    localStorage.removeItem("vaultId");
+    onChangeUser ? onChangeUser(null) : undefined;
   }
 
   return (
@@ -137,8 +143,7 @@ const Header: React.FC<HeaderProps> = ({
           <button
             className="logout_button"
             onClick={() => {
-              setUser(null);
-              localStorage.removeItem("vaultId");
+              logout();
             }}>
             {" "}
             <LogoutIcon

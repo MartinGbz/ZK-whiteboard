@@ -50,7 +50,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     x: 0,
     y: 0,
   });
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>();
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);

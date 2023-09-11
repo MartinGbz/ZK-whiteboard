@@ -23,6 +23,7 @@ import {
   purpleColor,
   sismoConnectConfig,
   MAX_WHITEBOARD_GROUPS,
+  greenColorDisabled,
 } from "@/app/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
@@ -432,7 +433,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           style={{
             padding: "10px",
             borderRadius: "10px",
-            backgroundColor: disableValidation ? "#83a48d" : greenColor,
+            backgroundColor: disableValidation
+              ? greenColorDisabled
+              : greenColor,
             cursor: disableValidation ? "default" : "pointer",
             pointerEvents: disableValidation ? "none" : "auto",
             alignSelf: "start",

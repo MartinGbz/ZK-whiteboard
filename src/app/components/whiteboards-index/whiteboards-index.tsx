@@ -9,9 +9,10 @@ import {
   WhiteboardIndex,
 } from "@/app/types/whiteboard-types";
 import Loading from "../loading-modal/loading-modal";
-import { greenColor } from "@/app/configs/configs";
+import { greenColor, greenColorDisabled } from "@/app/configs/configs";
 import AddIcon from "@mui/icons-material/Add";
 import WhiteboardCard from "../whiteboard-card/whiteboard-card";
+import { Tooltip } from "@mui/material";
 
 const WhiteboardsIndex = () => {
   const router = useRouter();
@@ -21,7 +22,7 @@ const WhiteboardsIndex = () => {
   const [isFetchingWhiteboards, setIsFetchingWhiteboards] =
     useState<boolean>(false);
   const [isResolveGroupId, setIsResolveGroupId] = useState<boolean>(false);
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>();
 
   // icon size 30px =so> button 40px =so> div 60px (because padding 10px)
   const baseMaxHeight = 60;
@@ -112,16 +113,40 @@ const WhiteboardsIndex = () => {
             margin: "20px 20px 0px 20px",
           }}>
           <h1 className="title"> Whiteboards </h1>
-          {user && (
-            <div className="create_whiteboard">
+
+          <div className="create_whiteboard">
+            {!user && (
+              <Tooltip title="Sign in to create a whiteboard">
+                <span>
+                  <button
+                    className="whiteboards_create_button"
+                    style={{
+                      color: "black",
+                      backgroundColor: greenColorDisabled,
+                      cursor: "default",
+                      padding: "10px",
+                      borderRadius: "10px",
+                      boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                    }}
+                    disabled={true}
+                    onClick={() => {
+                      router.push("/create-whiteboard");
+                    }}>
+                    <AddIcon />
+                    <span> Create </span>
+                  </button>
+                </span>
+              </Tooltip>
+            )}
+            {user && (
               <button
                 className="whiteboards_create_button"
                 style={{
                   color: "black",
                   backgroundColor: greenColor,
+                  cursor: "pointer",
                   padding: "10px",
                   borderRadius: "10px",
-                  cursor: "pointer",
                   boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
                 }}
                 onClick={() => {
@@ -130,8 +155,8 @@ const WhiteboardsIndex = () => {
                 <AddIcon />
                 <span> Create </span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
       <div className="whiteboards_list">

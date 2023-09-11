@@ -10,6 +10,7 @@ export const TRANSPARENCY = "E6";
 export const defaultInputColor = "#dddddd";
 
 export const greenColor = "#5eca7e";
+export const greenColorDisabled = "#83a48d";
 export const redColor = "#ff5656";
 export const purpleColor = "#a888e7";
 
