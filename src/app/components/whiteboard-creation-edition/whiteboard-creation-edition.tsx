@@ -286,16 +286,17 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               color: "grey",
               fontSize: "11px",
             }}>
-            {!isEdition && " (Currently only 3 max per person)"}
+            {!isEdition && " (Currently only 3 max per user)"}
           </span>
         </div>
-        <p className="p"> Name </p>
+        <p className="form-labels"> Name </p>
         <input
           type="text"
           className="whiteboard-creation-inputs"
           style={{
             padding: "10px",
             height: "40x",
+            fontSize: "14px",
           }}
           onChange={(event) => {
             setWhiteboardName(event.target.value);
@@ -307,10 +308,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             {MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
           </div>
         )}
-        <p className="p"> Description </p>
+        <p className="form-labels"> Description </p>
         <TextareaAutosize
           className="whiteboard-creation-inputs"
           style={{
+            fontSize: "14px",
             paddingBottom: "10px",
             paddingTop: "10px",
             paddingLeft: "10px",
@@ -327,13 +329,17 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             {MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
           </div>
         )}
-        <p className="p"> Group(s) </p>
+        <p className="form-labels"> Group(s) </p>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
           }}>
-          <div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}>
             <Autocomplete
               className="inputs"
               ListboxProps={{ style: { fontSize: "15px" } }}
@@ -368,6 +374,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               renderTags={(tagValue, getTagProps) =>
                 tagValue.map((option, index) => (
                   <Chip
+                    style={{
+                      fontSize: "12px",
+                    }}
                     {...getTagProps({ index })}
                     key={option.id}
                     label={option.name}
@@ -385,8 +394,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             )}
             <a
               style={{
-                fontSize: "10px",
+                fontSize: "11px",
                 color: "grey",
+                textDecoration: "underline",
               }}
               target="_blank"
               href="https://docs.sismo.io/sismo-docs/data-groups/data-groups-and-creation">
@@ -407,6 +417,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             </p>
             <a target="_blank" href="https://factory.sismo.io/create-group">
               <div
+                className="create-group-button"
                 style={{
                   fontSize: "12px",
                   padding: "10px",
@@ -443,7 +454,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             color: "black",
             marginTop: "20px",
             boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
-            fontSize: "15px",
+            fontSize: "18px",
           }}
           onClick={() => {
             if (!isEdition) createWhiteboard();

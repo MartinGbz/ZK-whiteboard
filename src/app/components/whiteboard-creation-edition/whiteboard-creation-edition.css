@@ -9,18 +9,18 @@
   background-color: white;
 }
 
-.p {
+.form-labels {
   color: black;
   margin-top: 10px;
-  font-size: 15px;
-}
-
-.form-element {
-  width: 200px;
-  margin-right: 10px;
+  margin-bottom: 5px;
+  font-size: 17px;
 }
 
 .create-edit-button:hover {
+  filter: brightness(1.1);
+}
+
+.create-group-button:hover {
   filter: brightness(1.1);
 }
 
