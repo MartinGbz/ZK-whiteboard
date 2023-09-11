@@ -30,4 +30,4 @@ export const preWrittenPostFarcasterSlug =
 
 export const creatorXName = "0xMartinGbz";
 export const creatorLensName = "martingbz.lens";
-export const creatorFarcasterName = "martinbbz";
+export const creatorFarcasterName = "martingbz";
