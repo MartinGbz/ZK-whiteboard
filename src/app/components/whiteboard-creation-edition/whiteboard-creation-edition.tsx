@@ -11,11 +11,18 @@ import Header from "../header/header";
 
 import "./whiteboard-creation-edition.css";
 import { Autocomplete, Chip, TextField } from "@mui/material";
+import { TextareaAutosize } from "@mui/base";
 import { Whiteboard } from "@prisma/client";
 import {
+  MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
+  MAX_CHARACTERS_WHITEBOARD_NAME,
+  MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
+  MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
+  MAX_WHITEBOARD_GROUPS_MESSAGE,
   greenColor,
   purpleColor,
   sismoConnectConfig,
+  MAX_WHITEBOARD_GROUPS,
 } from "@/app/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
@@ -75,6 +82,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [disableValidation, setDisableValidation] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -220,7 +228,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       const url = constructUrlFromMessage(message);
 
       try {
-        await performApiRequest(url, message);
+        const res = await performApiRequest(url, message);
+        if (res.error) {
+          console.error(res.error);
+          return;
+        }
       } catch (error) {
         console.error("API request error:", error);
       }
@@ -232,6 +244,18 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       postWhiteboard(sismoConnectResponseMessage);
     }
   }, [sismoConnectResponseMessage]);
+
+  useEffect(() => {
+    if (
+      whiteboardName.length > MAX_CHARACTERS_WHITEBOARD_NAME ||
+      whiteboardDescription.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION ||
+      selectedGroups.length > MAX_WHITEBOARD_GROUPS
+    ) {
+      setDisableValidation(true);
+    } else {
+      setDisableValidation(false);
+    }
+  }, [whiteboardName, whiteboardDescription, selectedGroups]);
 
   return (
     <div className="container">
@@ -265,36 +289,43 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           </span>
         </div>
         <p className="p"> Name </p>
-        <TextField
-          className="inputs"
-          size="small"
-          InputProps={{
-            style: {
-              borderRadius: "5px",
-              backgroundColor: "#e9e9e9",
-              width: "300px",
-            },
+        <input
+          type="text"
+          className="whiteboard-creation-inputs"
+          style={{
+            padding: "10px",
+            height: "40x",
           }}
           onChange={(event) => {
             setWhiteboardName(event.target.value);
           }}
           value={whiteboardName}
         />
+        {whiteboardName.length > MAX_CHARACTERS_WHITEBOARD_NAME && (
+          <div className="warning-message">
+            {MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
+          </div>
+        )}
         <p className="p"> Description </p>
-        <TextField
-          size="small"
-          InputProps={{
-            style: {
-              borderRadius: "5px",
-              backgroundColor: "#e9e9e9",
-              width: "300px",
-            },
+        <TextareaAutosize
+          className="whiteboard-creation-inputs"
+          style={{
+            paddingBottom: "10px",
+            paddingTop: "10px",
+            paddingLeft: "10px",
+            paddingRight: "10px",
           }}
           onChange={(event) => {
             setWhiteboardDescription(event.target.value);
           }}
           value={whiteboardDescription}
         />
+        {whiteboardDescription.length >
+          MAX_CHARACTERS_WHITEBOARD_DESCRIPTION && (
+          <div className="warning-message">
+            {MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
+          </div>
+        )}
         <p className="p"> Group(s) </p>
         <div
           style={{
@@ -346,6 +377,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 setSelectedGroups(value);
               }}
             />
+            {selectedGroups.length > MAX_WHITEBOARD_GROUPS && (
+              <div className="warning-message">
+                {MAX_WHITEBOARD_GROUPS_MESSAGE}
+              </div>
+            )}
             <a
               style={{
                 fontSize: "10px",
@@ -396,8 +432,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           style={{
             padding: "10px",
             borderRadius: "10px",
-            backgroundColor: greenColor,
-            cursor: "pointer",
+            backgroundColor: disableValidation ? "#83a48d" : greenColor,
+            cursor: disableValidation ? "default" : "pointer",
+            pointerEvents: disableValidation ? "none" : "auto",
             alignSelf: "start",
             width: "fit-content",
             color: "black",
@@ -408,7 +445,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           onClick={() => {
             if (!isEdition) createWhiteboard();
             if (isEdition) saveWhiteboard();
-          }}>
+          }}
+          disabled={disableValidation}>
           {!isEdition && "Create"}
           {isEdition && "Save"}
         </button>

@@ -55,7 +55,6 @@ const Header: React.FC<HeaderProps> = ({
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse does not have a signed message, it means there is no action to perform, only a login
     if (!sismoConnectResponse.signedMessage) {
-      console.log("IN");
       setIsLoging(true);
       const response = await fetch("/api/login", {
         method: "POST",

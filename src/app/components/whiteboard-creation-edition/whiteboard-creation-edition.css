@@ -23,3 +23,22 @@
 .create-edit-button:hover {
   filter: brightness(1.1);
 }
+
+.whiteboard-creation-inputs:hover {
+  border-color: #1e1e1e;
+}
+
+.whiteboard-creation-inputs {
+  border-radius: 5px;
+  border: solid 1px #b1b1b1;
+  background-color: #e9e9e9;
+  width: 300px;
+  font-size: 15px;
+  font-family: Inter-Regular;
+}
+
+.warning-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}

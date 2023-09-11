@@ -12,8 +12,11 @@ import {
 import { verifyResponseMessage } from "../../common";
 import {
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
+  MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
   MAX_CHARACTERS_WHITEBOARD_NAME,
+  MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
   MAX_WHITEBOARD_GROUPS,
+  MAX_WHITEBOARD_GROUPS_MESSAGE,
   sismoConnectConfig,
 } from "@/app/configs/configs";
 
@@ -44,22 +47,19 @@ export async function POST(req: Request): Promise<NextResponse> {
   ): Promise<NextResponse> {
     if (signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_NAME) {
       return NextResponse.json({
-        error:
-          "The number of characters in the whiteboard name exceeds the maximum allowed (50 characters max.)",
+        error: MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
       });
     }
     if (
       signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
     ) {
       return NextResponse.json({
-        error:
-          "The number of characters in the description name exceeds the maximum allowed (300 characters max.)",
+        error: MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
       });
     }
     if (signedMessage.message.groupIds.length > MAX_WHITEBOARD_GROUPS) {
       return NextResponse.json({
-        error:
-          "The number of groups of the whiteboard exceeds the maximum allowed (10 groups max.)",
+        error: MAX_WHITEBOARD_GROUPS_MESSAGE,
       });
     }
     const vaultId = await verifyResponseMessage(
