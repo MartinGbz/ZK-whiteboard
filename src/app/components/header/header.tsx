@@ -102,7 +102,15 @@ const Header: React.FC<HeaderProps> = ({
           width: "max-content",
           display: "inline-flex",
         }}>
-        <Title text="ZK-whiteboard" />
+        <Title
+          text="ZK-whiteboard"
+          style={{
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            router.push("/");
+          }}
+        />
         {whiteboardName && (
           <div
             style={{

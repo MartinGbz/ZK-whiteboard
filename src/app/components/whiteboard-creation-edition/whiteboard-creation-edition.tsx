@@ -342,7 +342,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             }}>
             <Autocomplete
               className="inputs"
-              ListboxProps={{ style: { fontSize: "15px" } }}
+              ListboxProps={{
+                style: { fontSize: "15px", backgroundColor: "#e9e9e9" },
+              }}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -465,7 +467,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           {isEdition && "Save"}
         </button>
       </div>
-      {isWhiteboardDataLoading && <Loading text="Loading whiteboard" />}
+      {isWhiteboardDataLoading && !isVerifying && (
+        <Loading text="Loading whiteboard" />
+      )}
       {isVerifying && <Loading text="Checking the proof..." />}
     </div>
   );
