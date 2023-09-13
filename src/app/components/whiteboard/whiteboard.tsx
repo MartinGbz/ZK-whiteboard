@@ -311,6 +311,27 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
           {isVerifying && <Loading text="Checking the proof..." />}
         </div>
       )}
+      {messages.length == 0 && !isFetchingMessages && !whiteboardVaultId && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%,-50%)",
+            color: "gray",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}>
+          <div
+            style={{
+              fontSize: "50px",
+            }}>
+            {":("}
+          </div>
+          <div>No messages yet</div>
+        </div>
+      )}
       {!isVerifying && isFetchingMessages && messages.length == 0 && (
         <Loading text="Loading messages..." />
       )}
