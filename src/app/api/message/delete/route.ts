@@ -2,16 +2,21 @@ import { sismoConnectConfig } from "@/app/configs/configs";
 import {
   MessageOperationType,
   SignedMessage,
+  Whiteboard,
 } from "@/app/types/whiteboard-types";
 import {
   AuthType,
   SismoConnect,
   SismoConnectResponse,
+  SismoConnectServer,
   SismoConnectVerifiedResult,
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import { getWhiteboardById } from "../../common";
+
+let whiteboard: Whiteboard | null = null;
+let sismoConnect: SismoConnectServer | null = null;
 
 export async function POST(req: Request): Promise<NextResponse> {
   const sismoConnectResponse: SismoConnectResponse = await req.json();
@@ -19,6 +24,21 @@ export async function POST(req: Request): Promise<NextResponse> {
     const signedMessage = JSON.parse(
       sismoConnectResponse.signedMessage
     ) as SignedMessage;
+    whiteboard = await getWhiteboardById(signedMessage.message.whiteboardId);
+    if (!whiteboard) {
+      return NextResponse.json({ error: "Whiteboard not found" });
+    }
+    if (!whiteboard.appId) {
+      return NextResponse.json({ error: "Whiteboard appId not found" });
+    }
+    sismoConnect = SismoConnect({
+      config: {
+        appId: whiteboard.appId,
+      },
+    });
+    if (!sismoConnect) {
+      return NextResponse.json({ error: "SismoConnect not found" });
+    }
     if (signedMessage.type === MessageOperationType.DELETE) {
       return await deleteMessage(sismoConnectResponse);
     } else if (!signedMessage.type) {
@@ -30,8 +50,6 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "No signed message" });
   }
 }
-
-const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 async function deleteMessage(
   sismoConnectResponse: SismoConnectResponse
@@ -92,6 +110,9 @@ async function verifyResponseDeleteMessage(
   const message = sismoConnectResponse.signedMessage
     ? sismoConnectResponse.signedMessage
     : "";
+  if (!sismoConnect) {
+    return "";
+  }
   const result: SismoConnectVerifiedResult = await sismoConnect.verify(
     sismoConnectResponse,
     {

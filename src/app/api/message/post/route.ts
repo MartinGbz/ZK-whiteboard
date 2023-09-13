@@ -7,6 +7,7 @@ import {
   AuthType,
   SismoConnect,
   SismoConnectResponse,
+  SismoConnectServer,
   SismoConnectVerifiedResult,
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
@@ -15,6 +16,7 @@ import { MAX_CHARACTERS, sismoConnectConfig } from "@/app/configs/configs";
 import { getWhiteboardById } from "../../common";
 
 let whiteboard: Whiteboard | null = null;
+let sismoConnect: SismoConnectServer | null = null;
 
 export async function POST(req: Request): Promise<NextResponse> {
   const sismoConnectResponse: SismoConnectResponse = await req.json();
@@ -25,6 +27,18 @@ export async function POST(req: Request): Promise<NextResponse> {
     whiteboard = await getWhiteboardById(signedMessage.message.whiteboardId);
     if (!whiteboard) {
       return NextResponse.json({ error: "Whiteboard not found" });
+    }
+    if (!whiteboard.appId) {
+      return NextResponse.json({ error: "Whiteboard appId not found" });
+    }
+    sismoConnect = SismoConnect({
+      config: {
+        appId: sismoConnectResponse.appId,
+      },
+    });
+    console.log("sismoConnect", sismoConnect);
+    if (!sismoConnect) {
+      return NextResponse.json({ error: "SismoConnect not found" });
     }
     if (signedMessage.type === MessageOperationType.POST) {
       return await addMessage(sismoConnectResponse, signedMessage);
@@ -37,8 +51,6 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "No signed message" });
   }
 }
-
-const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 async function addMessage(
   sismoConnectResponse: SismoConnectResponse,
@@ -73,6 +85,7 @@ async function addMessageToDB(
         whiteboardId: whiteboardId,
       },
     });
+    console.log("existingMessage", existingMessage);
     if (!existingMessage) {
       const newMessage = await prisma.message.create({
         data: {
@@ -92,9 +105,10 @@ async function addMessageToDB(
         return NextResponse.json("Messages not found");
       }
     } else {
-      return NextResponse.json({
-        error: "The user has already posted a message",
-      });
+      return NextResponse.json(
+        new Error("The vaultId has already posted a message"),
+        { status: 403 }
+      );
     }
   } catch (error) {
     return NextResponse.json(error);
@@ -111,6 +125,9 @@ async function verifyResponseAddMessage(
     const claims = whiteboard?.groupIds?.map((groupId) => ({
       groupId: groupId,
     }));
+    if (!sismoConnect) {
+      return "";
+    }
     const result: SismoConnectVerifiedResult = await sismoConnect.verify(
       sismoConnectResponse,
       {
@@ -119,6 +136,7 @@ async function verifyResponseAddMessage(
         signature: { message: message },
       }
     );
+    console.log("result", result);
     const vaultId = result.getUserId(AuthType.VAULT);
     return vaultId;
   }

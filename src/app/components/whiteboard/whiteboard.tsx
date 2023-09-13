@@ -12,11 +12,13 @@ import {
 import {
   AuthType,
   SismoConnect,
+  SismoConnectClient,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
 import {
   MAX_Z_INDEX,
   defaultInputColor,
+  redColor,
   sismoConnectConfig,
 } from "../../configs/configs";
 import MessageModal from "../message-modal/message-modal";
@@ -26,8 +28,11 @@ import Loading from "../loading-modal/loading-modal";
 import Header from "../header/header";
 import { Message as MessageType } from "@prisma/client";
 import ShareWhiteboard from "../share-whiteboard/share-whiteboard";
+// import { SismoConnectServer } from "@sismo-core/sismo-connect-server";
 
-const sismoConnect = SismoConnect({ config: sismoConnectConfig });
+// const sismoConnect = SismoConnect({ config: sismoConnectConfig });
+
+let sismoConnect: SismoConnectClient | null = null;
 
 const API_BASE_URL = "/api/message";
 const API_ENDPOINTS = {
@@ -78,6 +83,14 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     whiteboard?.authorVaultId === user?.vaultId
       ? setIsWhiteboardAuthor(true)
       : setIsWhiteboardAuthor(false);
+    if (whiteboard?.appId) {
+      localStorage.setItem("currentAppId", whiteboard.appId);
+      sismoConnect = SismoConnect({
+        config: {
+          appId: whiteboard.appId,
+        },
+      });
+    }
   }, [user, whiteboard]);
 
   useEffect(() => {
@@ -198,6 +211,10 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     const claims = whiteboard?.groupIds?.map((groupId) => ({
       groupId: groupId,
     }));
+    if (!sismoConnect) {
+      console.error("Error with sismoConnect");
+      return;
+    }
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
@@ -219,6 +236,10 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
         whiteboardId: whiteboardId,
       },
     };
+    if (!sismoConnect) {
+      console.error("Error with sismoConnect");
+      return;
+    }
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
@@ -229,6 +250,22 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   };
 
   useEffect(() => {
+    console.log("useEffect sismoConnect");
+    if (!sismoConnect) {
+      console.log("No sismoConnect");
+      const appId = localStorage.getItem("currentAppId");
+      if (!appId) {
+        console.error("No appId found in localStorage");
+        return;
+      }
+      sismoConnect = SismoConnect({
+        config: {
+          appId: appId,
+        },
+      });
+      console.log("sismoConnect created", sismoConnect);
+    }
+    console.log("GO");
     const responseMessage: SismoConnectResponse | null =
       sismoConnect.getResponse();
     if (responseMessage) {
@@ -282,7 +319,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
           {isVerifying && <Loading text="Checking the proof..." />}
         </div>
       )}
-      {isFetchingMessages && messages.length == 0 && (
+      {!isVerifying && isFetchingMessages && messages.length == 0 && (
         <Loading text="Loading messages..." />
       )}
       <MessageModal
