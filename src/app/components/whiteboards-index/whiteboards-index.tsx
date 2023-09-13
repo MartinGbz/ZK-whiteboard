@@ -67,6 +67,23 @@ const WhiteboardsIndex = () => {
               };
             })
           );
+
+        // sort by curated and then by creation date (oldest first) and then by name
+        whiteboardsWithResolvedGroupIds.sort((a, b) => {
+          if (a.curated && !b.curated) {
+            return -1;
+          } else if (!a.curated && b.curated) {
+            return 1;
+          } else {
+            if (a.id < b.id) {
+              return -1;
+            } else if (a.id > b.id) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }
+        });
         setWhiteboards(whiteboardsWithResolvedGroupIds);
       } catch (error) {
         console.error(error);
@@ -128,6 +145,7 @@ const WhiteboardsIndex = () => {
                       padding: "10px",
                       borderRadius: "10px",
                       boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                      filter: "brightness(1.1)",
                     }}
                     disabled={true}
                     onClick={() => {

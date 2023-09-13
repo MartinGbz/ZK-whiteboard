@@ -42,3 +42,7 @@
   font-size: 12px;
   margin-top: 5px;
 }
+
+.MuiAutocomplete-noOptions {
+  font-size: 14px;
+}

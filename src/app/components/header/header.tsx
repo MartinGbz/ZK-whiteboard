@@ -150,7 +150,7 @@ const Header: React.FC<HeaderProps> = ({
         <div className="login">
           <span className="user_id">
             {" "}
-            {user.vaultId.substring(0, 5) + "..."}{" "}
+            {user.vaultId.substring(0, 7) + "..."}{" "}
           </span>
           <button
             className="logout_button"

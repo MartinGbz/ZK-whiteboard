@@ -18,6 +18,7 @@
   margin-right: 5px;
   font-size: 12px;
   color: "white";
+  cursor: default;
 }
 
 .logout_button {

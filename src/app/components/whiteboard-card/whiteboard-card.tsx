@@ -10,10 +10,10 @@ import LoginIcon from "@mui/icons-material/Login";
 import {
   AuthType,
   SismoConnect,
-  SismoConnectButton,
   SismoConnectClient,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
+import { Tooltip } from "@mui/material";
 
 interface WhiteboardCardProps {
   vaultId: string | null;
@@ -35,9 +35,10 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   const router = useRouter();
 
   const [isHovering, setIsHovering] = useState<number | null>(null);
-  const [isLoging, setIsLoging] = useState<boolean>(false);
 
   const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
+  const [previewMouseOver, setPreviewMouseOver] = useState<boolean>(false);
+  const [loginMouseOver, setLoginMouseOver] = useState<boolean>(false);
 
   let currentVaultId = localStorage.getItem(
     "vaultId-whiteboard-" + whiteboard.id
@@ -100,7 +101,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
 
   async function loginToWhiteboard(sismoConnectResponse: SismoConnectResponse) {
     if (!currentVaultId) {
-      setIsLoging(true);
       const response = await fetch("/api/whiteboard/login", {
         method: "POST",
         body: JSON.stringify(sismoConnectResponse),
@@ -110,7 +110,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
       });
       const res = await response.json();
       localStorage.setItem("vaultId-whiteboard-" + whiteboard.id, res.vaultId);
-      setIsLoging(false);
     }
     whiteboardClick(whiteboard);
   }
@@ -163,15 +162,22 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             style={{
               gridRow: 1,
               gridColumn: 1,
+              display: "flex",
+              alignItems: "center",
             }}>
-            {whiteboard.name}{" "}
+            <div>{whiteboard.name}</div>
             {whiteboard.curated && (
-              <VerifiedIcon
+              <div
                 style={{
-                  fontSize: "12px",
-                }}
-                color="primary"
-              />
+                  marginLeft: "5px",
+                }}>
+                <VerifiedIcon
+                  style={{
+                    fontSize: "17px",
+                  }}
+                  color="primary"
+                />
+              </div>
             )}
           </div>
           <div
@@ -183,7 +189,8 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
               gridColumn: 1,
             }}>
             {" "}
-            from: {whiteboard.authorVaultId.substring(0, 7)}{" "}
+            from: {whiteboard.authorVaultId.substring(0, 7)}
+            {"..."}
           </div>{" "}
           <div
             style={{
@@ -192,39 +199,65 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
               justifySelf: "end",
               display: "flex",
             }}>
-            <button
-              style={{
-                backgroundColor: blueColor,
-                marginLeft: "10px",
-                padding: "5px",
-                cursor: "pointer",
-                borderRadius: "10px",
-                border: "none",
-                boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
-                fontSize: "10px",
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                whiteboardClick(whiteboard);
-              }}>
-              <PreviewIcon />
-            </button>
-            <button
-              style={{
-                backgroundColor: greenColor,
-                marginLeft: "10px",
-                padding: "5px",
-                cursor: "pointer",
-                borderRadius: "10px",
-                border: "none",
-                boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                requestLoginToWhiteboard();
-              }}>
-              <LoginIcon />
-            </button>
+            <Tooltip title="Preview">
+              <button
+                style={{
+                  marginLeft: "10px",
+                  padding: "5px",
+                  cursor: "pointer",
+                  borderRadius: "10px",
+                  border: "none",
+                  fontSize: "10px",
+
+                  background: !previewMouseOver
+                    ? "linear-gradient(145deg, #8bb1ff, #7595e6)"
+                    : "linear-gradient(145deg, #7595e6, #8bb1ff)",
+                  boxShadow: !previewMouseOver
+                    ? "10px 10px 20px #cdcdcd, -10px -10px 20px #cdcdcd"
+                    : "10px 10px 20px #cdcdcd, -10px -10px 20px #cdcdcd",
+                }}
+                onMouseOver={() => {
+                  setPreviewMouseOver(true);
+                }}
+                onMouseLeave={() => {
+                  setPreviewMouseOver(false);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  whiteboardClick(whiteboard);
+                }}>
+                <PreviewIcon />
+              </button>
+            </Tooltip>
+            <Tooltip title="Enter">
+              <button
+                style={{
+                  marginLeft: "10px",
+                  padding: "5px",
+                  cursor: "pointer",
+                  borderRadius: "10px",
+                  border: "none",
+
+                  background: !loginMouseOver
+                    ? "linear-gradient(145deg, #65d887, #55b671)"
+                    : "linear-gradient(145deg, #55b671, #65d887)",
+                  boxShadow: !loginMouseOver
+                    ? "10px 10px 20px #cdcdcd, -10px -10px 20px #cdcdcd"
+                    : "10px 10px 20px #cdcdcd, -10px -10px 20px #cdcdcd",
+                }}
+                onMouseOver={() => {
+                  setLoginMouseOver(true);
+                }}
+                onMouseLeave={() => {
+                  setLoginMouseOver(false);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  requestLoginToWhiteboard();
+                }}>
+                <LoginIcon />
+              </button>
+            </Tooltip>
           </div>
         </div>
         <div

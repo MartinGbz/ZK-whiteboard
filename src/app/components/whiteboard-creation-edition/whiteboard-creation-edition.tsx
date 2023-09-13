@@ -343,8 +343,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             <Autocomplete
               className="inputs"
               ListboxProps={{
-                style: { fontSize: "15px", backgroundColor: "#e9e9e9" },
+                style: { fontSize: "14px", backgroundColor: "#e9e9e9" },
               }}
+              noOptionsText={"No groups found"}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -354,6 +355,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                       borderRadius: "5px",
                       backgroundColor: "#e9e9e9",
                       width: "300px",
+                      fontSize: "14px",
+                      paddingBottom: "10px",
+                      paddingTop: "10px",
+                      paddingLeft: "10px",
+                      paddingRight: "10px",
                     },
                   }}
                 />
