@@ -6,6 +6,17 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import LaunchIcon from "@mui/icons-material/Launch";
+import PreviewIcon from "@mui/icons-material/Preview";
+import { blueColor, greenColor } from "@/app/configs/configs";
+import LoginIcon from "@mui/icons-material/Login";
+import {
+  AuthType,
+  SismoConnect,
+  SismoConnectButton,
+  SismoConnectClient,
+  SismoConnectResponse,
+} from "@sismo-core/sismo-connect-react";
 
 interface WhiteboardCardProps {
   vaultId: string | null;
@@ -27,8 +38,21 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   const router = useRouter();
 
   const [isHovering, setIsHovering] = useState<number | null>(null);
+  const [isLoging, setIsLoging] = useState<boolean>(false);
 
   const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
+
+  let currentVaultId = localStorage.getItem(
+    "vaultId-whiteboard-" + whiteboard.id
+  );
+
+  let responseMessage: SismoConnectResponse | null = null;
+
+  let sismoConnect: SismoConnectClient = SismoConnect({
+    config: {
+      appId: whiteboard.appId ?? "",
+    },
+  });
 
   useEffect(() => {
     setMaxHeights(maxHeightsList);
@@ -57,6 +81,60 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
     router.push("/whiteboard/" + whiteboard.id + "/settings");
   }
 
+  const requestLoginToWhiteboard = async () => {
+    console.log("### requestLoginToWhiteboard");
+    currentVaultId = localStorage.getItem(
+      "vaultId-whiteboard-" + whiteboard.id
+    );
+    if (currentVaultId) {
+      whiteboardClick(whiteboard);
+    } else {
+      sismoConnect.request({
+        namespace: "main",
+        auth: { authType: AuthType.VAULT },
+      });
+    }
+  };
+
+  useEffect(() => {
+    console.log("responseMessage", responseMessage);
+    if (responseMessage) {
+      loginToWhiteboard(responseMessage);
+    }
+  }, [responseMessage]);
+
+  async function loginToWhiteboard(sismoConnectResponse: SismoConnectResponse) {
+    console.log("### sismoConnectResponse", sismoConnectResponse);
+    if (!currentVaultId) {
+      setIsLoging(true);
+      const response = await fetch("/api/whiteboard/login", {
+        method: "POST",
+        body: JSON.stringify(sismoConnectResponse),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res = await response.json();
+      console.log("### res", res);
+      localStorage.setItem("vaultId-whiteboard-" + whiteboard.id, res.vaultId);
+      setIsLoging(false);
+    }
+    whiteboardClick(whiteboard);
+  }
+
+  useEffect(() => {
+    responseMessage = sismoConnect.getResponse();
+    if (responseMessage?.appId === whiteboard.appId && responseMessage) {
+      // const fetchData = async () => {
+      //   if (responseMessage.signedMessage) {
+      //     setSismoConnectResponseMessage(responseMessage);
+      //   }
+      // };
+      loginToWhiteboard(responseMessage);
+      // fetchData();
+    }
+  }, []);
+
   return (
     <div
       style={{
@@ -84,7 +162,9 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
           maxHeight: maxHeights[index],
           transition: "max-height 0.7s ease",
         }}
-        onClick={() => whiteboardClick(whiteboard)}>
+        onClick={(e) => {
+          handleDivClick(index);
+        }}>
         <div
           style={{
             marginBottom: "15px",
@@ -127,7 +207,24 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             }}>
             <button
               style={{
-                backgroundColor: "white",
+                backgroundColor: blueColor,
+                marginLeft: "10px",
+                padding: "5px",
+                cursor: "pointer",
+                borderRadius: "10px",
+                border: "none",
+                boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                fontSize: "10px",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                whiteboardClick(whiteboard);
+              }}>
+              <PreviewIcon />
+            </button>
+            <button
+              style={{
+                backgroundColor: greenColor,
                 marginLeft: "10px",
                 padding: "5px",
                 cursor: "pointer",
@@ -137,23 +234,30 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                handleDivClick(index);
+                requestLoginToWhiteboard();
+                // whiteboardClick(whiteboard);
               }}>
-              {maxHeights[index] === baseMaxHeight && (
-                <ExpandMoreIcon
-                  sx={{
-                    fontSize: "30px",
-                  }}
-                />
-              )}
-              {maxHeights[index] === maxMaxHeight && (
-                <ExpandLessIcon
-                  sx={{
-                    fontSize: "30px",
-                  }}
-                />
-              )}
+              <LoginIcon />
             </button>
+            {/* <SismoConnectButton
+              overrideStyle={{
+                gridColumn: "3",
+                width: "fit-content",
+                justifySelf: "end",
+                height: "15px",
+                backgroundColor: "lightgray",
+                color: "black",
+                alignSelf: "center",
+              }}
+              config={{
+                appId: whiteboard.appId ?? "",
+              }}
+              auth={{ authType: AuthType.VAULT }}
+              namespace="main"
+              onResponse={(response: SismoConnectResponse) => {
+                loginToWhiteboard(response);
+              }}
+            /> */}
           </div>
         </div>
         <div

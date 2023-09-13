@@ -13,6 +13,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  console.log("LL req", req);
   const SismoConnectResponse = await req.json();
   const vaultId = await verifyResponse(SismoConnectResponse);
   if (!vaultId) {

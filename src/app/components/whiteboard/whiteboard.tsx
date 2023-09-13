@@ -69,6 +69,12 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
   const [currentURL, setCurrentURL] = useState("");
 
+  const whiteboardVaultId = localStorage.getItem(
+    "vaultId-whiteboard-" + whiteboardId
+  );
+
+  console.log("whiteboardVaultId", whiteboardVaultId);
+
   const router = useRouter();
 
   const redirectToRoot = useCallback(() => {
@@ -155,10 +161,11 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
   useEffect(() => {
     const isUserMessageExists = messages.some(
-      (message: MessageType) => message.authorVaultId === user?.vaultId
+      (message: MessageType) => message.authorVaultId === whiteboardVaultId
     );
+    console.log("isUserMessageExists", isUserMessageExists);
     setIsUserMessageExists(isUserMessageExists);
-  }, [messages, user]);
+  }, [messages]);
 
   useEffect(() => {
     if (isModalOpen && messageInputRef.current) {
@@ -302,17 +309,17 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
           className="messages_container"
           style={{
             cursor:
-              isUserMessageExists || !user?.vaultId ? "default" : "pointer",
+              isUserMessageExists || !whiteboardVaultId ? "default" : "pointer",
             position: "relative",
           }}
           onClick={(e) =>
-            !isUserMessageExists && user?.vaultId && startMessageCreation(e)
+            !isUserMessageExists && whiteboardVaultId && startMessageCreation(e)
           }>
           {messages.map((message: MessageType) => (
             <Message
               key={message.authorVaultId}
               message={message}
-              vaultId={user?.vaultId ?? ""}
+              vaultId={whiteboardVaultId ?? ""}
               onDelete={(message) => requestDeleteMessage(message)}
             />
           ))}
