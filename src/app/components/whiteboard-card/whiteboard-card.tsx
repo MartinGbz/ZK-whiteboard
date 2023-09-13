@@ -5,7 +5,11 @@ import { WhiteboardIndex } from "@/app/types/whiteboard-types";
 import SettingsIcon from "@mui/icons-material/Settings";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import PreviewIcon from "@mui/icons-material/Preview";
-import { blueColor, greenColor } from "@/app/configs/configs";
+import {
+  WHITEBOARD_VAULTID_VARNAME,
+  blueColor,
+  greenColor,
+} from "@/app/configs/configs";
 import LoginIcon from "@mui/icons-material/Login";
 import {
   AuthType,
@@ -41,7 +45,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   const [loginMouseOver, setLoginMouseOver] = useState<boolean>(false);
 
   let currentVaultId = localStorage.getItem(
-    "vaultId-whiteboard-" + whiteboard.id
+    WHITEBOARD_VAULTID_VARNAME + whiteboard.id
   );
 
   let responseMessage: SismoConnectResponse | null = null;
@@ -81,7 +85,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
 
   const requestLoginToWhiteboard = async () => {
     currentVaultId = localStorage.getItem(
-      "vaultId-whiteboard-" + whiteboard.id
+      WHITEBOARD_VAULTID_VARNAME + whiteboard.id
     );
     if (currentVaultId) {
       whiteboardClick(whiteboard);
@@ -109,7 +113,10 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
         },
       });
       const res = await response.json();
-      localStorage.setItem("vaultId-whiteboard-" + whiteboard.id, res.vaultId);
+      localStorage.setItem(
+        WHITEBOARD_VAULTID_VARNAME + whiteboard.id,
+        res.vaultId
+      );
     }
     whiteboardClick(whiteboard);
   }

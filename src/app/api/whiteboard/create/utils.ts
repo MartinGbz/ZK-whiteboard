@@ -35,12 +35,19 @@ export async function getAppId(whiteboardId: number): Promise<string> {
     throw new Error("No verifyCookie");
   }
 
+  if (!process.env.APP_DOMAIN_NAME) {
+    throw new Error("No APP_DOMAIN_NAME env variable set");
+  }
+  if (!process.env.APP_TITLE) {
+    throw new Error("No APP_TITLE env variable set");
+  }
+
   const body = {
     appInput: {
-      name: "zk-whiteboard-test-" + whiteboardId,
+      name: process.env.APP_TITLE + whiteboardId,
       description:
-        "This is an app created by a user of zk-whiteboard.xyz. It allows to create a new whiteboard.",
-      authorizedDomains: [process.env.DOMAIN_NAME],
+        "This is an app created by zk-whiteboard.xyz user. It lets you create a new whiteboard.",
+      authorizedDomains: [process.env.APP_DOMAIN_NAME],
       logoBase64: LOGO_BASE_64,
       creatorId: wallet.address,
     },

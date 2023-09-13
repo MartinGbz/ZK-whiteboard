@@ -17,6 +17,7 @@ import {
   MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
   MAX_WHITEBOARD_GROUPS,
   MAX_WHITEBOARD_GROUPS_MESSAGE,
+  MAX_WHITEBOARD_PER_USER,
   sismoConnectConfig,
 } from "@/app/configs/configs";
 import { getAppId } from "./utils";
@@ -95,7 +96,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         { status: 404 }
       );
     }
-    if (user?.createdWhiteboards.length >= 10) {
+    if (user?.createdWhiteboards.length >= MAX_WHITEBOARD_PER_USER) {
       return NextResponse.json(
         {
           error: "You've reached the maximum number of whiteboards created.",

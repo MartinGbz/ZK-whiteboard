@@ -15,7 +15,12 @@ import {
   SismoConnectClient,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
-import { MAX_Z_INDEX, defaultInputColor } from "../../configs/configs";
+import {
+  CURRENT_APPID_VARNAME,
+  MAX_Z_INDEX,
+  WHITEBOARD_VAULTID_VARNAME,
+  defaultInputColor,
+} from "../../configs/configs";
 import MessageModal from "../message-modal/message-modal";
 import Message from "../message/message";
 import { useRouter } from "next/navigation";
@@ -62,7 +67,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   const [currentURL, setCurrentURL] = useState("");
 
   const whiteboardVaultId = localStorage.getItem(
-    "vaultId-whiteboard-" + whiteboardId
+    WHITEBOARD_VAULTID_VARNAME + whiteboardId
   );
 
   const router = useRouter();
@@ -80,7 +85,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
       ? setIsWhiteboardAuthor(true)
       : setIsWhiteboardAuthor(false);
     if (whiteboard?.appId) {
-      localStorage.setItem("currentAppId", whiteboard.appId);
+      localStorage.setItem(CURRENT_APPID_VARNAME, whiteboard.appId);
       sismoConnect = SismoConnect({
         config: {
           appId: whiteboard.appId,
@@ -247,7 +252,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
   useEffect(() => {
     if (!sismoConnect) {
-      const appId = localStorage.getItem("currentAppId");
+      const appId = localStorage.getItem(CURRENT_APPID_VARNAME);
       if (!appId) {
         console.error("No appId found in localStorage");
         return;

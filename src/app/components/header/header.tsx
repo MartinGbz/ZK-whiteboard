@@ -1,5 +1,8 @@
 "use client";
-import { sismoConnectConfig } from "@/app/configs/configs";
+import {
+  ZKWHITEBOARD_VAULTID_VARNAME,
+  sismoConnectConfig,
+} from "@/app/configs/configs";
 import {
   AuthType,
   SismoConnectButton,
@@ -30,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const storagedVaultId = localStorage.getItem("vaultId");
+    const storagedVaultId = localStorage.getItem(ZKWHITEBOARD_VAULTID_VARNAME);
     if (storagedVaultId) {
       setIsLoging(true);
       getUser(storagedVaultId);
@@ -71,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({
       const user: User = res.user;
       setUser(user);
       onChangeUser ? onChangeUser(user) : undefined;
-      localStorage.setItem("vaultId", user.vaultId);
+      localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
       router.push(currentRoute);
       setIsLoging(false);
     }
@@ -79,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({
 
   async function logout() {
     setUser(null);
-    localStorage.removeItem("vaultId");
+    localStorage.removeItem(ZKWHITEBOARD_VAULTID_VARNAME);
     onChangeUser ? onChangeUser(null) : undefined;
   }
 
