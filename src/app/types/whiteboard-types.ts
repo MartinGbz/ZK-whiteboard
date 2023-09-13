@@ -20,7 +20,7 @@ export type SignedMessage = {
 
 export type WhiteboardCreateSignedMessage = {
   type: WhiteboardOperationType;
-  message: Omit<WhiteboardPrisma, "id" | "authorVaultId" | "curated">;
+  message: Omit<WhiteboardPrisma, "id" | "authorVaultId" | "curated" | "appId">;
 };
 
 export type WhiteboardEditSignedMessage = {

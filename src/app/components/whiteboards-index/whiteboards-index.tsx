@@ -60,6 +60,7 @@ const WhiteboardsIndex = () => {
                 id: whiteboard.id,
                 name: whiteboard.name,
                 description: whiteboard.description,
+                appId: whiteboard.appId,
                 authorVaultId: whiteboard.authorVaultId,
                 curated: whiteboard.curated,
                 groupNames: resolvedGroupNames,

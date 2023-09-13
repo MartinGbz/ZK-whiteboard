@@ -25,6 +25,7 @@ model Whiteboard {
   name          String
   description   String
   groupIds      String[]
+  appId         String?
   author        User      @relation(fields: [authorVaultId], references: [vaultId])
   authorVaultId String
   messages      Message[]
