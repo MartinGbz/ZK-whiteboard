@@ -35,8 +35,6 @@ export async function getAppId(whiteboardId: number): Promise<string> {
     throw new Error("No verifyCookie");
   }
 
-  console.log("process.env.DOMAIN", process.env.DOMAIN);
-
   const body = {
     appInput: {
       name: "zk-whiteboard-test-" + whiteboardId,
@@ -57,7 +55,6 @@ export async function getAppId(whiteboardId: number): Promise<string> {
     }
   );
 
-  console.log("response.data", response.data);
   return await response.data.id;
 }
 

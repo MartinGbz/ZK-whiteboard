@@ -4,9 +4,6 @@ import { useRouter } from "next/navigation";
 import { WhiteboardIndex } from "@/app/types/whiteboard-types";
 import SettingsIcon from "@mui/icons-material/Settings";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import LaunchIcon from "@mui/icons-material/Launch";
 import PreviewIcon from "@mui/icons-material/Preview";
 import { blueColor, greenColor } from "@/app/configs/configs";
 import LoginIcon from "@mui/icons-material/Login";
@@ -82,7 +79,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   }
 
   const requestLoginToWhiteboard = async () => {
-    console.log("### requestLoginToWhiteboard");
     currentVaultId = localStorage.getItem(
       "vaultId-whiteboard-" + whiteboard.id
     );
@@ -97,14 +93,12 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   };
 
   useEffect(() => {
-    console.log("responseMessage", responseMessage);
     if (responseMessage) {
       loginToWhiteboard(responseMessage);
     }
   }, [responseMessage]);
 
   async function loginToWhiteboard(sismoConnectResponse: SismoConnectResponse) {
-    console.log("### sismoConnectResponse", sismoConnectResponse);
     if (!currentVaultId) {
       setIsLoging(true);
       const response = await fetch("/api/whiteboard/login", {
@@ -115,7 +109,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
         },
       });
       const res = await response.json();
-      console.log("### res", res);
       localStorage.setItem("vaultId-whiteboard-" + whiteboard.id, res.vaultId);
       setIsLoging(false);
     }
@@ -125,13 +118,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   useEffect(() => {
     responseMessage = sismoConnect.getResponse();
     if (responseMessage?.appId === whiteboard.appId && responseMessage) {
-      // const fetchData = async () => {
-      //   if (responseMessage.signedMessage) {
-      //     setSismoConnectResponseMessage(responseMessage);
-      //   }
-      // };
       loginToWhiteboard(responseMessage);
-      // fetchData();
     }
   }, []);
 
@@ -235,29 +222,9 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
               onClick={(e) => {
                 e.stopPropagation();
                 requestLoginToWhiteboard();
-                // whiteboardClick(whiteboard);
               }}>
               <LoginIcon />
             </button>
-            {/* <SismoConnectButton
-              overrideStyle={{
-                gridColumn: "3",
-                width: "fit-content",
-                justifySelf: "end",
-                height: "15px",
-                backgroundColor: "lightgray",
-                color: "black",
-                alignSelf: "center",
-              }}
-              config={{
-                appId: whiteboard.appId ?? "",
-              }}
-              auth={{ authType: AuthType.VAULT }}
-              namespace="main"
-              onResponse={(response: SismoConnectResponse) => {
-                loginToWhiteboard(response);
-              }}
-            /> */}
           </div>
         </div>
         <div

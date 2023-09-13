@@ -1,4 +1,3 @@
-import { sismoConnectConfig } from "@/app/configs/configs";
 import {
   MessageOperationType,
   SignedMessage,
@@ -54,7 +53,13 @@ export async function POST(req: Request): Promise<NextResponse> {
 async function deleteMessage(
   sismoConnectResponse: SismoConnectResponse
 ): Promise<NextResponse> {
-  const vaultId = await verifyResponseDeleteMessage(sismoConnectResponse);
+  if (!sismoConnect) {
+    return NextResponse.json({ error: "SismoConnect not defined" });
+  }
+  const vaultId = await verifyResponseDeleteMessage(
+    sismoConnectResponse,
+    sismoConnect
+  );
   if (vaultId) {
     if (!sismoConnectResponse.signedMessage) {
       return NextResponse.json({
@@ -105,14 +110,12 @@ async function deleteMessageFromDB(
 }
 
 async function verifyResponseDeleteMessage(
-  sismoConnectResponse: SismoConnectResponse
+  sismoConnectResponse: SismoConnectResponse,
+  sismoConnect: SismoConnectServer
 ): Promise<string | undefined> {
   const message = sismoConnectResponse.signedMessage
     ? sismoConnectResponse.signedMessage
     : "";
-  if (!sismoConnect) {
-    return "";
-  }
   const result: SismoConnectVerifiedResult = await sismoConnect.verify(
     sismoConnectResponse,
     {

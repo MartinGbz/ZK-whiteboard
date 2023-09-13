@@ -12,7 +12,7 @@ import {
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
-import { MAX_CHARACTERS, sismoConnectConfig } from "@/app/configs/configs";
+import { MAX_CHARACTERS } from "@/app/configs/configs";
 import { getWhiteboardById } from "../../common";
 
 let whiteboard: Whiteboard | null = null;
@@ -36,9 +36,8 @@ export async function POST(req: Request): Promise<NextResponse> {
         appId: sismoConnectResponse.appId,
       },
     });
-    console.log("sismoConnect", sismoConnect);
     if (!sismoConnect) {
-      return NextResponse.json({ error: "SismoConnect not found" });
+      return NextResponse.json({ error: "SismoConnect not defined" });
     }
     if (signedMessage.type === MessageOperationType.POST) {
       return await addMessage(sismoConnectResponse, signedMessage);
@@ -62,7 +61,13 @@ async function addMessage(
         "The number of characters in the message exceeds the maximum allowed (100 characters max.)",
     });
   }
-  const vaultId = await verifyResponseAddMessage(sismoConnectResponse);
+  if (!sismoConnect) {
+    return NextResponse.json({ error: "SismoConnect not defined" });
+  }
+  const vaultId = await verifyResponseAddMessage(
+    sismoConnectResponse,
+    sismoConnect
+  );
   if (vaultId) {
     const allMessagesInDB = await addMessageToDB(vaultId, signedMessage);
     return allMessagesInDB;
@@ -85,7 +90,6 @@ async function addMessageToDB(
         whiteboardId: whiteboardId,
       },
     });
-    console.log("existingMessage", existingMessage);
     if (!existingMessage) {
       const newMessage = await prisma.message.create({
         data: {
@@ -116,7 +120,8 @@ async function addMessageToDB(
 }
 
 async function verifyResponseAddMessage(
-  sismoConnectResponse: SismoConnectResponse
+  sismoConnectResponse: SismoConnectResponse,
+  sismoConnect: SismoConnectServer
 ): Promise<string | undefined> {
   const message = sismoConnectResponse.signedMessage
     ? sismoConnectResponse.signedMessage
@@ -125,9 +130,6 @@ async function verifyResponseAddMessage(
     const claims = whiteboard?.groupIds?.map((groupId) => ({
       groupId: groupId,
     }));
-    if (!sismoConnect) {
-      return "";
-    }
     const result: SismoConnectVerifiedResult = await sismoConnect.verify(
       sismoConnectResponse,
       {
@@ -136,7 +138,6 @@ async function verifyResponseAddMessage(
         signature: { message: message },
       }
     );
-    console.log("result", result);
     const vaultId = result.getUserId(AuthType.VAULT);
     return vaultId;
   }

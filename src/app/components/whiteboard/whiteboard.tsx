@@ -15,12 +15,7 @@ import {
   SismoConnectClient,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
-import {
-  MAX_Z_INDEX,
-  defaultInputColor,
-  redColor,
-  sismoConnectConfig,
-} from "../../configs/configs";
+import { MAX_Z_INDEX, defaultInputColor } from "../../configs/configs";
 import MessageModal from "../message-modal/message-modal";
 import Message from "../message/message";
 import { useRouter } from "next/navigation";
@@ -28,9 +23,6 @@ import Loading from "../loading-modal/loading-modal";
 import Header from "../header/header";
 import { Message as MessageType } from "@prisma/client";
 import ShareWhiteboard from "../share-whiteboard/share-whiteboard";
-// import { SismoConnectServer } from "@sismo-core/sismo-connect-server";
-
-// const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 let sismoConnect: SismoConnectClient | null = null;
 
@@ -72,8 +64,6 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   const whiteboardVaultId = localStorage.getItem(
     "vaultId-whiteboard-" + whiteboardId
   );
-
-  console.log("whiteboardVaultId", whiteboardVaultId);
 
   const router = useRouter();
 
@@ -163,7 +153,6 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     const isUserMessageExists = messages.some(
       (message: MessageType) => message.authorVaultId === whiteboardVaultId
     );
-    console.log("isUserMessageExists", isUserMessageExists);
     setIsUserMessageExists(isUserMessageExists);
   }, [messages]);
 
@@ -257,9 +246,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   };
 
   useEffect(() => {
-    console.log("useEffect sismoConnect");
     if (!sismoConnect) {
-      console.log("No sismoConnect");
       const appId = localStorage.getItem("currentAppId");
       if (!appId) {
         console.error("No appId found in localStorage");
@@ -270,18 +257,11 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
           appId: appId,
         },
       });
-      console.log("sismoConnect created", sismoConnect);
     }
-    console.log("GO");
     const responseMessage: SismoConnectResponse | null =
       sismoConnect.getResponse();
-    if (responseMessage) {
-      const fetchData = async () => {
-        if (responseMessage.signedMessage) {
-          setSismoConnectResponseMessage(responseMessage);
-        }
-      };
-      fetchData();
+    if (responseMessage?.signedMessage) {
+      setSismoConnectResponseMessage(responseMessage);
     }
   }, []);
 

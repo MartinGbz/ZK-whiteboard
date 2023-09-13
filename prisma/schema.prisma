@@ -9,7 +9,6 @@ datasource db {
 
 model Message {
   id            Int        @id @default(autoincrement())
-  // author        User       @relation(fields: [authorVaultId], references: [vaultId])
   authorVaultId String
   text          String
   positionX     Float
@@ -30,14 +29,9 @@ model Whiteboard {
   authorVaultId String
   messages      Message[]
   curated       Boolean
-  // joinedUsers   User[]    @relation("joinedWhiteboards")
-  // favoriteUsers User[]    @relation("favoriteWhiteboards")
 }
 
 model User {
   vaultId            String       @id
   createdWhiteboards Whiteboard[]
-  // joinedWhiteboards   Whiteboard[] @relation("joinedWhiteboards")
-  // favoriteWhiteboards Whiteboard[] @relation("favoriteWhiteboards")
-  // messages            Message[]
 }

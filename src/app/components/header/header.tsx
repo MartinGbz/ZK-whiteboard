@@ -53,8 +53,8 @@ const Header: React.FC<HeaderProps> = ({
   }
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
-    console.log("@@@sismoConnectResponse");
     // if the reponse does not have a signed message, it means there is no action to perform, only a login
+    // if the appId is the same as the one in the config, it means the login is for the app not for a whiteboard
     if (
       sismoConnectResponse.appId === sismoConnectConfig.appId &&
       !sismoConnectResponse.signedMessage
