@@ -310,7 +310,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
           ))}
         </div>
       </div>
-      {vaultId === whiteboard.authorVaultId && (
+      {/* {vaultId === whiteboard.authorVaultId && (
         <button
           className="delete-button"
           style={{
@@ -337,7 +337,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             }}
           />
         </button>
-      )}
+      )} */}
     </div>
   );
 };

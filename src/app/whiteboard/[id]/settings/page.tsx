@@ -12,8 +12,9 @@ interface pageProps {
 const page = ({ params }: pageProps) => {
   return (
     <div>
-      <MobileModal />
-      <WhiteboardCreationEdition isEdition={true} whiteboardId={params.id} />
+      {/* <MobileModal />
+      <WhiteboardCreationEdition isEdition={true} whiteboardId={params.id} /> */}
+      Settings not activated yet
     </div>
   );
 };
