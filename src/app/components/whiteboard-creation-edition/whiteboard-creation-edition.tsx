@@ -259,9 +259,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
       const url = constructUrlFromMessage(message);
 
-      console.log("API request url:", url);
       await retryRequest(performApiRequest, url, message, 2);
-      // await performApiRequest(url, message);
 
       setIsVerifying(false);
       router.push("/");
