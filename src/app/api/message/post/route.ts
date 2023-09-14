@@ -62,7 +62,10 @@ async function addMessage(
     });
   }
   if (!sismoConnect) {
-    return NextResponse.json({ error: "SismoConnect not defined" });
+    return NextResponse.json(
+      { error: "SismoConnect not defined" },
+      { status: 404 }
+    );
   }
   const vaultId = await verifyResponseAddMessage(
     sismoConnectResponse,
@@ -72,7 +75,7 @@ async function addMessage(
     const response = await addMessageToDB(vaultId, signedMessage);
     return response;
   } else {
-    return NextResponse.json({ error: "ZK Proof incorrect" });
+    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 403 });
   }
 }
 
@@ -110,7 +113,7 @@ async function addMessageToDB(
           {
             error: "Messages not found",
           },
-          { status: 500 }
+          { status: 404 }
         );
       }
     } else {

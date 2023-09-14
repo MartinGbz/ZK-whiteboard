@@ -117,18 +117,15 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
       message: SismoConnectResponse
     ) => {
       try {
-        const response: PostDeletionResponse = await axios.post(url, message, {
+        const response = await axios.post(url, message, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-        return response;
+        return response.data as PostDeletionResponse;
       } catch (error: any) {
         console.error("API request error:", error);
-        alert(
-          "An error occured while posting the message: " +
-            error.response.data.error
-        );
+        alert("An error occured: " + error.response.data.error);
         return null;
       }
     };
@@ -165,10 +162,12 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   }, [redirectToRoot, sismoConnectResponseMessage]);
 
   useEffect(() => {
-    const isUserMessageExists = messages.some(
-      (message: MessageType) => message.authorVaultId === whiteboardVaultId
-    );
-    setIsUserMessageExists(isUserMessageExists);
+    if (messages) {
+      const isUserMessageExists = messages.some(
+        (message: MessageType) => message.authorVaultId === whiteboardVaultId
+      );
+      setIsUserMessageExists(isUserMessageExists);
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -261,24 +260,14 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
   };
 
   useEffect(() => {
-    if (!sismoConnect) {
-      const appId = localStorage.getItem(CURRENT_APPID_VARNAME);
-      if (!appId) {
-        console.error("No appId found in localStorage");
-        return;
+    if (sismoConnect) {
+      const responseMessage: SismoConnectResponse | null =
+        sismoConnect.getResponse();
+      if (responseMessage?.signedMessage) {
+        setSismoConnectResponseMessage(responseMessage);
       }
-      sismoConnect = SismoConnect({
-        config: {
-          appId: appId,
-        },
-      });
     }
-    const responseMessage: SismoConnectResponse | null =
-      sismoConnect.getResponse();
-    if (responseMessage?.signedMessage) {
-      setSismoConnectResponseMessage(responseMessage);
-    }
-  }, []);
+  }, [sismoConnect]);
 
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>

@@ -25,10 +25,16 @@ export async function POST(req: Request): Promise<NextResponse> {
     ) as SignedMessage;
     whiteboard = await getWhiteboardById(signedMessage.message.whiteboardId);
     if (!whiteboard) {
-      return NextResponse.json({ error: "Whiteboard not found" });
+      return NextResponse.json(
+        { error: "Whiteboard not found" },
+        { status: 404 }
+      );
     }
     if (!whiteboard.appId) {
-      return NextResponse.json({ error: "Whiteboard appId not found" });
+      return NextResponse.json(
+        { error: "Whiteboard appId not found" },
+        { status: 404 }
+      );
     }
     sismoConnect = SismoConnect({
       config: {
@@ -36,17 +42,20 @@ export async function POST(req: Request): Promise<NextResponse> {
       },
     });
     if (!sismoConnect) {
-      return NextResponse.json({ error: "SismoConnect not found" });
+      return NextResponse.json(
+        { error: "SismoConnect not found" },
+        { status: 404 }
+      );
     }
     if (signedMessage.type === MessageOperationType.DELETE) {
       return await deleteMessage(sismoConnectResponse);
     } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type" });
+      return NextResponse.json({ error: "No type" }, { status: 404 });
     } else {
-      return NextResponse.json({ error: "Wrong API route" });
+      return NextResponse.json({ error: "Wrong API route" }, { status: 404 });
     }
   } else {
-    return NextResponse.json({ error: "No signed message" });
+    return NextResponse.json({ error: "No signed message" }, { status: 404 });
   }
 }
 
@@ -54,7 +63,10 @@ async function deleteMessage(
   sismoConnectResponse: SismoConnectResponse
 ): Promise<NextResponse> {
   if (!sismoConnect) {
-    return NextResponse.json({ error: "SismoConnect not defined" });
+    return NextResponse.json(
+      { error: "SismoConnect not defined" },
+      { status: 404 }
+    );
   }
   const vaultId = await verifyResponseDeleteMessage(
     sismoConnectResponse,
@@ -62,9 +74,12 @@ async function deleteMessage(
   );
   if (vaultId) {
     if (!sismoConnectResponse.signedMessage) {
-      return NextResponse.json({
-        error: "No signedMessage found in the ZK Proof",
-      });
+      return NextResponse.json(
+        {
+          error: "No signedMessage found in the ZK Proof",
+        },
+        { status: 404 }
+      );
     }
     const message = JSON.parse(
       sismoConnectResponse.signedMessage
@@ -72,7 +87,7 @@ async function deleteMessage(
     const response = await deleteMessageFromDB(vaultId, message);
     return response;
   } else {
-    return NextResponse.json({ error: "ZK Proof incorrect" });
+    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 403 });
   }
 }
 
@@ -91,7 +106,7 @@ async function deleteMessageFromDB(
       },
     });
     if (!messageToDelete) {
-      return NextResponse.json({ error: "No message found" });
+      return NextResponse.json({ error: "No message found" }, { status: 404 });
     }
     const deletedMessage = await prisma.message.delete({
       where: {
@@ -105,7 +120,7 @@ async function deleteMessageFromDB(
         messages: whiteboard.messages,
       });
     } else {
-      return NextResponse.json("Messages not found");
+      return NextResponse.json({ error: "No message found" }, { status: 404 });
     }
   } catch (error) {
     return NextResponse.json(error);
