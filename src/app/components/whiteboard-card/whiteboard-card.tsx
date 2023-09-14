@@ -188,17 +188,22 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             )}
           </div>
           <div
-            title={whiteboard.authorVaultId}
             style={{
               color: "gray",
               fontSize: "10px",
               gridRow: 2,
               gridColumn: 1,
             }}>
-            {" "}
-            from: {whiteboard.authorVaultId.substring(0, 7)}
-            {"..."}
-          </div>{" "}
+            <div
+              title={whiteboard.authorVaultId}
+              style={{
+                width: "fit-content",
+              }}>
+              {whiteboard.authorVaultId !== vaultId
+                ? "from:" + whiteboard.authorVaultId.substring(0, 7) + "..."
+                : "from: You"}
+            </div>
+          </div>
           <div
             style={{
               gridRow: "1 / 3",

@@ -151,7 +151,7 @@ const Header: React.FC<HeaderProps> = ({
       )}
       {user && !isLoging && (
         <div className="login">
-          <span className="user_id">
+          <span title={user.vaultId} className="user_id">
             {" "}
             {user.vaultId.substring(0, 7) + "..."}{" "}
           </span>

@@ -81,13 +81,16 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
           justifyContent: "flex-end",
         }}>
         <div
+          title={message.authorVaultId}
           style={{
             fontSize: "10px",
             fontWeight: "normal",
             fontFamily: "Inter-Regular",
             whiteSpace: "nowrap",
           }}>
-          {"from: " + message.authorVaultId.substring(0, 10) + "..."}
+          {message.authorVaultId !== vaultId
+            ? "from:" + message.authorVaultId.substring(0, 7) + "..."
+            : "from: You"}
         </div>
       </div>
       {vaultId === message.authorVaultId && (
