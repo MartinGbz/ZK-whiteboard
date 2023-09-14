@@ -87,13 +87,17 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
     currentVaultId = localStorage.getItem(
       WHITEBOARD_VAULTID_VARNAME + whiteboard.id
     );
-    if (currentVaultId) {
-      whiteboardClick(whiteboard);
-    } else {
+    if (
+      !currentVaultId ||
+      currentVaultId == "" ||
+      currentVaultId == "undefined"
+    ) {
       sismoConnect.request({
         namespace: "main",
         auth: { authType: AuthType.VAULT },
       });
+    } else {
+      whiteboardClick(whiteboard);
     }
   };
 
@@ -104,20 +108,19 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   }, [responseMessage]);
 
   async function loginToWhiteboard(sismoConnectResponse: SismoConnectResponse) {
-    if (!currentVaultId) {
-      const response = await fetch("/api/whiteboard/login", {
-        method: "POST",
-        body: JSON.stringify(sismoConnectResponse),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const res = await response.json();
-      localStorage.setItem(
-        WHITEBOARD_VAULTID_VARNAME + whiteboard.id,
-        res.vaultId
-      );
-    }
+    console.log("currentVaultId", currentVaultId);
+    const response = await fetch("/api/whiteboard/login", {
+      method: "POST",
+      body: JSON.stringify(sismoConnectResponse),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const res = await response.json();
+    localStorage.setItem(
+      WHITEBOARD_VAULTID_VARNAME + whiteboard.id,
+      res.vaultId
+    );
     whiteboardClick(whiteboard);
   }
 
@@ -211,36 +214,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
               justifySelf: "end",
               display: "flex",
             }}>
-            <Tooltip title="Preview">
-              <button
-                style={{
-                  marginLeft: "10px",
-                  padding: "5px",
-                  cursor: "pointer",
-                  borderRadius: "10px",
-                  border: "none",
-                  fontSize: "10px",
-
-                  background: !previewMouseOver
-                    ? "linear-gradient(145deg, #8bb1ff, #7595e6)"
-                    : "linear-gradient(145deg, #7595e6, #8bb1ff)",
-                  boxShadow: !previewMouseOver
-                    ? "10px 10px 20px #cdcdcd, -10px -10px 20px #cdcdcd"
-                    : "10px 10px 20px #cdcdcd, -10px -10px 20px #cdcdcd",
-                }}
-                onMouseOver={() => {
-                  setPreviewMouseOver(true);
-                }}
-                onMouseLeave={() => {
-                  setPreviewMouseOver(false);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  whiteboardClick(whiteboard);
-                }}>
-                <PreviewIcon />
-              </button>
-            </Tooltip>
             <Tooltip title="Enter">
               <button
                 style={{

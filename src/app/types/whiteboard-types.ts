@@ -18,6 +18,11 @@ export type SignedMessage = {
   message: Omit<Message, "id" | "authorVaultId" | "order">;
 };
 
+export type PostDeletionResponse = {
+  vaultId: string;
+  messages: Message[];
+};
+
 export type WhiteboardCreateSignedMessage = {
   type: WhiteboardOperationType;
   message: Omit<WhiteboardPrisma, "id" | "authorVaultId" | "curated" | "appId">;

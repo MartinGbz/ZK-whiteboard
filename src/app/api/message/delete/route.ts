@@ -69,8 +69,8 @@ async function deleteMessage(
     const message = JSON.parse(
       sismoConnectResponse.signedMessage
     ) as SignedMessage;
-    const deletedMessage = await deleteMessageFromDB(vaultId, message);
-    return deletedMessage;
+    const response = await deleteMessageFromDB(vaultId, message);
+    return response;
   } else {
     return NextResponse.json({ error: "ZK Proof incorrect" });
   }
@@ -100,7 +100,10 @@ async function deleteMessageFromDB(
     });
     const whiteboard = await getWhiteboardById(whiteboardId);
     if (whiteboard?.messages) {
-      return NextResponse.json(whiteboard?.messages);
+      return NextResponse.json({
+        vaultId: vaultId,
+        messages: whiteboard.messages,
+      });
     } else {
       return NextResponse.json("Messages not found");
     }

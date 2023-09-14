@@ -69,8 +69,8 @@ async function addMessage(
     sismoConnect
   );
   if (vaultId) {
-    const allMessagesInDB = await addMessageToDB(vaultId, signedMessage);
-    return allMessagesInDB;
+    const response = await addMessageToDB(vaultId, signedMessage);
+    return response;
   } else {
     return NextResponse.json({ error: "ZK Proof incorrect" });
   }
@@ -104,13 +104,18 @@ async function addMessageToDB(
       const existingMessages = whiteboard?.messages ?? [];
       const messages = [...existingMessages, newMessage];
       if (messages) {
-        return NextResponse.json(messages);
+        return NextResponse.json({ vaultId: vaultId, messages: messages });
       } else {
-        return NextResponse.json("Messages not found");
+        return NextResponse.json(
+          {
+            error: "Messages not found",
+          },
+          { status: 500 }
+        );
       }
     } else {
       return NextResponse.json(
-        new Error("The vaultId has already posted a message"),
+        { error: "The vaultId has already posted a message" },
         { status: 403 }
       );
     }

@@ -7,6 +7,7 @@ import {
   MessageOperationType,
   Whiteboard,
   User,
+  PostDeletionResponse,
 } from "../../types/whiteboard-types";
 
 import {
@@ -28,6 +29,7 @@ import Loading from "../loading-modal/loading-modal";
 import Header from "../header/header";
 import { Message as MessageType } from "@prisma/client";
 import ShareWhiteboard from "../share-whiteboard/share-whiteboard";
+import axios from "axios";
 
 let sismoConnect: SismoConnectClient | null = null;
 
@@ -66,7 +68,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
   const [currentURL, setCurrentURL] = useState("");
 
-  const whiteboardVaultId = localStorage.getItem(
+  let whiteboardVaultId = localStorage.getItem(
     WHITEBOARD_VAULTID_VARNAME + whiteboardId
   );
 
@@ -114,21 +116,28 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
       url: string,
       message: SismoConnectResponse
     ) => {
-      const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(message),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return response.json() as Promise<MessageType[]>;
+      try {
+        const response: PostDeletionResponse = await axios.post(url, message, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        return response;
+      } catch (error: any) {
+        console.error("API request error:", error);
+        alert(
+          "An error occured while posting the message: " +
+            error.response.data.error
+        );
+        return null;
+      }
     };
 
-    const handleApiResponse = async (apiResponse: MessageType[]) => {
+    const handleApiResponse = async (messages: MessageType[]) => {
       setMessageInputValue("");
       setMessageInputColorValue(defaultInputColor);
       setIsModalOpen(false);
-      setMessages(apiResponse);
+      setMessages(messages);
     };
 
     const postMessage = async (message: SismoConnectResponse) => {
@@ -136,16 +145,17 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
       const url = constructUrlFromMessage(message);
 
-      try {
-        const allMessageFromDB: MessageType[] = await performApiRequest(
-          url,
-          message
-        );
-        handleApiResponse(allMessageFromDB);
-      } catch (error) {
-        console.error("API request error:", error);
+      const response = await performApiRequest(url, message);
+      if (response) {
+        if (!whiteboardVaultId) {
+          localStorage.setItem(
+            WHITEBOARD_VAULTID_VARNAME + whiteboardId,
+            response.vaultId
+          );
+          whiteboardVaultId = response.vaultId;
+        }
+        handleApiResponse(response.messages);
       }
-
       setIsVerifying(false);
       redirectToRoot();
     };
@@ -293,12 +303,13 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
         <div
           className="messages_container"
           style={{
-            cursor:
-              isUserMessageExists || !whiteboardVaultId ? "default" : "pointer",
+            cursor: isUserMessageExists ? "default" : "pointer",
             position: "relative",
           }}
           onClick={(e) =>
-            !isUserMessageExists && whiteboardVaultId && startMessageCreation(e)
+            !isUserMessageExists &&
+            !isFetchingMessages &&
+            startMessageCreation(e)
           }>
           {messages.map((message: MessageType) => (
             <Message
@@ -308,28 +319,30 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
               onDelete={(message) => requestDeleteMessage(message)}
             />
           ))}
+          {messages.length == 0 && !isFetchingMessages && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%,-50%)",
+                color: "gray",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                cursor: "pointer",
+              }}>
+              <div
+                style={{
+                  fontSize: "50px",
+                }}>
+                {"👀"}
+              </div>
+              <div>No messages yet</div>
+              <div>Be the first to post a message!</div>
+            </div>
+          )}
           {isVerifying && <Loading text="Checking the proof..." />}
-        </div>
-      )}
-      {messages.length == 0 && !isFetchingMessages && !whiteboardVaultId && (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%,-50%)",
-            color: "gray",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}>
-          <div
-            style={{
-              fontSize: "50px",
-            }}>
-            {":("}
-          </div>
-          <div>No messages yet</div>
         </div>
       )}
       {!isVerifying && isFetchingMessages && messages.length == 0 && (

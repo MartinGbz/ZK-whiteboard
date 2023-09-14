@@ -89,7 +89,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
             whiteSpace: "nowrap",
           }}>
           {message.authorVaultId !== vaultId
-            ? "from:" + message.authorVaultId.substring(0, 7) + "..."
+            ? "from: " + message.authorVaultId.substring(0, 7) + "..."
             : "from: You"}
         </div>
       </div>
