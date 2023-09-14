@@ -81,27 +81,27 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
     setIsHovering(null);
   };
 
-  function onSettings(whiteboard: WhiteboardIndex): void {
-    router.push("/whiteboard/" + whiteboard.id + "/settings");
-  }
+  // function onSettings(whiteboard: WhiteboardIndex): void {
+  //   router.push("/whiteboard/" + whiteboard.id + "/settings");
+  // }
 
-  const requestLoginToWhiteboard = async () => {
-    currentVaultId = localStorage.getItem(
-      WHITEBOARD_VAULTID_VARNAME + whiteboard.id
-    );
-    if (
-      !currentVaultId ||
-      currentVaultId == "" ||
-      currentVaultId == "undefined"
-    ) {
-      sismoConnect.request({
-        namespace: "main",
-        auth: { authType: AuthType.VAULT },
-      });
-    } else {
-      whiteboardClick(whiteboard);
-    }
-  };
+  // const requestLoginToWhiteboard = async () => {
+  //   currentVaultId = localStorage.getItem(
+  //     WHITEBOARD_VAULTID_VARNAME + whiteboard.id
+  //   );
+  //   if (
+  //     !currentVaultId ||
+  //     currentVaultId == "" ||
+  //     currentVaultId == "undefined"
+  //   ) {
+  //     sismoConnect.request({
+  //       namespace: "main",
+  //       auth: { authType: AuthType.VAULT },
+  //     });
+  //   } else {
+  //     whiteboardClick(whiteboard);
+  //   }
+  // };
 
   useEffect(() => {
     if (responseMessage) {
@@ -241,7 +241,8 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  requestLoginToWhiteboard();
+                  // requestLoginToWhiteboard();
+                  whiteboardClick(whiteboard);
                 }}>
                 <LoginIcon />
               </button>
