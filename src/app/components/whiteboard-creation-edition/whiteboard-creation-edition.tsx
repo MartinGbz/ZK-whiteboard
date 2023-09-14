@@ -222,22 +222,36 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       return url;
     };
 
+    async function retryRequest(
+      functionToRetry: any,
+      url: string,
+      message: SismoConnectResponse,
+      retryMax: number
+    ) {
+      for (let i = 0; i < retryMax; i++) {
+        console.log("API request attempt:", i);
+        try {
+          return await functionToRetry(url, message);
+        } catch (error: any) {
+          if (i === retryMax - 1) {
+            console.error("API request error:", error);
+            alert("An error occured. Error: " + error.response.data.error);
+          }
+        }
+      }
+    }
+
     const performApiRequest = async (
       url: string,
       message: SismoConnectResponse
     ) => {
-      try {
-        await axios.post(url, message, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      } catch (error: any) {
-        console.error("API request error:", error);
-        setIsVerifying(false);
-        alert("An error occured. Error: " + error.response.data.error);
-        router.push("/");
-      }
+      await axios.post(url, message, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      setIsVerifying(false);
+      router.push("/");
     };
 
     const postWhiteboard = async (message: SismoConnectResponse) => {
@@ -245,7 +259,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
       const url = constructUrlFromMessage(message);
 
-      await performApiRequest(url, message);
+      console.log("API request url:", url);
+      await retryRequest(performApiRequest, url, message, 2);
+      // await performApiRequest(url, message);
 
       setIsVerifying(false);
       router.push("/");
