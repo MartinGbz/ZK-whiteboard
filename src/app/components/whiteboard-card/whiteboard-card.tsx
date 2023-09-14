@@ -26,6 +26,7 @@ interface WhiteboardCardProps {
   maxHeightsList: Array<number>;
   baseMaxHeight: number;
   maxMaxHeight: number;
+  onLoging?: (login: boolean) => void;
 }
 
 const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
@@ -35,6 +36,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   maxHeightsList,
   baseMaxHeight,
   maxMaxHeight,
+  onLoging,
 }) => {
   const router = useRouter();
 
@@ -108,7 +110,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   }, [responseMessage]);
 
   async function loginToWhiteboard(sismoConnectResponse: SismoConnectResponse) {
-    console.log("currentVaultId", currentVaultId);
+    onLoging ? onLoging(true) : undefined;
     const response = await fetch("/api/whiteboard/login", {
       method: "POST",
       body: JSON.stringify(sismoConnectResponse),
@@ -121,6 +123,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
       WHITEBOARD_VAULTID_VARNAME + whiteboard.id,
       res.vaultId
     );
+    onLoging ? onLoging(false) : undefined;
     whiteboardClick(whiteboard);
   }
 
