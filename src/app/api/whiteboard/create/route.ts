@@ -105,6 +105,18 @@ export async function POST(req: Request): Promise<NextResponse> {
       );
     }
 
+    let sismoAppId;
+    try {
+      sismoAppId = await getAppId(signedMessage.message.name);
+    } catch (error: any) {
+      return NextResponse.json(
+        {
+          error: "Error while creating the Sismo app: " + error,
+        },
+        { status: 500 }
+      );
+    }
+
     const whiteboard = await prisma.whiteboard.create({
       data: {
         name: signedMessage.message.name,
@@ -114,24 +126,9 @@ export async function POST(req: Request): Promise<NextResponse> {
         author: {
           connect: { vaultId: vaultId },
         },
-        appId: "",
+        appId: sismoAppId,
       },
     });
-
-    const sismoAppId = await getAppId(whiteboard.id);
-
-    if (!sismoAppId) {
-      // Delete whiteboard if app creation failed
-      await prisma.whiteboard.delete({
-        where: { id: whiteboard.id },
-      });
-      return NextResponse.json(
-        {
-          error: "App not created.",
-        },
-        { status: 500 }
-      );
-    }
 
     await prisma.whiteboard.update({
       where: { id: whiteboard.id },

@@ -3,7 +3,7 @@ import { SiweMessage } from "siwe";
 import axios from "axios";
 import { LOGO_BASE_64 } from "@/app/configs/configs";
 
-export async function getAppId(whiteboardId: number): Promise<string> {
+export async function getAppId(whiteboardName: string): Promise<string> {
   const wallet = ethers.Wallet.createRandom();
 
   const res = await axios.get(`https://factory-api.sismo.io/siwe/nonce`, {
@@ -44,7 +44,7 @@ export async function getAppId(whiteboardId: number): Promise<string> {
 
   const body = {
     appInput: {
-      name: process.env.APP_TITLE + whiteboardId,
+      name: process.env.APP_TITLE + whiteboardName,
       description:
         "This is an app created by zk-whiteboard.xyz user. It lets you create a new whiteboard.",
       authorizedDomains: [process.env.APP_DOMAIN_NAME],
