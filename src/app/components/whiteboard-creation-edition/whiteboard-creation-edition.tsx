@@ -24,6 +24,8 @@ import {
   sismoConnectConfig,
   MAX_WHITEBOARD_GROUPS,
   greenColorDisabled,
+  MAX_WHITEBOARD_PER_USER,
+  MIN_WHITEBOARD,
 } from "@/app/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
@@ -32,6 +34,7 @@ import {
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import axios from "axios";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -73,9 +76,19 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const router = useRouter();
   const [groups, setGroups] = useState<Group[]>([]);
   const [whiteboardName, setWhiteboardName] = useState<string>("");
+  const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(false);
+  const [whiteboardNameChanged, setWhiteboardNameChanged] =
+    useState<boolean>(false);
   const [whiteboardDescription, setWhiteboardDescription] =
     useState<string>("");
+  const [whiteboardDescriptionOk, setWhiteboardDescriptionOk] =
+    useState<boolean>(false);
+  const [whiteboardDescriptionChanged, setWhiteboardDescriptionChanged] =
+    useState<boolean>(false);
   const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
+  const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(false);
+  const [selectedGroupsChanged, setSelectedGroupsChanged] =
+    useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
   const [isWhiteboardDataLoading, setIsWhiteboardDataLoading] =
@@ -213,14 +226,25 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       url: string,
       message: SismoConnectResponse
     ) => {
-      const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(message),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return await response.json();
+      try {
+        // await fetch(url, {
+        //   method: "POST",
+        //   body: JSON.stringify(message),
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        // });
+        await axios.post(url, message, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } catch (error: any) {
+        console.error("API request error:", error);
+        setIsVerifying(false);
+        alert("An error occured. Error: " + error.response.data.error);
+        router.push("/");
+      }
     };
 
     const postWhiteboard = async (message: SismoConnectResponse) => {
@@ -228,15 +252,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
       const url = constructUrlFromMessage(message);
 
-      try {
-        const res = await performApiRequest(url, message);
-        if (res.error) {
-          console.error(res.error);
-          return;
-        }
-      } catch (error) {
-        console.error("API request error:", error);
-      }
+      await performApiRequest(url, message);
 
       setIsVerifying(false);
       router.push("/");
@@ -247,16 +263,51 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   }, [sismoConnectResponseMessage]);
 
   useEffect(() => {
+    if (whiteboardName) {
+      setWhiteboardNameChanged(true);
+    }
+    if (whiteboardDescription) {
+      setWhiteboardDescriptionChanged(true);
+    }
+    if (selectedGroups.length > 0) {
+      setSelectedGroupsChanged(true);
+    }
+
     if (
       whiteboardName.length > MAX_CHARACTERS_WHITEBOARD_NAME ||
-      whiteboardDescription.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION ||
-      selectedGroups.length > MAX_WHITEBOARD_GROUPS
+      whiteboardName.length < MIN_WHITEBOARD
     ) {
-      setDisableValidation(true);
+      setWhiteboardNameOk(false);
     } else {
-      setDisableValidation(false);
+      setWhiteboardNameOk(true);
+    }
+
+    if (
+      whiteboardDescription.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION ||
+      whiteboardDescription.length < MIN_WHITEBOARD
+    ) {
+      setWhiteboardDescriptionOk(false);
+    } else {
+      setWhiteboardDescriptionOk(true);
+    }
+
+    if (
+      selectedGroups.length > MAX_WHITEBOARD_GROUPS ||
+      selectedGroups.length < MIN_WHITEBOARD
+    ) {
+      setSelectedGroupsOk(false);
+    } else {
+      setSelectedGroupsOk(true);
     }
   }, [whiteboardName, whiteboardDescription, selectedGroups]);
+
+  useEffect(() => {
+    if (whiteboardNameOk && whiteboardDescriptionOk && selectedGroupsOk) {
+      setDisableValidation(false);
+    } else {
+      setDisableValidation(true);
+    }
+  }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk]);
 
   return (
     <div className="container">
@@ -286,7 +337,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               color: "grey",
               fontSize: "11px",
             }}>
-            {!isEdition && " (Currently only 3 max per user)"}
+            {!isEdition &&
+              " (Currently only " + MAX_WHITEBOARD_PER_USER + " max per user)"}
           </span>
         </div>
         <p className="form-labels"> Name </p>
@@ -303,7 +355,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           }}
           value={whiteboardName}
         />
-        {whiteboardName.length > MAX_CHARACTERS_WHITEBOARD_NAME && (
+        {whiteboardNameChanged && !whiteboardNameOk && (
           <div className="warning-message">
             {MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
           </div>
@@ -323,8 +375,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           }}
           value={whiteboardDescription}
         />
-        {whiteboardDescription.length >
-          MAX_CHARACTERS_WHITEBOARD_DESCRIPTION && (
+        {whiteboardDescriptionChanged && !whiteboardDescriptionOk && (
           <div className="warning-message">
             {MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
           </div>
@@ -395,7 +446,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 setSelectedGroups(value);
               }}
             />
-            {selectedGroups.length > MAX_WHITEBOARD_GROUPS && (
+            {selectedGroupsChanged && !selectedGroupsOk && (
               <div className="warning-message">
                 {MAX_WHITEBOARD_GROUPS_MESSAGE}
               </div>

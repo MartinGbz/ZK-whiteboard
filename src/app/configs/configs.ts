@@ -19,15 +19,16 @@ export const redColor = "#ff5656";
 export const purpleColor = "#a888e7";
 export const blueColor = "#82a5ff";
 
+export const MIN_WHITEBOARD = 1;
 export const MAX_WHITEBOARD_PER_USER = 5;
 export const MAX_CHARACTERS = 100;
 export const MAX_CHARACTERS_WHITEBOARD_NAME = 50;
 export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION = 300;
 export const MAX_WHITEBOARD_GROUPS = 10;
 
-export const MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE = `The number of characters in the whiteboard name exceeds the maximum allowed (${MAX_CHARACTERS_WHITEBOARD_NAME} characters max.)`;
-export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE = `The number of characters in the whiteboard description exceeds the maximum allowed (${MAX_CHARACTERS_WHITEBOARD_DESCRIPTION} characters max.)`;
-export const MAX_WHITEBOARD_GROUPS_MESSAGE = `The number of groups of the whiteboard exceeds the maximum allowed (${MAX_WHITEBOARD_GROUPS} groups max.)`;
+export const MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE = `Your whiteboard name should be ${MIN_WHITEBOARD} to ${MAX_CHARACTERS_WHITEBOARD_NAME} characters long`;
+export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE = `Your description should be ${MIN_WHITEBOARD} to ${MAX_CHARACTERS_WHITEBOARD_DESCRIPTION} characters long`;
+export const MAX_WHITEBOARD_GROUPS_MESSAGE = `Please select between ${MIN_WHITEBOARD} to ${MAX_WHITEBOARD_GROUPS} groups.`;
 
 export const preWrittenPostXSlug = "http://twitter.com/intent/tweet?text=";
 export const preWrittenPostLensSlug = "https://lenster.xyz/?text=";

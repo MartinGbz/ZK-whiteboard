@@ -9,7 +9,11 @@ import {
   WhiteboardIndex,
 } from "@/app/types/whiteboard-types";
 import Loading from "../loading-modal/loading-modal";
-import { greenColor, greenColorDisabled } from "@/app/configs/configs";
+import {
+  MAX_WHITEBOARD_PER_USER,
+  greenColor,
+  greenColorDisabled,
+} from "@/app/configs/configs";
 import AddIcon from "@mui/icons-material/Add";
 import WhiteboardCard from "../whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";
@@ -133,8 +137,16 @@ const WhiteboardsIndex = () => {
           <h1 className="title"> Whiteboards </h1>
 
           <div className="create_whiteboard">
-            {!user && (
-              <Tooltip title="Sign in to create a whiteboard">
+            {(!user ||
+              user.createdWhiteboards.length >= MAX_WHITEBOARD_PER_USER) && (
+              <Tooltip
+                title={
+                  !user
+                    ? "Sign in to create a whiteboard"
+                    : "You have already created " +
+                      MAX_WHITEBOARD_PER_USER +
+                      " whiteboards"
+                }>
                 <span>
                   <button
                     className="whiteboards_create_button"
@@ -157,24 +169,25 @@ const WhiteboardsIndex = () => {
                 </span>
               </Tooltip>
             )}
-            {user && (
-              <button
-                className="whiteboards_create_button"
-                style={{
-                  color: "black",
-                  backgroundColor: greenColor,
-                  cursor: "pointer",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
-                }}
-                onClick={() => {
-                  router.push("/create-whiteboard");
-                }}>
-                <AddIcon />
-                <span> Create </span>
-              </button>
-            )}
+            {user &&
+              user.createdWhiteboards.length < MAX_WHITEBOARD_PER_USER && (
+                <button
+                  className="whiteboards_create_button"
+                  style={{
+                    color: "black",
+                    backgroundColor: greenColor,
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                  }}
+                  onClick={() => {
+                    router.push("/create-whiteboard");
+                  }}>
+                  <AddIcon />
+                  <span> Create </span>
+                </button>
+              )}
           </div>
         </div>
       </div>
