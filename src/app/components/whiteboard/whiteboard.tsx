@@ -3,36 +3,48 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./whiteboard.css";
 import {
   Position,
-  Message as MessageType,
   SignedMessage,
-  OperationType,
+  MessageOperationType,
+  Whiteboard,
+  User,
+  PostDeletionResponse,
 } from "../../types/whiteboard-types";
 
 import {
   AuthType,
   SismoConnect,
+  SismoConnectClient,
   SismoConnectResponse,
 } from "@sismo-core/sismo-connect-react";
 import {
+  CURRENT_APPID_VARNAME,
   MAX_Z_INDEX,
+  WHITEBOARD_VAULTID_VARNAME,
   defaultInputColor,
-  sismoConnectConfig,
 } from "../../configs/configs";
 import MessageModal from "../message-modal/message-modal";
 import Message from "../message/message";
 import { useRouter } from "next/navigation";
 import Loading from "../loading-modal/loading-modal";
 import Header from "../header/header";
+import { Message as MessageType } from "@prisma/client";
+import ShareWhiteboard from "../share-whiteboard/share-whiteboard";
+import axios from "axios";
 
-const sismoConnect = SismoConnect({ config: sismoConnectConfig });
+let sismoConnect: SismoConnectClient | null = null;
 
-const API_BASE_URL = "/api/whiteboard";
+const API_BASE_URL = "/api/message";
 const API_ENDPOINTS = {
   POST: "/post",
   DELETE: "/delete",
 };
 
-const Whiteboard = () => {
+interface WhiteboardProps {
+  whiteboardId: number;
+}
+
+const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
+  const [whiteboard, setWhiteboard] = useState<Whiteboard>();
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageInputValue, setMessageInputValue] = useState("");
@@ -42,23 +54,47 @@ const Whiteboard = () => {
     x: 0,
     y: 0,
   });
-  const [vaultId, setVaultId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>();
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  const [isLoging, setIsLoging] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
   const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false);
+  const [isWhiteboardAuthor, setIsWhiteboardAuthor] = useState<boolean>(false);
 
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const messageModalRef = useRef<HTMLDivElement>(null);
 
+  const [currentURL, setCurrentURL] = useState("");
+
+  let whiteboardVaultId = localStorage.getItem(
+    WHITEBOARD_VAULTID_VARNAME + whiteboardId
+  );
+
   const router = useRouter();
 
   const redirectToRoot = useCallback(() => {
-    router.push("/");
-  }, [router]);
+    router.push("/whiteboard/" + whiteboardId);
+  }, [router, whiteboardId]);
+
+  useEffect(() => {
+    setCurrentURL(`${window.location.origin}/whiteboard/${whiteboardId}`);
+  }, [whiteboardId]);
+
+  useEffect(() => {
+    whiteboard?.authorVaultId === user?.vaultId
+      ? setIsWhiteboardAuthor(true)
+      : setIsWhiteboardAuthor(false);
+    if (whiteboard?.appId) {
+      localStorage.setItem(CURRENT_APPID_VARNAME, whiteboard.appId);
+      sismoConnect = SismoConnect({
+        config: {
+          appId: whiteboard.appId,
+        },
+      });
+    }
+  }, [user, whiteboard]);
 
   useEffect(() => {
     const constructUrlFromMessage = (message: SismoConnectResponse) => {
@@ -67,9 +103,9 @@ const Whiteboard = () => {
         ? (JSON.parse(message.signedMessage) as SignedMessage)
         : null;
 
-      if (signedMessage?.type === OperationType.POST) {
+      if (signedMessage?.type === MessageOperationType.POST) {
         url += API_ENDPOINTS.POST;
-      } else if (signedMessage?.type === OperationType.DELETE) {
+      } else if (signedMessage?.type === MessageOperationType.DELETE) {
         url += API_ENDPOINTS.DELETE;
       }
 
@@ -80,27 +116,25 @@ const Whiteboard = () => {
       url: string,
       message: SismoConnectResponse
     ) => {
-      const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(message),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      return response.json();
+      try {
+        const response = await axios.post(url, message, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        return response.data as PostDeletionResponse;
+      } catch (error: any) {
+        console.error("API request error:", error);
+        alert("An error occured: " + error.response.data.error);
+        return null;
+      }
     };
 
-    const handleApiResponse = async (apiResponse: any) => {
-      if (!apiResponse.error) {
-        setMessageInputValue("");
-        setMessageInputColorValue(defaultInputColor);
-        setIsModalOpen(false);
-
-        setMessages(apiResponse);
-      } else {
-        alert("Error: " + apiResponse.error);
-      }
+    const handleApiResponse = async (messages: MessageType[]) => {
+      setMessageInputValue("");
+      setMessageInputColorValue(defaultInputColor);
+      setIsModalOpen(false);
+      setMessages(messages);
     };
 
     const postMessage = async (message: SismoConnectResponse) => {
@@ -108,13 +142,17 @@ const Whiteboard = () => {
 
       const url = constructUrlFromMessage(message);
 
-      try {
-        const allMessageFromDB: any = await performApiRequest(url, message);
-        handleApiResponse(allMessageFromDB);
-      } catch (error) {
-        console.error("API request error:", error);
+      const response = await performApiRequest(url, message);
+      if (response) {
+        if (!whiteboardVaultId) {
+          localStorage.setItem(
+            WHITEBOARD_VAULTID_VARNAME + whiteboardId,
+            response.vaultId
+          );
+          whiteboardVaultId = response.vaultId;
+        }
+        handleApiResponse(response.messages);
       }
-
       setIsVerifying(false);
       redirectToRoot();
     };
@@ -124,11 +162,13 @@ const Whiteboard = () => {
   }, [redirectToRoot, sismoConnectResponseMessage]);
 
   useEffect(() => {
-    const isUserMessageExists = messages.some(
-      (message: MessageType) => message.vaultId === vaultId
-    );
-    setIsUserMessageExists(isUserMessageExists);
-  }, [messages, vaultId]);
+    if (messages) {
+      const isUserMessageExists = messages.some(
+        (message: MessageType) => message.authorVaultId === whiteboardVaultId
+      );
+      setIsUserMessageExists(isUserMessageExists);
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (isModalOpen && messageInputRef.current) {
@@ -145,14 +185,19 @@ const Whiteboard = () => {
       setIsFetchingMessages(true);
       try {
         const response = await fetch("/api/whiteboard", {
-          method: "GET",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify(whiteboardId),
           cache: "no-cache",
         });
-        const messages = await response.json();
-        setMessages(messages);
+
+        const whiteboard: Whiteboard = await response.json();
+        setWhiteboard(whiteboard);
+        if (whiteboard.messages) {
+          setMessages(whiteboard.messages);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -160,50 +205,30 @@ const Whiteboard = () => {
     };
 
     fetchMessages();
-
-    const storagedVaultId = localStorage.getItem("vaultId");
-    if (storagedVaultId) {
-      setVaultId(storagedVaultId);
-    }
-  }, []);
-
-  async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
-    // if the reponse does not come from the message creation
-    if (sismoConnectResponse.proofs.length < 2) {
-      setIsLoging(true);
-      const response = await fetch("/api/whiteboard/login", {
-        method: "POST",
-        body: JSON.stringify(sismoConnectResponse),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      const vaultId = data.vaultId;
-      setVaultId(vaultId);
-      localStorage.setItem("vaultId", vaultId);
-      redirectToRoot();
-      setIsLoging(false);
-    }
-  }
+  }, [whiteboardId]);
 
   const requestAddMessage = async () => {
     const sismoConnectSignedMessage: SignedMessage = {
-      type: OperationType.POST,
+      type: MessageOperationType.POST,
       message: {
         text: messageInputValue,
         positionX: messagePosition.x,
         positionY: messagePosition.y,
         color: messageInputColorValue.substring(1),
+        whiteboardId: whiteboardId,
       },
     };
+    const claims = whiteboard?.groupIds?.map((groupId) => ({
+      groupId: groupId,
+    }));
+    if (!sismoConnect) {
+      console.error("Error with sismoConnect");
+      return;
+    }
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
-      claims: [
-        { groupId: "0x0f800ff28a426924cbe66b67b9f837e2" },
-        { groupId: "0x1cde61966decb8600dfd0749bd371f12" },
-      ],
+      claims: claims,
       signature: {
         message: JSON.stringify(sismoConnectSignedMessage),
       },
@@ -212,14 +237,19 @@ const Whiteboard = () => {
 
   const requestDeleteMessage = async (message: MessageType) => {
     const sismoConnectSignedMessage: SignedMessage = {
-      type: OperationType.DELETE,
+      type: MessageOperationType.DELETE,
       message: {
         text: message.text,
         positionX: message.positionX,
         positionY: message.positionY,
         color: message.color,
+        whiteboardId: whiteboardId,
       },
     };
+    if (!sismoConnect) {
+      console.error("Error with sismoConnect");
+      return;
+    }
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
@@ -230,17 +260,14 @@ const Whiteboard = () => {
   };
 
   useEffect(() => {
-    const responseMessage: SismoConnectResponse | null =
-      sismoConnect.getResponse();
-    if (responseMessage) {
-      const fetchData = async () => {
-        if (responseMessage.signedMessage) {
-          setSismoConnectResponseMessage(responseMessage);
-        }
-      };
-      fetchData();
+    if (sismoConnect) {
+      const responseMessage: SismoConnectResponse | null =
+        sismoConnect.getResponse();
+      if (responseMessage?.signedMessage) {
+        setSismoConnectResponseMessage(responseMessage);
+      }
     }
-  }, []);
+  }, [sismoConnect]);
 
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -257,33 +284,57 @@ const Whiteboard = () => {
   return (
     <div className="whiteboard">
       <Header
-        vaultId={vaultId}
-        isLoging={isLoging}
-        loginWithSismo={(response) => loginWithSismo(response)}
-        setVaultId={(vaultId) => setVaultId(vaultId)}
+        currentRoute={"/whiteboard/" + whiteboardId}
+        onChangeUser={(user) => setUser(user)}
+        whiteboardName={whiteboard?.name}
       />
       {messages && (
         <div
           className="messages_container"
           style={{
-            cursor: isUserMessageExists || !vaultId ? "default" : "pointer",
+            cursor: isUserMessageExists ? "default" : "pointer",
             position: "relative",
           }}
           onClick={(e) =>
-            !isUserMessageExists && vaultId && startMessageCreation(e)
+            !isUserMessageExists &&
+            !isFetchingMessages &&
+            startMessageCreation(e)
           }>
           {messages.map((message: MessageType) => (
             <Message
-              key={message.vaultId}
+              key={message.authorVaultId}
               message={message}
-              vaultId={vaultId}
+              vaultId={whiteboardVaultId ?? ""}
               onDelete={(message) => requestDeleteMessage(message)}
             />
           ))}
+          {messages.length == 0 && !isFetchingMessages && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%,-50%)",
+                color: "gray",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                cursor: "pointer",
+              }}>
+              <div
+                style={{
+                  fontSize: "50px",
+                }}>
+                {"👀"}
+              </div>
+              <div>No messages yet</div>
+              <div>Be the first to post a message!</div>
+            </div>
+          )}
           {isVerifying && <Loading text="Checking the proof..." />}
         </div>
       )}
-      {isFetchingMessages && !messages && (
+      {!isVerifying && isFetchingMessages && messages.length == 0 && (
         <Loading text="Loading messages..." />
       )}
       <MessageModal
@@ -303,6 +354,13 @@ const Whiteboard = () => {
         onClickCancel={() => setIsModalOpen(false)}
         onClickSave={() => requestAddMessage()}
       />
+      {whiteboard && (
+        <ShareWhiteboard
+          currentURL={currentURL}
+          isAuthor={isWhiteboardAuthor}
+          whiteboardName={whiteboard.name}
+        />
+      )}
     </div>
   );
 };

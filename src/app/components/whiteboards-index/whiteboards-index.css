@@ -1,0 +1,28 @@
+.whiteboards_container {
+  position: relative;
+  display: flex;
+}
+
+.container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 10000px;
+  max-height: 7000px;
+  background-color: white;
+}
+
+.whiteboards_list {
+  flex: 1;
+  margin: 0px 0px 0px 20px;
+}
+
+.title {
+  font-size: 20px;
+}
+
+.whiteboards_create_button:hover {
+  filter: brightness(1.1);
+}

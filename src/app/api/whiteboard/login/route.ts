@@ -4,22 +4,30 @@ import {
   SismoConnectVerifiedResult,
   AuthType,
   SismoConnectResponse,
+  SismoConnectServer,
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-  return NextResponse.json("test");
-}
+let sismoConnect: SismoConnectServer | null = null;
 
 export async function POST(req: Request) {
-  const SismoConnectResponse = await req.json();
-  const vaultId = await verifyResponse(SismoConnectResponse);
+  const sismoConnectResponse: SismoConnectResponse = await req.json();
+  sismoConnect = SismoConnect({
+    config: {
+      appId: sismoConnectResponse.appId,
+    },
+  });
+  const vaultId = await verifyResponse(sismoConnectResponse, sismoConnect);
+  if (!vaultId) {
+    return NextResponse.json({ error: "ZK Proof incorrect" });
+  }
   return NextResponse.json({ vaultId: vaultId });
 }
 
-const sismoConnect = SismoConnect({ config: sismoConnectConfig });
-
-async function verifyResponse(sismoConnectResponse: SismoConnectResponse) {
+async function verifyResponse(
+  sismoConnectResponse: SismoConnectResponse,
+  sismoConnect: SismoConnectServer
+) {
   const result: SismoConnectVerifiedResult = await sismoConnect.verify(
     sismoConnectResponse,
     {

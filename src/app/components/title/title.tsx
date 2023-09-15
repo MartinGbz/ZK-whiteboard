@@ -5,9 +5,10 @@ import "./title.css";
 interface MessageProps {
   text: string;
   style?: CSSProperties;
+  onClick?: () => void;
 }
 
-const Title: React.FC<MessageProps> = ({ text, style }) => {
+const Title: React.FC<MessageProps> = ({ text, style, onClick }) => {
   const transformedElements = [];
 
   for (let i = 0; i < text.length; i++) {
@@ -24,7 +25,7 @@ const Title: React.FC<MessageProps> = ({ text, style }) => {
   }
 
   return (
-    <div className="waviy" style={style}>
+    <div className="waviy" style={style} onClick={onClick}>
       {transformedElements}
     </div>
   );

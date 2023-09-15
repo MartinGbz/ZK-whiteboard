@@ -2,18 +2,15 @@
 
 ## Express yourself freely & anonymously without bots spamming
 
-ZK-whiteboard is a space where each member of a specific group can post a single message. Messages are anonymous.
+ZK-whiteboard is a platform for creating whiteboards: spaces where each member of a specific group can post a single message. Messages are anonymous. No link can be done between messages of a same author on different whiteboards.
 
-Currently, the ZK-whiteboard app can be used by anyone who owns:
-
-- An [ENS](https://ens.domains/fr/)
-- A [Gitcoin Passport](https://passport.gitcoin.co/#/)
-
-ZK-whiteboard is an app built using [Sismo](https://github.com/orgs/sismo-core/repositories?type=all). The Sismo Data Vault allows you to prove that you have met the 2 requirements written above without disclosing the address(es) you used.
+ZK-whiteboard is an app built using [Sismo](https://github.com/orgs/sismo-core/repositories?type=all). The Sismo Data Vault allows you to prove that you have met specials requirements written above without disclosing the address(es) you used. It also allows to create an anonymous user id to post anonymous messages among all whiteboards.
 
 To use ZK-whiteboard you will need to created a Sismo Data Vault. More information on Sismo [here](https://www.sismo.io/).
 
-## Usage
+**The app is live on [zk-whiteboard.xyz](https://www.zk-whiteboard.xyz/)**
+
+## Project Usage
 
 ### Install dependencies
 

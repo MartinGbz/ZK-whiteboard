@@ -1,5 +1,8 @@
 "use client";
-import { sismoConnectConfig } from "@/app/configs/configs";
+import {
+  ZKWHITEBOARD_VAULTID_VARNAME,
+  sismoConnectConfig,
+} from "@/app/configs/configs";
 import {
   AuthType,
   SismoConnectButton,
@@ -9,32 +12,125 @@ import Title from "../title/title";
 import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Home } from "@mui/icons-material";
+import { User } from "@/app/types/whiteboard-types";
 
 interface HeaderProps {
-  vaultId: string | null;
-  isLoging: boolean | null;
-  loginWithSismo?: (response: SismoConnectResponse) => void;
-  setVaultId?: (vaultId: string | null) => void;
+  currentRoute: string;
+  onChangeUser?: (user: User | null) => void;
+  whiteboardName?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  vaultId,
-  isLoging,
-  loginWithSismo,
-  setVaultId,
+  onChangeUser,
+  whiteboardName,
+  currentRoute,
 }) => {
+  const router = useRouter();
+  const [isLoging, setIsLoging] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const storagedVaultId = localStorage.getItem(ZKWHITEBOARD_VAULTID_VARNAME);
+    if (storagedVaultId) {
+      setIsLoging(true);
+      getUser(storagedVaultId);
+      setIsLoging(false);
+    }
+  }, []);
+
+  async function getUser(vaultId: string) {
+    const response = await fetch("/api/user", {
+      method: "POST",
+      body: JSON.stringify(vaultId),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const res = await response.json();
+    const user = res.user;
+    setUser(user);
+    onChangeUser ? onChangeUser(user) : undefined;
+  }
+
+  async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
+    // if the reponse does not have a signed message, it means there is no action to perform, only a login
+    // if the appId is the same as the one in the config, it means the login is for the app not for a whiteboard
+    if (
+      sismoConnectResponse.appId === sismoConnectConfig.appId &&
+      !sismoConnectResponse.signedMessage
+    ) {
+      setIsLoging(true);
+      const response = await fetch("/api/login", {
+        method: "POST",
+        body: JSON.stringify(sismoConnectResponse),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res = await response.json();
+      const user: User = res.user;
+      setUser(user);
+      onChangeUser ? onChangeUser(user) : undefined;
+      localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
+      router.push(currentRoute);
+      setIsLoging(false);
+    }
+  }
+
+  async function logout() {
+    setUser(null);
+    localStorage.removeItem(ZKWHITEBOARD_VAULTID_VARNAME);
+    onChangeUser ? onChangeUser(null) : undefined;
+  }
+
   return (
     <div className="header">
-      <Title
-        text="ZK-whiteboard"
+      {currentRoute !== "/" && (
+        <Home
+          style={{
+            gridColumn: 1,
+            justifySelf: "start",
+            alignSelf: "center",
+            cursor: "pointer",
+            color: "white",
+          }}
+          fontSize="medium"
+          onClick={() => router.push("/")}
+        />
+      )}
+      <div
         style={{
           textAlign: "center",
           alignSelf: "center",
           gridColumn: 2,
           width: "max-content",
-        }}
-      />
-      {!vaultId && !isLoging && (
+          display: "inline-flex",
+        }}>
+        <Title
+          text="ZK-whiteboard"
+          style={{
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            router.push("/");
+          }}
+        />
+        {whiteboardName && (
+          <div
+            style={{
+              color: "gray",
+              alignSelf: "center",
+              marginLeft: "5px",
+            }}>
+            {" "}
+            / {whiteboardName}
+          </div>
+        )}
+      </div>
+      {!user && !isLoging && (
         <SismoConnectButton
           overrideStyle={{
             gridColumn: "3",
@@ -49,18 +145,20 @@ const Header: React.FC<HeaderProps> = ({
           auth={{ authType: AuthType.VAULT }}
           namespace="main"
           onResponse={(response: SismoConnectResponse) => {
-            loginWithSismo ? loginWithSismo(response) : undefined;
+            loginWithSismo(response);
           }}
         />
       )}
-      {vaultId && !isLoging && (
+      {user && !isLoging && (
         <div className="login">
-          <span className="user_id"> {vaultId.substring(0, 5) + "..."} </span>
+          <span title={user.vaultId} className="user_id">
+            {" "}
+            {user.vaultId.substring(0, 7) + "..."}{" "}
+          </span>
           <button
             className="logout_button"
             onClick={() => {
-              setVaultId ? setVaultId(null) : undefined;
-              localStorage.removeItem("vaultId");
+              logout();
             }}>
             {" "}
             <LogoutIcon

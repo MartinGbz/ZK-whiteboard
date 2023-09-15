@@ -7,7 +7,6 @@ export const MobileModal = () => {
 
   useEffect(() => {
     if (window.innerWidth < 800) {
-      console.log("isDisplay");
       setIsDisplay(true);
     }
     function resizeHandler() {

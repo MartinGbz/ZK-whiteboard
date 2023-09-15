@@ -1,14 +1,14 @@
 "use client";
 import React, { CSSProperties, useRef, useState } from "react";
-import { Message } from "../../types/whiteboard-types";
 import { MAX_Z_INDEX, TRANSPARENCY, redColor } from "@/app/configs/configs";
 import "./message.css";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Message as MessageType } from "@prisma/client";
 
 interface MessageProps {
-  message: Message;
+  message: MessageType;
   vaultId: string | null;
-  onDelete?: (message: Message) => void;
+  onDelete?: (message: MessageType) => void;
 }
 
 const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
@@ -23,7 +23,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
     backgroundColor: "#" + message.color + TRANSPARENCY,
     zIndex: isHovering ? MAX_Z_INDEX : MAX_Z_INDEX - message.order,
     animation:
-      vaultId === message.vaultId && !isHovering
+      vaultId === message.authorVaultId && !isHovering
         ? `shine 5s infinite linear`
         : "",
     top: y,
@@ -68,7 +68,7 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
   return (
     <div
       ref={messageRef}
-      key={message.vaultId}
+      key={message.authorVaultId}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="message hoverable"
@@ -81,16 +81,19 @@ const Message: React.FC<MessageProps> = ({ message, vaultId, onDelete }) => {
           justifyContent: "flex-end",
         }}>
         <div
+          title={message.authorVaultId}
           style={{
             fontSize: "10px",
             fontWeight: "normal",
             fontFamily: "Inter-Regular",
             whiteSpace: "nowrap",
           }}>
-          {"from: " + message.vaultId.substring(0, 10) + "..."}
+          {message.authorVaultId !== vaultId
+            ? "from: " + message.authorVaultId.substring(0, 7) + "..."
+            : "from: You"}
         </div>
       </div>
-      {vaultId === message.vaultId && (
+      {vaultId === message.authorVaultId && (
         <button
           className="delete-button"
           style={deleteButtonStyle}
