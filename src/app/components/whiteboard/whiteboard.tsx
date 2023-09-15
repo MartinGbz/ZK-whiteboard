@@ -125,7 +125,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
         return response.data as PostDeletionResponse;
       } catch (error: any) {
         console.error("API request error:", error);
-        alert("An error occured: " + error.response.data.error);
+        // alert("An error occured: " + error.response.data.error);
         return null;
       }
     };
