@@ -49,21 +49,11 @@ async function saveWhiteboard(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
-  if (signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_NAME) {
-    return NextResponse.json({
-      error: MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
-    });
-  }
   if (
     signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
   ) {
     return NextResponse.json({
       error: MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
-    });
-  }
-  if (signedMessage.message.groupIds.length > MAX_WHITEBOARD_GROUPS) {
-    return NextResponse.json({
-      error: MAX_WHITEBOARD_GROUPS_MESSAGE,
     });
   }
   const vaultId = await verifyResponseMessage(
@@ -108,9 +98,7 @@ async function saveWhiteboardToDB(
         id: whiteboardId,
       },
       data: {
-        name: signedMessage.message.name,
         description: signedMessage.message.description,
-        groupIds: signedMessage.message.groupIds,
       },
     });
     return NextResponse.json(editedWhiteboard);

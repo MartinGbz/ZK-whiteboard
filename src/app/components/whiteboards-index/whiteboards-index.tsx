@@ -137,7 +137,6 @@ const WhiteboardsIndex = () => {
             margin: "20px 20px 0px 20px",
           }}>
           <h1 className="title"> Whiteboards </h1>
-
           <div className="create_whiteboard">
             {(!user ||
               user.createdWhiteboards.length >= MAX_WHITEBOARD_PER_USER) && (
@@ -151,14 +150,11 @@ const WhiteboardsIndex = () => {
                 }>
                 <span>
                   <button
-                    className="whiteboards_create_button"
+                    className="whiteboards_create_button validate-button"
                     style={{
                       color: "black",
                       backgroundColor: greenColorDisabled,
                       cursor: "default",
-                      padding: "10px",
-                      borderRadius: "10px",
-                      boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
                       filter: "brightness(1.1)",
                     }}
                     disabled={true}
@@ -174,14 +170,11 @@ const WhiteboardsIndex = () => {
             {user &&
               user.createdWhiteboards.length < MAX_WHITEBOARD_PER_USER && (
                 <button
-                  className="whiteboards_create_button"
+                  className="whiteboards_create_button validate-button"
                   style={{
                     color: "black",
                     backgroundColor: greenColor,
                     cursor: "pointer",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
                   }}
                   onClick={() => {
                     router.push("/create-whiteboard");
@@ -193,30 +186,27 @@ const WhiteboardsIndex = () => {
           </div>
         </div>
       </div>
-      <div className="whiteboards_list">
-        <div
-          style={{
-            paddingTop: "20px",
-            paddingRight: "20px",
-            maxHeight: "700px",
-            overflow: "auto",
-          }}>
-          {!isFetchingWhiteboards &&
-            whiteboards.map((whiteboard: WhiteboardIndex, index) => (
-              <WhiteboardCard
-                key={whiteboard.id}
-                vaultId={user?.vaultId ?? ""}
-                whiteboard={whiteboard}
-                index={index}
-                maxHeightsList={maxHeights}
-                baseMaxHeight={baseMaxHeight}
-                maxMaxHeight={maxMaxHeight}
-                onLoging={(isLogin: boolean) => {
-                  setIsLoging(isLogin);
-                }}
-              />
-            ))}
-        </div>
+      <div
+        style={{
+          padding: "20px",
+          maxHeight: "700px",
+          overflow: "auto",
+        }}>
+        {!isFetchingWhiteboards &&
+          whiteboards.map((whiteboard: WhiteboardIndex, index) => (
+            <WhiteboardCard
+              key={whiteboard.id}
+              vaultId={user?.vaultId ?? ""}
+              whiteboard={whiteboard}
+              index={index}
+              maxHeightsList={maxHeights}
+              baseMaxHeight={baseMaxHeight}
+              maxMaxHeight={maxMaxHeight}
+              onLoging={(isLogin: boolean) => {
+                setIsLoging(isLogin);
+              }}
+            />
+          ))}
       </div>
       {whiteboards.length == 0 && isFetchingWhiteboards && (
         <Loading text="Loading whiteboards..." />

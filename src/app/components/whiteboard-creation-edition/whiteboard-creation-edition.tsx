@@ -97,6 +97,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [disableValidation, setDisableValidation] = useState<boolean>(false);
+  const [disableValidationEdition, setDisableValidationEdition] =
+    useState<boolean>(false);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -179,9 +181,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       type: WhiteboardOperationType.EDIT,
       message: {
         ...initalWhiteboard,
-        name: whiteboardName,
         description: whiteboardDescription,
-        groupIds: selectedGroups.map((group: Group) => group.id),
       },
     };
     sismoConnect.request({
@@ -309,12 +309,28 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   }, [whiteboardName, whiteboardDescription, selectedGroups]);
 
   useEffect(() => {
-    if (whiteboardNameOk && whiteboardDescriptionOk && selectedGroupsOk) {
+    if (
+      whiteboardNameOk &&
+      whiteboardDescriptionOk &&
+      selectedGroupsOk &&
+      user
+    ) {
       setDisableValidation(false);
     } else {
       setDisableValidation(true);
     }
-  }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk]);
+    if (whiteboardNameOk && whiteboardDescriptionOk) {
+      setDisableValidationEdition(false);
+    } else {
+      setDisableValidationEdition(true);
+    }
+    console.log("whiteboardNameOk", whiteboardNameOk);
+    console.log("whiteboardDescriptionOk", whiteboardDescriptionOk);
+    console.log("selectedGroupsOk", selectedGroupsOk);
+    console.log("user", user);
+    console.log("disableValidation", disableValidation);
+    console.log("disableValidationEdition", disableValidationEdition);
+  }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
   return (
     <div className="container">
@@ -338,24 +354,31 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             color: "black",
             fontSize: "20px",
           }}>
-          <span>Create a new whiteboard</span>
+          <span>
+            {isEdition ? "Edit a whiteboard" : "Create a new whiteboard"}
+          </span>
           <span
             style={{
               color: "grey",
               fontSize: "11px",
             }}>
-            {!isEdition &&
-              " (Currently only " + MAX_WHITEBOARD_PER_USER + " max per user)"}
+            {isEdition
+              ? " (You can only edit the description for now)"
+              : " (Currently only " +
+                MAX_WHITEBOARD_PER_USER +
+                " max per user)"}
           </span>
         </div>
         <p className="form-labels"> Name </p>
         <input
+          disabled={isEdition}
           type="text"
           className="whiteboard-creation-inputs"
           style={{
             padding: "10px",
             height: "40x",
             fontSize: "14px",
+            cursor: isEdition ? "not-allowed" : "default",
           }}
           onChange={(event) => {
             setWhiteboardName(event.target.value);
@@ -399,9 +422,14 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               flexDirection: "column",
             }}>
             <Autocomplete
+              disabled={isEdition}
               className="inputs"
               ListboxProps={{
-                style: { fontSize: "14px", backgroundColor: "#e9e9e9" },
+                style: {
+                  fontSize: "14px",
+                  backgroundColor: "#e9e9e9",
+                  cursor: isEdition ? "not-allowed" : "default",
+                },
               }}
               noOptionsText={"No groups found"}
               renderInput={(params) => (
@@ -453,7 +481,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 setSelectedGroups(value);
               }}
             />
-            {selectedGroupsChanged && !selectedGroupsOk && (
+            {!isEdition && selectedGroupsChanged && !selectedGroupsOk && (
               <div className="warning-message">
                 {MAX_WHITEBOARD_GROUPS_MESSAGE}
               </div>
@@ -469,64 +497,72 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               What are Groups?
             </a>
           </div>
-          <div
-            style={{
-              marginLeft: "20px",
-            }}>
-            <p
+          {!isEdition && (
+            <div
               style={{
-                fontSize: "12px",
-                color: "black",
-                backgroundColor: "#e9e9e9",
+                marginLeft: "20px",
               }}>
-              No groups fit your needs? Create one here!
-            </p>
-            <a target="_blank" href="https://factory.sismo.io/create-group">
-              <div
-                className="create-group-button"
+              <p
                 style={{
                   fontSize: "12px",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  backgroundColor: purpleColor,
-                  cursor: "pointer",
-                  width: "fit-content",
                   color: "black",
-                  marginTop: "5px",
-                  boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                  backgroundColor: "#e9e9e9",
                 }}>
-                <OpenInNewIcon
-                  sx={{
-                    fontSize: "15px",
-                  }}
-                />{" "}
-                Create a group
-              </div>
-            </a>
-          </div>
+                No groups fit your needs? Create one here!
+              </p>
+              <a target="_blank" href="https://factory.sismo.io/create-group">
+                <div
+                  className="create-group-button"
+                  style={{
+                    fontSize: "12px",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    backgroundColor: purpleColor,
+                    cursor: "pointer",
+                    width: "fit-content",
+                    color: "black",
+                    marginTop: "5px",
+                    boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                  }}>
+                  <OpenInNewIcon
+                    sx={{
+                      fontSize: "15px",
+                    }}
+                  />{" "}
+                  Create a group
+                </div>
+              </a>
+            </div>
+          )}
         </div>
         <button
-          className="create-edit-button"
+          className="create-edit-button validate-button"
           style={{
-            padding: "10px",
-            borderRadius: "10px",
-            backgroundColor: disableValidation
-              ? greenColorDisabled
-              : greenColor,
-            cursor: disableValidation ? "default" : "pointer",
-            pointerEvents: disableValidation ? "none" : "auto",
+            backgroundColor:
+              (isEdition && disableValidationEdition) ||
+              (!isEdition && disableValidation)
+                ? greenColorDisabled
+                : greenColor,
+            cursor:
+              (isEdition && disableValidationEdition) ||
+              (!isEdition && disableValidation)
+                ? "default"
+                : "pointer",
+            pointerEvents:
+              (isEdition && disableValidationEdition) ||
+              (!isEdition && disableValidation)
+                ? "none"
+                : "auto",
             alignSelf: "start",
-            width: "fit-content",
-            color: "black",
             marginTop: "20px",
-            boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
             fontSize: "18px",
           }}
           onClick={() => {
+            console.log("isEdition", isEdition);
             if (!isEdition) createWhiteboard();
             if (isEdition) saveWhiteboard();
           }}
-          disabled={disableValidation}>
+          disabled={isEdition ? disableValidationEdition : disableValidation}>
           {!isEdition && "Create"}
           {isEdition && "Save"}
         </button>
