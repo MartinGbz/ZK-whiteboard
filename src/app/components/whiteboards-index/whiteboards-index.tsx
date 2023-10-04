@@ -34,8 +34,6 @@ const WhiteboardsIndex = () => {
 
   const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
 
-  const [isLoging, setIsLoging] = useState<boolean>(false);
-
   useEffect(() => {
     setMaxHeights(Array(whiteboards.length).fill(baseMaxHeight));
   }, [whiteboards]);
@@ -202,17 +200,11 @@ const WhiteboardsIndex = () => {
               maxHeightsList={maxHeights}
               baseMaxHeight={baseMaxHeight}
               maxMaxHeight={maxMaxHeight}
-              onLoging={(isLogin: boolean) => {
-                setIsLoging(isLogin);
-              }}
             />
           ))}
       </div>
       {whiteboards.length == 0 && isFetchingWhiteboards && (
         <Loading text="Loading whiteboards..." />
-      )}
-      {!isFetchingWhiteboards && isLoging && (
-        <Loading text="Login to whiteboard..." />
       )}
     </div>
   );

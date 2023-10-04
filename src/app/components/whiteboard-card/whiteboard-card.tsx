@@ -4,19 +4,7 @@ import { useRouter } from "next/navigation";
 import { WhiteboardIndex } from "@/app/types/whiteboard-types";
 import SettingsIcon from "@mui/icons-material/Settings";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import PreviewIcon from "@mui/icons-material/Preview";
-import {
-  WHITEBOARD_VAULTID_VARNAME,
-  blueColor,
-  greenColor,
-} from "@/app/configs/configs";
 import LoginIcon from "@mui/icons-material/Login";
-import {
-  AuthType,
-  SismoConnect,
-  SismoConnectClient,
-  SismoConnectResponse,
-} from "@sismo-core/sismo-connect-react";
 import { Tooltip } from "@mui/material";
 
 interface WhiteboardCardProps {
@@ -26,7 +14,6 @@ interface WhiteboardCardProps {
   maxHeightsList: Array<number>;
   baseMaxHeight: number;
   maxMaxHeight: number;
-  onLoging?: (login: boolean) => void;
 }
 
 const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
@@ -36,7 +23,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   maxHeightsList,
   baseMaxHeight,
   maxMaxHeight,
-  onLoging,
 }) => {
   const router = useRouter();
 
@@ -95,10 +81,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
         color: "black",
         borderRadius: "10px",
         backgroundColor: "lightgrey",
-        // boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
         boxShadow: "rgba(0, 0, 0, 0.25) 3px 3px 5px 1px",
-        // boxShadow: "6px 6px 12px #b3b3b3, -6px -6px 12px #f3f3f3",
-        // boxShadow: "  5px 5px 10px #bebebe, -5px -5px 10px #e8e8e8",
       }}
       onMouseEnter={() => handleMouseEnter(whiteboard.id)}
       onMouseLeave={() => handleMouseLeave()}

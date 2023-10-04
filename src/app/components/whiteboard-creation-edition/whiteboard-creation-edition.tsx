@@ -121,7 +121,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       }
     };
     fetchGroups();
-  }, []);
+  }, [isEdition]);
 
   useEffect(() => {
     const fetchWhiteboard = async (id: number) => {
@@ -152,7 +152,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     if (isEdition && whiteboardId) {
       fetchWhiteboard(whiteboardId);
     }
-  }, [groups]);
+  }, [groups, isEdition, whiteboardId]);
 
   async function createWhiteboard() {
     const sismoConnectSignedMessage: WhiteboardCreateSignedMessage = {
@@ -267,7 +267,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     if (sismoConnectResponseMessage?.signedMessage) {
       postWhiteboard(sismoConnectResponseMessage);
     }
-  }, [sismoConnectResponseMessage]);
+  }, [router, sismoConnectResponseMessage]);
 
   useEffect(() => {
     if (whiteboardName) {
@@ -324,12 +324,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     } else {
       setDisableValidationEdition(true);
     }
-    console.log("whiteboardNameOk", whiteboardNameOk);
-    console.log("whiteboardDescriptionOk", whiteboardDescriptionOk);
-    console.log("selectedGroupsOk", selectedGroupsOk);
-    console.log("user", user);
-    console.log("disableValidation", disableValidation);
-    console.log("disableValidationEdition", disableValidationEdition);
   }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
   return (
