@@ -1,29 +1,19 @@
 import {
-  MessageOperationType,
-  SignedMessage,
-  Whiteboard,
   WhiteboardOperationType,
   WhiteboardEditSignedMessage,
 } from "@/types/whiteboard-types";
 import {
-  AuthType,
   SismoConnect,
   SismoConnectResponse,
-  SismoConnectVerifiedResult,
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import {
-  MAX_CHARACTERS,
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
-  MAX_CHARACTERS_WHITEBOARD_NAME,
-  MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
-  MAX_WHITEBOARD_GROUPS,
-  MAX_WHITEBOARD_GROUPS_MESSAGE,
   sismoConnectConfig,
 } from "@/configs/configs";
-import { getWhiteboardById, verifyResponseMessage } from "../../common";
+import { verifyResponseMessage } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {
   const sismoConnectResponse: SismoConnectResponse = await req.json();

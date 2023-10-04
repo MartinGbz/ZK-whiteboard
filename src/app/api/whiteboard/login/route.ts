@@ -1,4 +1,3 @@
-import { sismoConnectConfig } from "@/configs/configs";
 import {
   SismoConnect,
   SismoConnectVerifiedResult,

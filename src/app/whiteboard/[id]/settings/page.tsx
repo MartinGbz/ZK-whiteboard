@@ -1,5 +1,4 @@
 "use client";
-import { MobileModal } from "@/components/mobile-modal/mobile-modal";
 import React from "react";
 
 import "../../../page.css";
@@ -12,7 +11,6 @@ interface pageProps {
 const page = ({ params }: pageProps) => {
   return (
     <div>
-      <MobileModal />
       <WhiteboardCreationEdition isEdition={true} whiteboardId={params.id} />
     </div>
   );

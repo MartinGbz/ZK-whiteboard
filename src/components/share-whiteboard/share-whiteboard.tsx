@@ -47,7 +47,7 @@ const ShareWhiteboard: React.FC<ShareWhiteboard> = ({
         currentURL +
         "%0A%0Aby.%20%40"
     );
-  }, [currentURL]);
+  }, [currentURL, whiteboardName]);
 
   const actions = [
     {

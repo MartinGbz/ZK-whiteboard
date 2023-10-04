@@ -1,5 +1,8 @@
+import Header from "@/components/header/header";
 import "./globals.css";
 import { Inter } from "next/font/google";
+import { User } from "@/types/whiteboard-types";
+import { MobileModal } from "@/components/mobile-modal/mobile-modal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +22,10 @@ export default function RootLayout({
         <link rel="icon" href="./favicon.ico" />
         <title>{metadata.title}</title>
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <MobileModal />
+        {children}
+      </body>
     </html>
   );
 }

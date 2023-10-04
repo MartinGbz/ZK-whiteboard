@@ -168,7 +168,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
       );
       setIsUserMessageExists(isUserMessageExists);
     }
-  }, [messages]);
+  }, [messages, whiteboardVaultId]);
 
   useEffect(() => {
     if (isModalOpen && messageInputRef.current) {
@@ -267,7 +267,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
         setSismoConnectResponseMessage(responseMessage);
       }
     }
-  }, [sismoConnect]);
+  }, []);
 
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>

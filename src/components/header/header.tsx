@@ -12,14 +12,14 @@ import Title from "../title/title";
 import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Home } from "@mui/icons-material";
 import { User } from "@/types/whiteboard-types";
 
 interface HeaderProps {
   currentRoute: string;
-  onChangeUser?: (user: User | null) => void;
+  onChangeUser: (user: User | null) => void;
   whiteboardName?: string;
 }
 
@@ -32,28 +32,117 @@ const Header: React.FC<HeaderProps> = ({
   const [isLoging, setIsLoging] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
+  // const onChangeUserCallback = useCallback(
+  //   (user: User) => {
+  //     onChangeUser ? onChangeUser(user) : undefined;
+  //   },
+  //   [onChangeUser]
+  // );
+
+  // const getUser = useCallback(
+  //   async (vaultId: string) => {
+  //     console.log("onChangeUser", onChangeUser);
+  //     setIsLoging(true);
+  //     const response = await fetch("/api/user", {
+  //       method: "POST",
+  //       body: JSON.stringify(vaultId),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     const res = await response.json();
+  //     const user = res.user;
+  //     setUser(user);
+  //     onChangeUser ? onChangeUser(user) : undefined;
+  //     setIsLoging(false);
+  //   },
+  //   [onChangeUser]
+  // );
+
+  // const getUser = async (vaultId: string) => {
+  //   console.log("onChangeUser", onChangeUser);
+  //   setIsLoging(true);
+  //   const response = await fetch("/api/user", {
+  //     method: "POST",
+  //     body: JSON.stringify(vaultId),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  //   const res = await response.json();
+  //   const user = res.user;
+  //   setUser(user);
+  //   onChangeUser ? onChangeUser(user) : undefined;
+  //   setIsLoging(false);
+  // };
+
   useEffect(() => {
-    const storagedVaultId = localStorage.getItem(ZKWHITEBOARD_VAULTID_VARNAME);
-    if (storagedVaultId) {
+    const getUser = async () => {
       setIsLoging(true);
-      getUser(storagedVaultId);
+      const storagedVaultId = localStorage.getItem(
+        ZKWHITEBOARD_VAULTID_VARNAME
+      );
+      console.log("onChangeUser", onChangeUser);
+      const response = await fetch("/api/user", {
+        method: "POST",
+        body: JSON.stringify(storagedVaultId),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res = await response.json();
+      const user = res.user;
+      setUser(user);
+      onChangeUser(user);
       setIsLoging(false);
-    }
+    };
+    getUser();
+    // need to disable the eslint rule because we want to call getUser only once
+    // if we add onChangeUser to the dependency array, it will be called each time onChangeUser changes
+    // and it creates an infinite loop (not fully understood why)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function getUser(vaultId: string) {
-    const response = await fetch("/api/user", {
-      method: "POST",
-      body: JSON.stringify(vaultId),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const res = await response.json();
-    const user = res.user;
-    setUser(user);
-    onChangeUser ? onChangeUser(user) : undefined;
-  }
+  // async function getUser(vaultId: string) {
+  //   // console.log("onChangeUser", onChangeUser);
+  //   const response = await fetch("/api/user", {
+  //     method: "POST",
+  //     body: JSON.stringify(vaultId),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  //   const res = await response.json();
+  //   const user = res.user;
+  //   setUser(user);
+  //   onChangeUser ? onChangeUser(user) : undefined;
+  // }
+
+  // const onChangeUserCallback = useCallback((user: User) => {
+  //   onChangeUser(user);
+  // }, []);
+
+  // useEffect(() => {
+  //   const getUser = async () => {
+  //     setIsLoging(true);
+  //     const storagedVaultId = localStorage.getItem(
+  //       ZKWHITEBOARD_VAULTID_VARNAME
+  //     );
+  //     const response = await fetch("/api/user", {
+  //       method: "POST",
+  //       body: JSON.stringify(storagedVaultId),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     const res = await response.json();
+  //     const user = res.user;
+  //     setUser(user);
+  //     onChangeUserCallback(user);
+  //     setIsLoging(false);
+  //   };
+  //   getUser();
+  // }, [onChangeUserCallback]);
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse does not have a signed message, it means there is no action to perform, only a login
@@ -73,7 +162,7 @@ const Header: React.FC<HeaderProps> = ({
       const res = await response.json();
       const user: User = res.user;
       setUser(user);
-      onChangeUser ? onChangeUser(user) : undefined;
+      onChangeUser(user);
       localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
       router.push(currentRoute);
       setIsLoging(false);
@@ -83,7 +172,7 @@ const Header: React.FC<HeaderProps> = ({
   async function logout() {
     setUser(null);
     localStorage.removeItem(ZKWHITEBOARD_VAULTID_VARNAME);
-    onChangeUser ? onChangeUser(null) : undefined;
+    onChangeUser(null);
   }
 
   return (

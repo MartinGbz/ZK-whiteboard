@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./whiteboards-index.css";
 import { useRouter } from "next/navigation";
 import Header from "../header/header";
@@ -117,9 +117,17 @@ const WhiteboardsIndex = () => {
     fetchWhiteboards();
   }, []);
 
+  const onChangeUser = useCallback((user: User | null) => {
+    setUser(user);
+  }, []);
+
+  useEffect(() => {
+    // Utilisez onChangeUser ici sans inclure dans les dépendances de useEffect
+  }, [onChangeUser]);
+
   return (
     <div className="container">
-      <Header currentRoute="/" onChangeUser={(user) => setUser(user)} />
+      <Header currentRoute="/" onChangeUser={(user) => onChangeUser(user)} />
       <div className="whiteboards_container">
         <div
           style={{
