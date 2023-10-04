@@ -2,7 +2,7 @@ import {
   MessageOperationType,
   SignedMessage,
   Whiteboard,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import {
   AuthType,
   SismoConnect,

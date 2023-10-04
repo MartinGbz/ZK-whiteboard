@@ -2,7 +2,7 @@
 import {
   ZKWHITEBOARD_VAULTID_VARNAME,
   sismoConnectConfig,
-} from "@/app/configs/configs";
+} from "@/configs/configs";
 import {
   AuthType,
   SismoConnectButton,
@@ -15,7 +15,7 @@ import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Home } from "@mui/icons-material";
-import { User } from "@/app/types/whiteboard-types";
+import { User } from "@/types/whiteboard-types";
 
 interface HeaderProps {
   currentRoute: string;

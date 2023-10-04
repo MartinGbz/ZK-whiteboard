@@ -1,5 +1,5 @@
-import { MobileModal } from "../components/mobile-modal/mobile-modal";
-import WhiteboardCreationEdition from "../components/whiteboard-creation-edition/whiteboard-creation-edition";
+import { MobileModal } from "../../components/mobile-modal/mobile-modal";
+import WhiteboardCreationEdition from "../../components/whiteboard-creation-edition/whiteboard-creation-edition";
 import "../page.css";
 
 const page = () => {

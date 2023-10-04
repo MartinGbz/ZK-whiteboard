@@ -2,7 +2,7 @@ import {
   MessageOperationType,
   SignedMessage,
   Whiteboard,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import {
   AuthType,
   SismoConnect,
@@ -12,7 +12,7 @@ import {
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
-import { MAX_CHARACTERS } from "@/app/configs/configs";
+import { MAX_CHARACTERS } from "@/configs/configs";
 import { getWhiteboardById } from "../../common";
 
 let whiteboard: Whiteboard | null = null;

@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { SiweMessage } from "siwe";
 import axios from "axios";
-import { LOGO_BASE_64 } from "@/app/configs/configs";
+import { LOGO_BASE_64 } from "@/configs/configs";
 
 export async function getAppId(whiteboardName: string): Promise<string> {
   const wallet = ethers.Wallet.createRandom();

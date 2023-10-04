@@ -1,5 +1,5 @@
 "use client";
-import { MAX_Z_INDEX } from "@/app/configs/configs";
+import { MAX_Z_INDEX } from "@/configs/configs";
 import { useEffect, useState } from "react";
 
 export const MobileModal = () => {

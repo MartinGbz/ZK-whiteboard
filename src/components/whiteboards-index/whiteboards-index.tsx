@@ -3,17 +3,13 @@ import React, { useEffect, useState } from "react";
 import "./whiteboards-index.css";
 import { useRouter } from "next/navigation";
 import Header from "../header/header";
-import {
-  User,
-  Whiteboard,
-  WhiteboardIndex,
-} from "@/app/types/whiteboard-types";
+import { User, Whiteboard, WhiteboardIndex } from "@/types/whiteboard-types";
 import Loading from "../loading-modal/loading-modal";
 import {
   MAX_WHITEBOARD_PER_USER,
   greenColor,
   greenColorDisabled,
-} from "@/app/configs/configs";
+} from "@/configs/configs";
 import AddIcon from "@mui/icons-material/Add";
 import WhiteboardCard from "../whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";

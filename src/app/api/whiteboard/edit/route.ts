@@ -4,7 +4,7 @@ import {
   Whiteboard,
   WhiteboardOperationType,
   WhiteboardEditSignedMessage,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import {
   AuthType,
   SismoConnect,
@@ -22,7 +22,7 @@ import {
   MAX_WHITEBOARD_GROUPS,
   MAX_WHITEBOARD_GROUPS_MESSAGE,
   sismoConnectConfig,
-} from "@/app/configs/configs";
+} from "@/configs/configs";
 import { getWhiteboardById, verifyResponseMessage } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {

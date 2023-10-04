@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { WhiteboardIndex } from "@/app/types/whiteboard-types";
+import { WhiteboardIndex } from "@/types/whiteboard-types";
 import SettingsIcon from "@mui/icons-material/Settings";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import LoginIcon from "@mui/icons-material/Login";

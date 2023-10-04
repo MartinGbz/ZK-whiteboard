@@ -6,7 +6,7 @@ import {
   WhiteboardCreateSignedMessage,
   WhiteboardEditSignedMessage,
   User,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import Header from "../header/header";
 
 import "./whiteboard-creation-edition.css";
@@ -26,7 +26,7 @@ import {
   greenColorDisabled,
   MAX_WHITEBOARD_PER_USER,
   MIN_WHITEBOARD,
-} from "@/app/configs/configs";
+} from "@/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
   AuthType,

@@ -4,7 +4,7 @@ import { prisma } from "../../db";
 import {
   WhiteboardCreateSignedMessage,
   WhiteboardOperationType,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import {
   SismoConnect,
   SismoConnectResponse,
@@ -19,7 +19,7 @@ import {
   MAX_WHITEBOARD_GROUPS_MESSAGE,
   MAX_WHITEBOARD_PER_USER,
   sismoConnectConfig,
-} from "@/app/configs/configs";
+} from "@/configs/configs";
 import { getAppId } from "./utils";
 
 export const dynamic = "force-dynamic";

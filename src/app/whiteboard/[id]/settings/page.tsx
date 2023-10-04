@@ -1,9 +1,9 @@
 "use client";
-import { MobileModal } from "@/app/components/mobile-modal/mobile-modal";
+import { MobileModal } from "@/components/mobile-modal/mobile-modal";
 import React from "react";
 
 import "../../../page.css";
-import WhiteboardCreationEdition from "@/app/components/whiteboard-creation-edition/whiteboard-creation-edition";
+import WhiteboardCreationEdition from "@/components/whiteboard-creation-edition/whiteboard-creation-edition";
 
 interface pageProps {
   params: { id: number };

@@ -1,41 +1,41 @@
 @font-face {
   font-family: "Lumanosimo";
-  src: url(./fonts/Lumanosimo-Regular.ttf);
+  src: url(../fonts/Lumanosimo-Regular.ttf);
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Satoshi";
-  src: url(./fonts/Satoshi.ttf);
+  src: url(../fonts/Satoshi.ttf);
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Nunito";
-  src: url(./fonts/Nunito/NunitoSans_10pt_Condensed-Black.ttf);
+  src: url(../fonts/Nunito/NunitoSans_10pt_Condensed-Black.ttf);
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Inter-SemiBold";
-  src: url(./fonts/Inter/Inter-SemiBold.ttf);
+  src: url(../fonts/Inter/Inter-SemiBold.ttf);
   font-weight: semi-bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Inter-Regular";
-  src: url(./fonts/Inter/Inter-Regular.ttf);
+  src: url(../fonts/Inter/Inter-Regular.ttf);
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Damion-Regular";
-  src: url(./fonts/Damion-Regular.ttf);
+  src: url(../fonts/Damion-Regular.ttf);
   font-weight: normal;
   font-style: normal;
 }

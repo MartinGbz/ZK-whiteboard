@@ -1,5 +1,5 @@
-import { MobileModal } from "@/app/components/mobile-modal/mobile-modal";
-import Whiteboard from "@/app/components/whiteboard/whiteboard";
+import { MobileModal } from "@/components/mobile-modal/mobile-modal";
+import Whiteboard from "@/components/whiteboard/whiteboard";
 
 import "../../page.css";
 
