@@ -12,7 +12,7 @@ import Title from "../title/title";
 import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Home } from "@mui/icons-material";
 import { User } from "@/types/whiteboard-types";
@@ -32,57 +32,12 @@ const Header: React.FC<HeaderProps> = ({
   const [isLoging, setIsLoging] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
-  // const onChangeUserCallback = useCallback(
-  //   (user: User) => {
-  //     onChangeUser ? onChangeUser(user) : undefined;
-  //   },
-  //   [onChangeUser]
-  // );
-
-  // const getUser = useCallback(
-  //   async (vaultId: string) => {
-  //     console.log("onChangeUser", onChangeUser);
-  //     setIsLoging(true);
-  //     const response = await fetch("/api/user", {
-  //       method: "POST",
-  //       body: JSON.stringify(vaultId),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const res = await response.json();
-  //     const user = res.user;
-  //     setUser(user);
-  //     onChangeUser ? onChangeUser(user) : undefined;
-  //     setIsLoging(false);
-  //   },
-  //   [onChangeUser]
-  // );
-
-  // const getUser = async (vaultId: string) => {
-  //   console.log("onChangeUser", onChangeUser);
-  //   setIsLoging(true);
-  //   const response = await fetch("/api/user", {
-  //     method: "POST",
-  //     body: JSON.stringify(vaultId),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-  //   const res = await response.json();
-  //   const user = res.user;
-  //   setUser(user);
-  //   onChangeUser ? onChangeUser(user) : undefined;
-  //   setIsLoging(false);
-  // };
-
   useEffect(() => {
     const getUser = async () => {
       setIsLoging(true);
       const storagedVaultId = localStorage.getItem(
         ZKWHITEBOARD_VAULTID_VARNAME
       );
-      console.log("onChangeUser", onChangeUser);
       const response = await fetch("/api/user", {
         method: "POST",
         body: JSON.stringify(storagedVaultId),
@@ -102,47 +57,6 @@ const Header: React.FC<HeaderProps> = ({
     // and it creates an infinite loop (not fully understood why)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // async function getUser(vaultId: string) {
-  //   // console.log("onChangeUser", onChangeUser);
-  //   const response = await fetch("/api/user", {
-  //     method: "POST",
-  //     body: JSON.stringify(vaultId),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-  //   const res = await response.json();
-  //   const user = res.user;
-  //   setUser(user);
-  //   onChangeUser ? onChangeUser(user) : undefined;
-  // }
-
-  // const onChangeUserCallback = useCallback((user: User) => {
-  //   onChangeUser(user);
-  // }, []);
-
-  // useEffect(() => {
-  //   const getUser = async () => {
-  //     setIsLoging(true);
-  //     const storagedVaultId = localStorage.getItem(
-  //       ZKWHITEBOARD_VAULTID_VARNAME
-  //     );
-  //     const response = await fetch("/api/user", {
-  //       method: "POST",
-  //       body: JSON.stringify(storagedVaultId),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const res = await response.json();
-  //     const user = res.user;
-  //     setUser(user);
-  //     onChangeUserCallback(user);
-  //     setIsLoging(false);
-  //   };
-  //   getUser();
-  // }, [onChangeUserCallback]);
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse does not have a signed message, it means there is no action to perform, only a login
