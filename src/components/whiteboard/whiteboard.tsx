@@ -68,8 +68,8 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
 
   const [currentURL, setCurrentURL] = useState("");
 
-  let whiteboardVaultId = localStorage.getItem(
-    WHITEBOARD_VAULTID_VARNAME + whiteboardId
+  const [whiteboardVaultId, setWhiteboardVaultId] = useState<string | null>(
+    localStorage.getItem(WHITEBOARD_VAULTID_VARNAME + whiteboardId)
   );
 
   const router = useRouter();
@@ -149,7 +149,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
             WHITEBOARD_VAULTID_VARNAME + whiteboardId,
             response.vaultId
           );
-          whiteboardVaultId = response.vaultId;
+          setWhiteboardVaultId(response.vaultId);
         }
         handleApiResponse(response.messages);
       }
@@ -159,7 +159,12 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     if (sismoConnectResponseMessage?.signedMessage) {
       postMessage(sismoConnectResponseMessage);
     }
-  }, [redirectToRoot, sismoConnectResponseMessage]);
+  }, [
+    redirectToRoot,
+    sismoConnectResponseMessage,
+    whiteboardId,
+    whiteboardVaultId,
+  ]);
 
   useEffect(() => {
     if (messages) {
