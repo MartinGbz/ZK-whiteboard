@@ -75,7 +75,7 @@ async function addMessage(
     const response = await addMessageToDB(vaultId, signedMessage);
     return response;
   } else {
-    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 403 });
+    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
 }
 

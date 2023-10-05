@@ -38,17 +38,19 @@ const Header: React.FC<HeaderProps> = ({
       const storagedVaultId = localStorage.getItem(
         ZKWHITEBOARD_VAULTID_VARNAME
       );
-      const response = await fetch("/api/user", {
-        method: "POST",
-        body: JSON.stringify(storagedVaultId),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const res = await response.json();
-      const user = res.user;
-      setUser(user);
-      onChangeUser(user);
+      if (storagedVaultId) {
+        const response = await fetch("/api/user", {
+          method: "POST",
+          body: JSON.stringify(storagedVaultId),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const res = await response.json();
+        const user = res.user;
+        setUser(user);
+        onChangeUser(user);
+      }
       setIsLoging(false);
     };
     getUser();

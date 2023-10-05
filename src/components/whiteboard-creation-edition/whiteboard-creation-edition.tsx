@@ -552,7 +552,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             fontSize: "18px",
           }}
           onClick={() => {
-            console.log("isEdition", isEdition);
             if (!isEdition) createWhiteboard();
             if (isEdition) saveWhiteboard();
           }}

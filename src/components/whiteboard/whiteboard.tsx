@@ -197,7 +197,9 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
           body: JSON.stringify(whiteboardId),
           cache: "no-cache",
         });
-
+        if (!response.ok) {
+          router.back();
+        }
         const whiteboard: Whiteboard = await response.json();
         setWhiteboard(whiteboard);
         if (whiteboard.messages) {
@@ -210,7 +212,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardId }) => {
     };
 
     fetchMessages();
-  }, [whiteboardId]);
+  }, [router, whiteboardId]);
 
   const requestAddMessage = async () => {
     const sismoConnectSignedMessage: SignedMessage = {

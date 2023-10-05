@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 
 let sismoConnect: SismoConnectServer | null = null;
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<NextResponse> {
   const sismoConnectResponse: SismoConnectResponse = await req.json();
   sismoConnect = SismoConnect({
     config: {
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   });
   const vaultId = await verifyResponse(sismoConnectResponse, sismoConnect);
   if (!vaultId) {
-    return NextResponse.json({ error: "ZK Proof incorrect" });
+    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
   return NextResponse.json({ vaultId: vaultId });
 }

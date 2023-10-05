@@ -72,7 +72,10 @@ export async function POST(req: Request): Promise<NextResponse> {
       const allMessagesInDB = await saveWhiteboardToDB(vaultId, signedMessage);
       return allMessagesInDB;
     } else {
-      return NextResponse.json({ error: "ZK Proof incorrect" });
+      return NextResponse.json(
+        { error: "ZK Proof incorrect" },
+        { status: 401 }
+      );
     }
   }
 

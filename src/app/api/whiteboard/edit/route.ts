@@ -54,7 +54,7 @@ async function saveWhiteboard(
     const allMessagesInDB = await saveWhiteboardToDB(vaultId, signedMessage);
     return allMessagesInDB;
   } else {
-    return NextResponse.json({ error: "ZK Proof incorrect" });
+    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
 }
 
