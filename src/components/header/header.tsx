@@ -13,7 +13,7 @@ import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Home } from "@mui/icons-material";
 import { User } from "@/types/whiteboard-types";
 
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <div className="header">
-      {currentRoute !== "/" && (
+      {currentRoute !== "/" && currentRoute !== "/whiteboards" && (
         <Home
           style={{
             gridColumn: 1,
