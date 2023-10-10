@@ -16,6 +16,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import WhiteboardCard from "../../components/whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";
+import ErrorModal from "@/components/error-modal/error-modal";
 
 export default function Home() {
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function Home() {
   const maxMaxHeight = 200;
 
   const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
+
+  const [errorVisible, setErrorVisible] = useState<boolean>(false);
 
   useEffect(() => {
     setMaxHeights(Array(whiteboards.length).fill(baseMaxHeight));
@@ -216,6 +219,14 @@ export default function Home() {
       </div>
       {whiteboards.length == 0 && isFetchingWhiteboards && (
         <Loading text="Loading whiteboards..." />
+      )}
+      {errorVisible && (
+        <ErrorModal
+          text="Error while loading whiteboards. It is an error tha comes from us."
+          onClose={() => {
+            setErrorVisible(false);
+          }}
+        />
       )}
     </div>
   );
