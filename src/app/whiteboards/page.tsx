@@ -17,6 +17,7 @@ import AddIcon from "@mui/icons-material/Add";
 import WhiteboardCard from "../../components/whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";
 import ErrorModal from "@/components/error-modal/error-modal";
+import axios from "axios";
 
 export default function Home() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function Home() {
 
   const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
 
-  const [errorVisible, setErrorVisible] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     setMaxHeights(Array(whiteboards.length).fill(baseMaxHeight));
@@ -43,57 +44,63 @@ export default function Home() {
   useEffect(() => {
     const fetchWhiteboards = async () => {
       setIsFetchingWhiteboards(true);
+      let response;
       try {
-        const response = await fetch("/api/whiteboard", {
-          method: "GET",
+        response = await axios.get("/api/whiteboard", {
           headers: {
             "Content-Type": "application/json",
           },
-          cache: "no-cache",
         });
-        const whiteboards: Whiteboard[] = await response.json();
+      } catch (error: any) {
+        console.error("API request error:", error);
+        if (error.response.data.error) {
+          setErrorMessage(error.response.data.error);
+        } else {
+          setErrorMessage("An error occured while fetching whiteboards");
+        }
+        return null;
+      }
 
-        const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =
-          await Promise.all(
-            whiteboards.map(async (whiteboard: Whiteboard) => {
-              const resolvedGroupNames = await Promise.all(
-                whiteboard.groupIds.map(async (groupId: string) => {
-                  const groupName = await resolveGroupId(groupId);
-                  return groupName;
-                })
-              );
-              return {
-                id: whiteboard.id,
-                name: whiteboard.name,
-                description: whiteboard.description,
-                appId: whiteboard.appId,
-                authorVaultId: whiteboard.authorVaultId,
-                curated: whiteboard.curated,
-                groupNames: resolvedGroupNames,
-              };
-            })
-          );
+      const whiteboards: Whiteboard[] = await response.data;
 
-        // sort by curated and then by creation date (oldest first) and then by name
-        whiteboardsWithResolvedGroupIds.sort((a, b) => {
-          if (a.curated && !b.curated) {
+      const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =
+        await Promise.all(
+          whiteboards.map(async (whiteboard: Whiteboard) => {
+            const resolvedGroupNames = await Promise.all(
+              whiteboard.groupIds.map(async (groupId: string) => {
+                const groupName = await resolveGroupId(groupId);
+                return groupName;
+              })
+            );
+            return {
+              id: whiteboard.id,
+              name: whiteboard.name,
+              description: whiteboard.description,
+              appId: whiteboard.appId,
+              authorVaultId: whiteboard.authorVaultId,
+              curated: whiteboard.curated,
+              groupNames: resolvedGroupNames,
+            };
+          })
+        );
+
+      // sort by curated and then by creation date (oldest first) and then by name
+      whiteboardsWithResolvedGroupIds.sort((a, b) => {
+        if (a.curated && !b.curated) {
+          return -1;
+        } else if (!a.curated && b.curated) {
+          return 1;
+        } else {
+          if (a.id < b.id) {
             return -1;
-          } else if (!a.curated && b.curated) {
+          } else if (a.id > b.id) {
             return 1;
           } else {
-            if (a.id < b.id) {
-              return -1;
-            } else if (a.id > b.id) {
-              return 1;
-            } else {
-              return 0;
-            }
+            return 0;
           }
-        });
-        setWhiteboards(whiteboardsWithResolvedGroupIds);
-      } catch (error) {
-        console.error(error);
-      }
+        }
+      });
+      setWhiteboards(whiteboardsWithResolvedGroupIds);
       setIsFetchingWhiteboards(false);
     };
 
@@ -137,7 +144,7 @@ export default function Home() {
       style={{
         width: "100%",
       }}>
-      <Header currentRoute="/" onChangeUser={(user) => onChangeUser(user)} />
+      <Header onChangeUser={(user) => onChangeUser(user)} />
       <div className="whiteboards_container">
         <div
           style={{
@@ -220,14 +227,7 @@ export default function Home() {
       {whiteboards.length == 0 && isFetchingWhiteboards && (
         <Loading text="Loading whiteboards..." />
       )}
-      {errorVisible && (
-        <ErrorModal
-          text="Error while loading whiteboards. It is an error tha comes from us."
-          onClose={() => {
-            setErrorVisible(false);
-          }}
-        />
-      )}
+      {errorMessage && <ErrorModal text={errorMessage} />}
     </div>
   );
 }

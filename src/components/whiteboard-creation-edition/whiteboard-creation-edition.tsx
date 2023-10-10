@@ -328,14 +328,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
   return (
     <div className="container">
-      <Header
-        currentRoute={
-          isEdition
-            ? "/whiteboard/settings/" + whiteboardId
-            : "/create-whiteboard"
-        }
-        onChangeUser={(user) => setUser(user)}
-      />
+      <Header onChangeUser={(user) => setUser(user)} />
       <div
         style={{
           display: "flex",

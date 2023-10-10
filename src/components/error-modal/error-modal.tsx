@@ -3,13 +3,13 @@ import React, { CSSProperties } from "react";
 import { MAX_Z_INDEX, redColor } from "@/configs/configs";
 
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { useRouter, usePathname } from "next/navigation";
 
 interface ErrorModalProps {
   text: string;
-  onClose: () => void;
 }
 
-const ErrorModal: React.FC<ErrorModalProps> = ({ text, onClose }) => {
+const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
   const modalStyle: CSSProperties = {
     backgroundColor: "white",
     marginBottom: "10px",
@@ -34,6 +34,9 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text, onClose }) => {
     flexDirection: "column",
     justifyContent: "space-between",
   };
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <div
@@ -98,8 +101,10 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text, onClose }) => {
                 alignSelf: "center",
                 fontSize: "17px",
               }}
-              onClick={() => onClose()}>
-              Let me retry
+              onClick={() => {
+                router.push(pathname);
+              }}>
+              Refresh
             </button>
             <p
               style={{

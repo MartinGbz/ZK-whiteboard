@@ -328,7 +328,6 @@ const Whiteboard = ({ params }: pageProps) => {
   return (
     <div className="whiteboard">
       <Header
-        currentRoute={"/whiteboard/" + params.id}
         onChangeUser={(user) => setUser(user)}
         whiteboardName={whiteboard?.name}
       />

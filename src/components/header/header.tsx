@@ -13,22 +13,19 @@ import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, usePathname } from "next/navigation";
 import { Home } from "@mui/icons-material";
 import { User } from "@/types/whiteboard-types";
 
 interface HeaderProps {
-  currentRoute: string;
   onChangeUser: (user: User | null) => void;
   whiteboardName?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  onChangeUser,
-  whiteboardName,
-  currentRoute,
-}) => {
+const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [isLoging, setIsLoging] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
@@ -80,7 +77,7 @@ const Header: React.FC<HeaderProps> = ({
       setUser(user);
       onChangeUser(user);
       localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
-      router.push(currentRoute);
+      router.push(pathname);
       setIsLoging(false);
     }
   }
@@ -93,7 +90,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <div className="header">
-      {currentRoute !== "/" && currentRoute !== "/whiteboards" && (
+      {pathname !== "/" && pathname !== "/whiteboards" && (
         <Home
           style={{
             gridColumn: 1,

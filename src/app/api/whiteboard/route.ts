@@ -6,6 +6,7 @@ import { getWhiteboardById } from "../common";
 export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<NextResponse> {
+  // return NextResponse.json({ error: "Whiteboards not found" }, { status: 404 });
   const whiteboards = await prisma.whiteboard.findMany();
   return NextResponse.json(whiteboards);
 }
