@@ -1,6 +1,5 @@
 "use client";
 import React, { CSSProperties } from "react";
-// import "./loading-modal.css";
 import { MAX_Z_INDEX, redColor } from "@/configs/configs";
 
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
@@ -13,7 +12,6 @@ interface ErrorModalProps {
 const ErrorModal: React.FC<ErrorModalProps> = ({ text, onClose }) => {
   const modalStyle: CSSProperties = {
     backgroundColor: "white",
-    // padding: "10px",
     marginBottom: "10px",
     position: "fixed",
     top: "50%",
@@ -25,13 +23,10 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text, onClose }) => {
     display: "flex",
     justifyContent: "center",
     flexDirection: "column",
-
-    // border: "3px solid " + redColor,
   };
 
   const messageStyle: CSSProperties = {
     textAlign: "center",
-    // marginBottom: "20px",
     color: "black",
     minHeight: "150px",
     padding: "10px",
@@ -100,8 +95,6 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text, onClose }) => {
                 borderRadius: "5px",
                 border: "none",
                 cursor: "pointer",
-                // marginTop: "10px",
-                // width: "50%",
                 alignSelf: "center",
                 fontSize: "17px",
               }}
