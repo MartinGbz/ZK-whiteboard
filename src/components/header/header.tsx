@@ -13,7 +13,7 @@ import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
-import { redirect, useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Home } from "@mui/icons-material";
 import { User } from "@/types/whiteboard-types";
 

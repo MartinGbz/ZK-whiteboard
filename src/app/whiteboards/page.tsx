@@ -134,10 +134,6 @@ export default function Home() {
     setUser(user);
   }, []);
 
-  useEffect(() => {
-    // Utilisez onChangeUser ici sans inclure dans les dépendances de useEffect
-  }, [onChangeUser]);
-
   return (
     <div
       className="container"

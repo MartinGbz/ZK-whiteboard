@@ -72,21 +72,11 @@ const Whiteboard = ({ params }: pageProps) => {
   const [currentURL, setCurrentURL] = useState("");
   const [whiteboardVaultId, setWhiteboardVaultId] = useState<string | null>();
 
-  // const [sismoConnect, setSismoConnect] = useState<SismoConnectClient | null>(
-  //   null
-  // );
-
   const router = useRouter();
 
   const redirectToRoot = useCallback(() => {
     router.push("/whiteboard/" + params.id);
   }, [router, params.id]);
-
-  // useEffect(() => {
-  //   setWhiteboardVaultId(
-  //     localStorage.getItem(WHITEBOARD_VAULTID_VARNAME + params.id)
-  //   );
-  // }, [params.id]);
 
   useEffect(() => {
     setCurrentURL(`${window.location.origin}/whiteboard/${params.id}`);
@@ -264,17 +254,6 @@ const Whiteboard = ({ params }: pageProps) => {
     });
   };
 
-  // useEffect(() => {
-  //   console.log("sismoConnect", sismoConnect);
-  //   if (sismoConnect) {
-  //     const responseMessage: SismoConnectResponse | null =
-  //       sismoConnect.getResponse();
-  //     if (responseMessage?.signedMessage) {
-  //       setSismoConnectResponseMessage(responseMessage);
-  //     }
-  //   }
-  // }, []);
-
   const requestDeleteMessage = async (message: MessageType) => {
     const sismoConnectSignedMessage: SignedMessage = {
       type: MessageOperationType.DELETE,
@@ -298,20 +277,6 @@ const Whiteboard = ({ params }: pageProps) => {
       },
     });
   };
-
-  // useEffect(() => {
-  //   console.log("a");
-  //   console.log("sismoConnect", sismoConnect);
-  //   if (sismoConnect) {
-  //     console.log("sismoConnect", sismoConnect);
-  //     const responseMessage: SismoConnectResponse | null =
-  //       sismoConnect.getResponse();
-  //     console.log(responseMessage);
-  //     if (responseMessage?.signedMessage) {
-  //       setSismoConnectResponseMessage(responseMessage);
-  //     }
-  //   }
-  // }, [sismoConnect]);
 
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
