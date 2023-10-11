@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   WhiteboardOperationType,
   WhiteboardCreateSignedMessage,
@@ -35,6 +35,7 @@ import {
 } from "@sismo-core/sismo-connect-react";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import axios from "axios";
+import ErrorModal from "../error-modal/error-modal";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -99,23 +100,27 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const [disableValidation, setDisableValidation] = useState<boolean>(false);
   const [disableValidationEdition, setDisableValidationEdition] =
     useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchGroups = async () => {
       setIsWhiteboardDataLoading(true);
+      let response;
       try {
-        const response = await fetch("https://hub.sismo.io/groups/latests", {
-          method: "GET",
+        response = await axios.get("https://hub.sismo.io/groups/latests", {
           headers: {
             "Content-Type": "application/json",
           },
         });
-        const responseDecoded = await response.json();
-        const groups: Group[] = responseDecoded.items;
-        setGroups(groups);
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        console.error("API request error:", error);
+        setErrorMessage("An error occured while fetching Sismo Data Groups");
+        return null;
       }
+      const groups: Group[] = response.data.items;
+      setGroups(groups);
       if (!isEdition) {
         setIsWhiteboardDataLoading(false);
       }
@@ -125,28 +130,33 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
   useEffect(() => {
     const fetchWhiteboard = async (id: number) => {
+      let response;
       try {
-        const response = await fetch("/api/whiteboard", {
-          method: "POST",
+        response = await axios.post("/api/whiteboard", id, {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(id),
-          cache: "no-cache",
         });
-
-        const whiteboard: Whiteboard = await response.json();
-        setInitalWhiteboard(whiteboard);
-        setWhiteboardName(whiteboard?.name || "");
-        setWhiteboardDescription(whiteboard?.description || "");
-        setSelectedGroups(
-          groups.filter((group: Group) =>
-            whiteboard?.groupIds?.includes(group.id)
-          )
-        );
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        console.error("API request error:", error);
+        if (error.response.data.error) {
+          setErrorMessage(error.response.data.error);
+        } else {
+          setErrorMessage(
+            "An error occured while fetching the whiteboard data"
+          );
+        }
+        return null;
       }
+      const whiteboard: Whiteboard = response.data;
+      setInitalWhiteboard(whiteboard);
+      setWhiteboardName(whiteboard?.name || "");
+      setWhiteboardDescription(whiteboard?.description || "");
+      setSelectedGroups(
+        groups.filter((group: Group) =>
+          whiteboard?.groupIds?.includes(group.id)
+        )
+      );
       setIsWhiteboardDataLoading(false);
     };
     if (isEdition && whiteboardId) {
@@ -235,7 +245,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         } catch (error: any) {
           if (i === retryMax - 1) {
             console.error("API request error:", error);
-            alert("An error occured. Error: " + error.response.data.error);
+            if (error.response.data.error) {
+              setErrorMessage(error.response.data.error);
+            } else {
+              setErrorMessage("An error occured while posting your whiteboard");
+            }
+            return null;
           }
         }
       }
@@ -259,15 +274,19 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
       const url = constructUrlFromMessage(message);
 
-      await retryRequest(performApiRequest, url, message, 2);
+      const success = await retryRequest(performApiRequest, url, message, 2);
 
-      setIsVerifying(false);
-      router.push("/");
+      if (!success) {
+        router.push(pathname);
+      } else {
+        setIsVerifying(false);
+        router.push("/");
+      }
     };
     if (sismoConnectResponseMessage?.signedMessage) {
       postWhiteboard(sismoConnectResponseMessage);
     }
-  }, [router, sismoConnectResponseMessage]);
+  }, [pathname, router, sismoConnectResponseMessage]);
 
   useEffect(() => {
     if (whiteboardName) {
@@ -557,6 +576,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         <Loading text="Loading whiteboard" />
       )}
       {isVerifying && <Loading text="Checking the proof..." />}
+      {errorMessage && <ErrorModal text={errorMessage} />}
     </div>
   );
 };

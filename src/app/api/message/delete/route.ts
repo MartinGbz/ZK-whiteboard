@@ -55,7 +55,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         { status: 400 }
       );
     } else {
-      return NextResponse.json({ error: "Wrong API route" }, { status: 403 });
+      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
     }
   } else {
     return NextResponse.json(

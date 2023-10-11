@@ -3,7 +3,7 @@
 import "../../page.css";
 import "./page.css";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import {
   Position,
   SignedMessage,
@@ -27,7 +27,7 @@ import {
 } from "../../../configs/configs";
 import MessageModal from "../../../components/message-modal/message-modal";
 import Message from "../../../components/message/message";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Loading from "../../../components/loading-modal/loading-modal";
 import Header from "../../../components/header/header";
 import { Message as MessageType } from "@prisma/client";
@@ -76,19 +76,24 @@ const Whiteboard = ({ params }: pageProps) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const router = useRouter();
+  const pathname = usePathname();
 
   const redirectToRoot = useCallback(() => {
-    router.push("/whiteboard/" + params.id);
-  }, [router, params.id]);
+    // router.push("/whiteboard/" + params.id);
+    router.push(pathname);
+  }, [router, pathname]);
 
-  useEffect(() => {
-    setCurrentURL(`${window.location.origin}/whiteboard/${params.id}`);
-  }, [params.id]);
+  // useEffect(() => {
+  //   setCurrentURL(`${window.location.origin}/whiteboard/${params.id}`);
+  // }, [params.id]);
 
   useEffect(() => {
     whiteboard?.authorVaultId === user?.vaultId
       ? setIsWhiteboardAuthor(true)
       : setIsWhiteboardAuthor(false);
+  }, [user, whiteboard]);
+
+  useEffect(() => {
     if (whiteboard?.appId) {
       localStorage.setItem(CURRENT_APPID_VARNAME, whiteboard.appId);
       sismoConnect = SismoConnect({
@@ -99,10 +104,13 @@ const Whiteboard = ({ params }: pageProps) => {
       const responseMessage: SismoConnectResponse | null =
         sismoConnect.getResponse();
       if (responseMessage?.signedMessage) {
+        console.log("EFFECTTTT");
+        // console.log("user", user);
+        console.log("whiteboard", whiteboard);
         setSismoConnectResponseMessage(responseMessage);
       }
     }
-  }, [user, whiteboard]);
+  }, [whiteboard]);
 
   useEffect(() => {
     const constructUrlFromMessage = (message: SismoConnectResponse) => {
@@ -137,6 +145,7 @@ const Whiteboard = ({ params }: pageProps) => {
           setErrorMessage(error.response.data.error);
         } else if (message.signedMessage) {
           const signedMessage = JSON.parse(message.signedMessage);
+          console.log("signedMessage", signedMessage);
           const type =
             signedMessage.message.type === "POST" ? "posting" : "deleting";
           setErrorMessage(`An error occured while ${type} your message`);
@@ -159,6 +168,8 @@ const Whiteboard = ({ params }: pageProps) => {
 
     const postMessage = async (message: SismoConnectResponse) => {
       setIsVerifying(true);
+
+      console.log("! postMessage !");
 
       const url = constructUrlFromMessage(message);
 
