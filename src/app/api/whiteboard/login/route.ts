@@ -20,7 +20,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   if (!vaultId) {
     return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
-  return NextResponse.json({ vaultId: vaultId });
+  return NextResponse.json({ vaultId: vaultId }, { status: 200 });
 }
 
 async function verifyResponse(

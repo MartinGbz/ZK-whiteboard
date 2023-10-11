@@ -100,7 +100,7 @@ async function saveWhiteboardToDB(
         description: signedMessage.message.description,
       },
     });
-    return NextResponse.json(editedWhiteboard);
+    return NextResponse.json(editedWhiteboard, { status: 200 });
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
   }

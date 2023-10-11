@@ -121,15 +121,18 @@ async function deleteMessageFromDB(
     });
     const whiteboard = await getWhiteboardById(whiteboardId);
     if (whiteboard?.messages) {
-      return NextResponse.json({
-        vaultId: vaultId,
-        messages: whiteboard.messages,
-      });
+      return NextResponse.json(
+        {
+          vaultId: vaultId,
+          messages: whiteboard.messages,
+        },
+        { status: 200 }
+      );
     } else {
       return NextResponse.json({ error: "No message found" }, { status: 400 });
     }
   } catch (error) {
-    return NextResponse.json(error);
+    return NextResponse.json(error, { status: 500 });
   }
 }
 

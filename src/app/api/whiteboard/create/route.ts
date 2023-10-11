@@ -147,6 +147,6 @@ export async function POST(req: Request): Promise<NextResponse> {
       data: { appId: sismoAppId },
     });
 
-    return NextResponse.json(whiteboard);
+    return NextResponse.json(whiteboard, { status: 200 });
   }
 }

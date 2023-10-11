@@ -119,7 +119,10 @@ async function addMessageToDB(
       const existingMessages = whiteboard?.messages ?? [];
       const messages = [...existingMessages, newMessage];
       if (messages) {
-        return NextResponse.json({ vaultId: vaultId, messages: messages });
+        return NextResponse.json(
+          { vaultId: vaultId, messages: messages },
+          { status: 200 }
+        );
       } else {
         return NextResponse.json(
           {

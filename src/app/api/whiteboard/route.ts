@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<NextResponse> {
   const whiteboards = await prisma.whiteboard.findMany();
-  return NextResponse.json(whiteboards);
+  return NextResponse.json(whiteboards, { status: 200 });
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -19,5 +19,5 @@ export async function POST(req: Request): Promise<NextResponse> {
       { status: 404 }
     );
   }
-  return NextResponse.json(whiteboard);
+  return NextResponse.json(whiteboard, { status: 200 });
 }
