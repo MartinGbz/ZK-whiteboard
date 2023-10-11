@@ -89,30 +89,6 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
               }}>
               {text}
             </p>
-            {/* <button
-              type="button"
-              style={{
-                backgroundColor: redColor,
-                color: "white",
-                padding: "5px 10px 5px 10px",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-                alignSelf: "center",
-                fontSize: "17px",
-              }}
-              onClick={() => {
-                // router.replace(pathname);
-                // router.replace(router.asPath)
-                // router.refresh();
-                // onClose();
-                console.log("pathname", pathname);
-                // router.push(pathname);
-                router.push("/");
-                // router.refresh();
-              }}>
-              Refresh
-            </button> */}
             <div
               style={{
                 backgroundColor: redColor,

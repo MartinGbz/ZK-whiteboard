@@ -86,8 +86,6 @@ const Whiteboard = ({ params }: pageProps) => {
   }, [params.id]);
 
   useEffect(() => {
-    console.log("user", user);
-    console.log("whiteboard", whiteboard);
     whiteboard?.authorVaultId === user?.vaultId
       ? setIsWhiteboardAuthor(true)
       : setIsWhiteboardAuthor(false);
@@ -98,7 +96,6 @@ const Whiteboard = ({ params }: pageProps) => {
           appId: whiteboard.appId,
         },
       });
-      console.log("sismoConnect", sismoConnect);
       const responseMessage: SismoConnectResponse | null =
         sismoConnect.getResponse();
       if (responseMessage?.signedMessage) {
@@ -150,7 +147,6 @@ const Whiteboard = ({ params }: pageProps) => {
         }
         return null;
       }
-      console.log("333");
       return response.data as PostDeletionResponse;
     };
 
