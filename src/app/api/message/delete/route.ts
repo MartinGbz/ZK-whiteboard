@@ -44,7 +44,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     if (!sismoConnect) {
       return NextResponse.json(
         { error: "SismoConnect not found" },
-        { status: 404 }
+        { status: 500 }
       );
     }
     if (signedMessage.type === MessageOperationType.DELETE) {
@@ -52,7 +52,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     } else if (!signedMessage.type) {
       return NextResponse.json(
         { error: "No request type found" },
-        { status: 404 }
+        { status: 400 }
       );
     } else {
       return NextResponse.json({ error: "Wrong API route" }, { status: 403 });
@@ -60,7 +60,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   } else {
     return NextResponse.json(
       { error: "No signed message found" },
-      { status: 404 }
+      { status: 400 }
     );
   }
 }
@@ -84,7 +84,7 @@ async function deleteMessage(
         {
           error: "No signedMessage in the ZK Proof found",
         },
-        { status: 404 }
+        { status: 400 }
       );
     }
     const message = JSON.parse(
@@ -112,7 +112,7 @@ async function deleteMessageFromDB(
       },
     });
     if (!messageToDelete) {
-      return NextResponse.json({ error: "No message found" }, { status: 404 });
+      return NextResponse.json({ error: "No message found" }, { status: 400 });
     }
     const deletedMessage = await prisma.message.delete({
       where: {
@@ -126,7 +126,7 @@ async function deleteMessageFromDB(
         messages: whiteboard.messages,
       });
     } else {
-      return NextResponse.json({ error: "No message found" }, { status: 404 });
+      return NextResponse.json({ error: "No message found" }, { status: 400 });
     }
   } catch (error) {
     return NextResponse.json(error);

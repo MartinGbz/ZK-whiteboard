@@ -26,10 +26,16 @@ export async function POST(req: Request): Promise<NextResponse> {
     ) as SignedMessage;
     whiteboard = await getWhiteboardById(signedMessage.message.whiteboardId);
     if (!whiteboard) {
-      return NextResponse.json({ error: "Whiteboard not found" });
+      return NextResponse.json(
+        { error: "Whiteboard not found" },
+        { status: 404 }
+      );
     }
     if (!whiteboard.appId) {
-      return NextResponse.json({ error: "Whiteboard appId not found" });
+      return NextResponse.json(
+        { error: "Whiteboard appId not found" },
+        { status: 404 }
+      );
     }
     sismoConnect = SismoConnect({
       config: {
@@ -37,17 +43,20 @@ export async function POST(req: Request): Promise<NextResponse> {
       },
     });
     if (!sismoConnect) {
-      return NextResponse.json({ error: "SismoConnect not defined" });
+      return NextResponse.json(
+        { error: "SismoConnect not defined" },
+        { status: 500 }
+      );
     }
     if (signedMessage.type === MessageOperationType.POST) {
       return await addMessage(sismoConnectResponse, signedMessage);
     } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type" });
+      return NextResponse.json({ error: "No type provided" }, { status: 400 });
     } else {
-      return NextResponse.json({ error: "Wrong API route" });
+      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
     }
   } else {
-    return NextResponse.json({ error: "No signed message" });
+    return NextResponse.json({ error: "No signed message" }, { status: 400 });
   }
 }
 
@@ -56,15 +65,18 @@ async function addMessage(
   signedMessage: SignedMessage
 ): Promise<NextResponse> {
   if (signedMessage.message.text.length > MAX_CHARACTERS) {
-    return NextResponse.json({
-      error:
-        "The number of characters in the message exceeds the maximum allowed (100 characters max.)",
-    });
+    return NextResponse.json(
+      {
+        error:
+          "The number of characters in the message exceeds the maximum allowed (100 characters max.)",
+      },
+      { status: 403 }
+    );
   }
   if (!sismoConnect) {
     return NextResponse.json(
       { error: "SismoConnect not defined" },
-      { status: 404 }
+      { status: 500 }
     );
   }
   const vaultId = await verifyResponseAddMessage(

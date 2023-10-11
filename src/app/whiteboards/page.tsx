@@ -220,7 +220,7 @@ export default function Home() {
             />
           ))}
       </div>
-      {whiteboards.length == 0 && isFetchingWhiteboards && (
+      {!errorMessage && whiteboards.length == 0 && isFetchingWhiteboards && (
         <Loading text="Loading whiteboards..." />
       )}
       {errorMessage && <ErrorModal text={errorMessage} />}

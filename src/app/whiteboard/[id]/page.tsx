@@ -33,6 +33,7 @@ import Header from "../../../components/header/header";
 import { Message as MessageType } from "@prisma/client";
 import ShareWhiteboard from "../../../components/share-whiteboard/share-whiteboard";
 import axios from "axios";
+import ErrorModal from "@/components/error-modal/error-modal";
 
 let sismoConnect: SismoConnectClient | null = null;
 
@@ -71,6 +72,8 @@ const Whiteboard = ({ params }: pageProps) => {
 
   const [currentURL, setCurrentURL] = useState("");
   const [whiteboardVaultId, setWhiteboardVaultId] = useState<string | null>();
+
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const router = useRouter();
 
@@ -124,18 +127,31 @@ const Whiteboard = ({ params }: pageProps) => {
       url: string,
       message: SismoConnectResponse
     ) => {
+      let response;
       try {
-        const response = await axios.post(url, message, {
+        response = await axios.post(url, message, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-        return response.data as PostDeletionResponse;
       } catch (error: any) {
         console.error("API request error:", error);
-        // alert("An error occured: " + error.response.data.error);
+        if (error.response.data.error) {
+          setErrorMessage(error.response.data.error);
+        } else if (message.signedMessage) {
+          const signedMessage = JSON.parse(message.signedMessage);
+          const type =
+            signedMessage.message.type === "POST" ? "posting" : "deleting";
+          setErrorMessage(`An error occured while ${type} your message`);
+        } else {
+          setErrorMessage(
+            "An error occured while deleting or posting your message"
+          );
+        }
         return null;
       }
+      console.log("333");
+      return response.data as PostDeletionResponse;
     };
 
     const handleApiResponse = async (messages: MessageType[]) => {
@@ -201,24 +217,25 @@ const Whiteboard = ({ params }: pageProps) => {
     const fetchMessages = async () => {
       setIsFetchingMessages(true);
       try {
-        const response = await fetch("/api/whiteboard", {
-          method: "POST",
+        const response = await axios.post("/api/whiteboard", params.id, {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(params.id),
-          cache: "no-cache",
         });
-        if (!response.ok) {
-          router.back();
-        }
-        const whiteboard: Whiteboard = await response.json();
+        const whiteboard: Whiteboard = response.data;
         setWhiteboard(whiteboard);
         if (whiteboard.messages) {
           setMessages(whiteboard.messages);
         }
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        console.error("API request error:", error);
+        if (error.response.data.error) {
+          setErrorMessage(error.response.data.error);
+        } else {
+          setErrorMessage(
+            "An error occured while fetching the messages of this whiteboard"
+          );
+        }
       }
       setIsFetchingMessages(false);
     };
@@ -345,23 +362,25 @@ const Whiteboard = ({ params }: pageProps) => {
       {!isVerifying && isFetchingMessages && messages.length == 0 && (
         <Loading text="Loading messages..." />
       )}
-      <MessageModal
-        modalRef={messageModalRef}
-        style={{
-          position: "absolute",
-          zIndex: MAX_Z_INDEX + 2,
-          display: isModalOpen ? "flex" : "none",
-        }}
-        initialPositionX={messagePosition?.x}
-        initialPositionY={messagePosition?.y}
-        inputValue={messageInputValue}
-        inputColorValue={messageInputColorValue}
-        onChange={(e) => setMessageInputValue(e.target.value)}
-        onColorChange={(e) => setMessageInputColorValue(e.target.value)}
-        inputRef={messageInputRef}
-        onClickCancel={() => setIsModalOpen(false)}
-        onClickSave={() => requestAddMessage()}
-      />
+      {isModalOpen && (
+        <MessageModal
+          modalRef={messageModalRef}
+          style={{
+            position: "absolute",
+            zIndex: MAX_Z_INDEX + 2,
+            display: "flex",
+          }}
+          initialPositionX={messagePosition?.x}
+          initialPositionY={messagePosition?.y}
+          inputValue={messageInputValue}
+          inputColorValue={messageInputColorValue}
+          onChange={(e) => setMessageInputValue(e.target.value)}
+          onColorChange={(e) => setMessageInputColorValue(e.target.value)}
+          inputRef={messageInputRef}
+          onClickCancel={() => setIsModalOpen(false)}
+          onClickSave={() => requestAddMessage()}
+        />
+      )}
       {whiteboard && (
         <ShareWhiteboard
           currentURL={currentURL}
@@ -369,6 +388,7 @@ const Whiteboard = ({ params }: pageProps) => {
           whiteboardName={whiteboard.name}
         />
       )}
+      {errorMessage && <ErrorModal text={errorMessage} />}
     </div>
   );
 };
