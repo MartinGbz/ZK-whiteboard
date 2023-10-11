@@ -104,9 +104,6 @@ const Whiteboard = ({ params }: pageProps) => {
       const responseMessage: SismoConnectResponse | null =
         sismoConnect.getResponse();
       if (responseMessage?.signedMessage) {
-        console.log("EFFECTTTT");
-        // console.log("user", user);
-        console.log("whiteboard", whiteboard);
         setSismoConnectResponseMessage(responseMessage);
       }
     }
@@ -145,7 +142,6 @@ const Whiteboard = ({ params }: pageProps) => {
           setErrorMessage(error.response.data.error);
         } else if (message.signedMessage) {
           const signedMessage = JSON.parse(message.signedMessage);
-          console.log("signedMessage", signedMessage);
           const type =
             signedMessage.message.type === "POST" ? "posting" : "deleting";
           setErrorMessage(`An error occured while ${type} your message`);
@@ -168,8 +164,6 @@ const Whiteboard = ({ params }: pageProps) => {
 
     const postMessage = async (message: SismoConnectResponse) => {
       setIsVerifying(true);
-
-      console.log("! postMessage !");
 
       const url = constructUrlFromMessage(message);
 
