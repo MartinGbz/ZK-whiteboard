@@ -1,9 +1,7 @@
 "use client";
-import { MobileModal } from "@/app/components/mobile-modal/mobile-modal";
 import React from "react";
 
-import "../../../page.css";
-import WhiteboardCreationEdition from "@/app/components/whiteboard-creation-edition/whiteboard-creation-edition";
+import WhiteboardCreationEdition from "@/components/whiteboard-creation-edition/whiteboard-creation-edition";
 
 interface pageProps {
   params: { id: number };
@@ -12,9 +10,7 @@ interface pageProps {
 const page = ({ params }: pageProps) => {
   return (
     <div>
-      {/* <MobileModal />
-      <WhiteboardCreationEdition isEdition={true} whiteboardId={params.id} /> */}
-      Settings not activated yet
+      <WhiteboardCreationEdition isEdition={true} whiteboardId={params.id} />
     </div>
   );
 };

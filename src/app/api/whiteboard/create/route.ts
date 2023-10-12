@@ -4,7 +4,7 @@ import { prisma } from "../../db";
 import {
   WhiteboardCreateSignedMessage,
   WhiteboardOperationType,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import {
   SismoConnect,
   SismoConnectResponse,
@@ -19,10 +19,8 @@ import {
   MAX_WHITEBOARD_GROUPS_MESSAGE,
   MAX_WHITEBOARD_PER_USER,
   sismoConnectConfig,
-} from "@/app/configs/configs";
+} from "@/configs/configs";
 import { getAppId } from "./utils";
-
-export const dynamic = "force-dynamic";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -35,12 +33,12 @@ export async function POST(req: Request): Promise<NextResponse> {
     if (signedMessage.type === WhiteboardOperationType.CREATE) {
       return await saveWhiteboard(sismoConnectResponse, signedMessage);
     } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type" });
+      return NextResponse.json({ error: "No type provided" }, { status: 400 });
     } else {
-      return NextResponse.json({ error: "Wrong API route" });
+      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
     }
   } else {
-    return NextResponse.json({ error: "No signed message" });
+    return NextResponse.json({ error: "No signed message" }, { status: 400 });
   }
 
   async function saveWhiteboard(
@@ -48,21 +46,30 @@ export async function POST(req: Request): Promise<NextResponse> {
     signedMessage: WhiteboardCreateSignedMessage
   ): Promise<NextResponse> {
     if (signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_NAME) {
-      return NextResponse.json({
-        error: MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
-      });
+      return NextResponse.json(
+        {
+          error: MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
+        },
+        { status: 403 }
+      );
     }
     if (
       signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
     ) {
-      return NextResponse.json({
-        error: MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
-      });
+      return NextResponse.json(
+        {
+          error: MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
+        },
+        { status: 403 }
+      );
     }
     if (signedMessage.message.groupIds.length > MAX_WHITEBOARD_GROUPS) {
-      return NextResponse.json({
-        error: MAX_WHITEBOARD_GROUPS_MESSAGE,
-      });
+      return NextResponse.json(
+        {
+          error: MAX_WHITEBOARD_GROUPS_MESSAGE,
+        },
+        { status: 403 }
+      );
     }
     const vaultId = await verifyResponseMessage(
       sismoConnect,
@@ -72,7 +79,10 @@ export async function POST(req: Request): Promise<NextResponse> {
       const allMessagesInDB = await saveWhiteboardToDB(vaultId, signedMessage);
       return allMessagesInDB;
     } else {
-      return NextResponse.json({ error: "ZK Proof incorrect" });
+      return NextResponse.json(
+        { error: "ZK Proof incorrect" },
+        { status: 401 }
+      );
     }
   }
 
@@ -135,6 +145,6 @@ export async function POST(req: Request): Promise<NextResponse> {
       data: { appId: sismoAppId },
     });
 
-    return NextResponse.json(whiteboard);
+    return NextResponse.json(whiteboard, { status: 200 });
   }
 }

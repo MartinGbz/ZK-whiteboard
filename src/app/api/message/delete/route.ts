@@ -2,7 +2,7 @@ import {
   MessageOperationType,
   SignedMessage,
   Whiteboard,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import {
   AuthType,
   SismoConnect,
@@ -44,18 +44,24 @@ export async function POST(req: Request): Promise<NextResponse> {
     if (!sismoConnect) {
       return NextResponse.json(
         { error: "SismoConnect not found" },
-        { status: 404 }
+        { status: 500 }
       );
     }
     if (signedMessage.type === MessageOperationType.DELETE) {
       return await deleteMessage(sismoConnectResponse);
     } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No request type found" },
+        { status: 400 }
+      );
     } else {
-      return NextResponse.json({ error: "Wrong API route" }, { status: 404 });
+      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
     }
   } else {
-    return NextResponse.json({ error: "No signed message" }, { status: 404 });
+    return NextResponse.json(
+      { error: "No signed message found" },
+      { status: 400 }
+    );
   }
 }
 
@@ -65,7 +71,7 @@ async function deleteMessage(
   if (!sismoConnect) {
     return NextResponse.json(
       { error: "SismoConnect not defined" },
-      { status: 404 }
+      { status: 500 }
     );
   }
   const vaultId = await verifyResponseDeleteMessage(
@@ -76,9 +82,9 @@ async function deleteMessage(
     if (!sismoConnectResponse.signedMessage) {
       return NextResponse.json(
         {
-          error: "No signedMessage found in the ZK Proof",
+          error: "No signedMessage in the ZK Proof found",
         },
-        { status: 404 }
+        { status: 400 }
       );
     }
     const message = JSON.parse(
@@ -87,7 +93,7 @@ async function deleteMessage(
     const response = await deleteMessageFromDB(vaultId, message);
     return response;
   } else {
-    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 403 });
+    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
 }
 
@@ -106,7 +112,7 @@ async function deleteMessageFromDB(
       },
     });
     if (!messageToDelete) {
-      return NextResponse.json({ error: "No message found" }, { status: 404 });
+      return NextResponse.json({ error: "No message found" }, { status: 400 });
     }
     const deletedMessage = await prisma.message.delete({
       where: {
@@ -115,15 +121,18 @@ async function deleteMessageFromDB(
     });
     const whiteboard = await getWhiteboardById(whiteboardId);
     if (whiteboard?.messages) {
-      return NextResponse.json({
-        vaultId: vaultId,
-        messages: whiteboard.messages,
-      });
+      return NextResponse.json(
+        {
+          vaultId: vaultId,
+          messages: whiteboard.messages,
+        },
+        { status: 200 }
+      );
     } else {
-      return NextResponse.json({ error: "No message found" }, { status: 404 });
+      return NextResponse.json({ error: "No message found" }, { status: 400 });
     }
   } catch (error) {
-    return NextResponse.json(error);
+    return NextResponse.json(error, { status: 500 });
   }
 }
 

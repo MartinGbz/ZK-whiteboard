@@ -8,11 +8,7 @@ import {
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
-import {
-  MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
-  MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
-  sismoConnectConfig,
-} from "@/configs/configs";
+import { sismoConnectConfig } from "@/configs/configs";
 import { verifyResponseMessage } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -21,8 +17,8 @@ export async function POST(req: Request): Promise<NextResponse> {
     const signedMessage = JSON.parse(
       sismoConnectResponse.signedMessage
     ) as WhiteboardEditSignedMessage;
-    if (signedMessage.type === WhiteboardOperationType.EDIT) {
-      return await saveWhiteboard(sismoConnectResponse, signedMessage);
+    if (signedMessage.type === WhiteboardOperationType.DELETE) {
+      return await deleteWhiteboard(sismoConnectResponse, signedMessage);
     } else if (!signedMessage.type) {
       return NextResponse.json({ error: "No type provided" }, { status: 400 });
     } else {
@@ -35,33 +31,23 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
-async function saveWhiteboard(
+async function deleteWhiteboard(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
-  if (
-    signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
-  ) {
-    return NextResponse.json(
-      {
-        error: MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
-      },
-      { status: 403 }
-    );
-  }
   const vaultId = await verifyResponseMessage(
     sismoConnect,
     sismoConnectResponse
   );
   if (vaultId) {
-    const allMessagesInDB = await saveWhiteboardToDB(vaultId, signedMessage);
+    const allMessagesInDB = await deleteWhiteboardInDB(vaultId, signedMessage);
     return allMessagesInDB;
   } else {
     return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
 }
 
-async function saveWhiteboardToDB(
+async function deleteWhiteboardInDB(
   vaultId: string,
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
@@ -92,15 +78,19 @@ async function saveWhiteboardToDB(
       );
     }
 
-    const editedWhiteboard = await prisma.whiteboard.update({
+    await prisma.message.deleteMany({
+      where: {
+        whiteboardId: whiteboardId,
+      },
+    });
+
+    const deletedWhiteboard = await prisma.whiteboard.delete({
       where: {
         id: whiteboardId,
       },
-      data: {
-        description: signedMessage.message.description,
-      },
     });
-    return NextResponse.json(editedWhiteboard, { status: 200 });
+
+    return NextResponse.json(deletedWhiteboard, { status: 200 });
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
   }

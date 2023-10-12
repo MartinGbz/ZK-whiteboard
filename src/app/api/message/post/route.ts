@@ -2,7 +2,7 @@ import {
   MessageOperationType,
   SignedMessage,
   Whiteboard,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import {
   AuthType,
   SismoConnect,
@@ -12,7 +12,7 @@ import {
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
-import { MAX_CHARACTERS } from "@/app/configs/configs";
+import { MAX_CHARACTERS } from "@/configs/configs";
 import { getWhiteboardById } from "../../common";
 
 let whiteboard: Whiteboard | null = null;
@@ -26,10 +26,16 @@ export async function POST(req: Request): Promise<NextResponse> {
     ) as SignedMessage;
     whiteboard = await getWhiteboardById(signedMessage.message.whiteboardId);
     if (!whiteboard) {
-      return NextResponse.json({ error: "Whiteboard not found" });
+      return NextResponse.json(
+        { error: "Whiteboard not found" },
+        { status: 404 }
+      );
     }
     if (!whiteboard.appId) {
-      return NextResponse.json({ error: "Whiteboard appId not found" });
+      return NextResponse.json(
+        { error: "Whiteboard appId not found" },
+        { status: 404 }
+      );
     }
     sismoConnect = SismoConnect({
       config: {
@@ -37,17 +43,20 @@ export async function POST(req: Request): Promise<NextResponse> {
       },
     });
     if (!sismoConnect) {
-      return NextResponse.json({ error: "SismoConnect not defined" });
+      return NextResponse.json(
+        { error: "SismoConnect not defined" },
+        { status: 500 }
+      );
     }
     if (signedMessage.type === MessageOperationType.POST) {
       return await addMessage(sismoConnectResponse, signedMessage);
     } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type" });
+      return NextResponse.json({ error: "No type provided" }, { status: 400 });
     } else {
-      return NextResponse.json({ error: "Wrong API route" });
+      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
     }
   } else {
-    return NextResponse.json({ error: "No signed message" });
+    return NextResponse.json({ error: "No signed message" }, { status: 400 });
   }
 }
 
@@ -56,15 +65,18 @@ async function addMessage(
   signedMessage: SignedMessage
 ): Promise<NextResponse> {
   if (signedMessage.message.text.length > MAX_CHARACTERS) {
-    return NextResponse.json({
-      error:
-        "The number of characters in the message exceeds the maximum allowed (100 characters max.)",
-    });
+    return NextResponse.json(
+      {
+        error:
+          "The number of characters in the message exceeds the maximum allowed (100 characters max.)",
+      },
+      { status: 403 }
+    );
   }
   if (!sismoConnect) {
     return NextResponse.json(
       { error: "SismoConnect not defined" },
-      { status: 404 }
+      { status: 500 }
     );
   }
   const vaultId = await verifyResponseAddMessage(
@@ -75,7 +87,7 @@ async function addMessage(
     const response = await addMessageToDB(vaultId, signedMessage);
     return response;
   } else {
-    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 403 });
+    return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
 }
 
@@ -107,7 +119,10 @@ async function addMessageToDB(
       const existingMessages = whiteboard?.messages ?? [];
       const messages = [...existingMessages, newMessage];
       if (messages) {
-        return NextResponse.json({ vaultId: vaultId, messages: messages });
+        return NextResponse.json(
+          { vaultId: vaultId, messages: messages },
+          { status: 200 }
+        );
       } else {
         return NextResponse.json(
           {

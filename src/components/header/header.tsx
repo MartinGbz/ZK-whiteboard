@@ -2,7 +2,7 @@
 import {
   ZKWHITEBOARD_VAULTID_VARNAME,
   sismoConnectConfig,
-} from "@/app/configs/configs";
+} from "@/configs/configs";
 import {
   AuthType,
   SismoConnectButton,
@@ -13,47 +13,49 @@ import "./header.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Home } from "@mui/icons-material";
-import { User } from "@/app/types/whiteboard-types";
+import { User } from "@/types/whiteboard-types";
 
 interface HeaderProps {
-  currentRoute: string;
-  onChangeUser?: (user: User | null) => void;
+  onChangeUser: (user: User | null) => void;
   whiteboardName?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  onChangeUser,
-  whiteboardName,
-  currentRoute,
-}) => {
+const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [isLoging, setIsLoging] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const storagedVaultId = localStorage.getItem(ZKWHITEBOARD_VAULTID_VARNAME);
-    if (storagedVaultId) {
+    const getUser = async () => {
       setIsLoging(true);
-      getUser(storagedVaultId);
+      const storagedVaultId = localStorage.getItem(
+        ZKWHITEBOARD_VAULTID_VARNAME
+      );
+      if (storagedVaultId) {
+        const response = await fetch("/api/user", {
+          method: "POST",
+          body: JSON.stringify(storagedVaultId),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const res = await response.json();
+        const user = res.user;
+        setUser(user);
+        onChangeUser(user);
+      }
       setIsLoging(false);
-    }
+    };
+    getUser();
+    // need to disable the eslint rule because we want to call getUser only once
+    // if we add onChangeUser to the dependency array, it will be called each time onChangeUser changes
+    // and it creates an infinite loop (not fully understood why)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  async function getUser(vaultId: string) {
-    const response = await fetch("/api/user", {
-      method: "POST",
-      body: JSON.stringify(vaultId),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const res = await response.json();
-    const user = res.user;
-    setUser(user);
-    onChangeUser ? onChangeUser(user) : undefined;
-  }
 
   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
     // if the reponse does not have a signed message, it means there is no action to perform, only a login
@@ -73,9 +75,9 @@ const Header: React.FC<HeaderProps> = ({
       const res = await response.json();
       const user: User = res.user;
       setUser(user);
-      onChangeUser ? onChangeUser(user) : undefined;
+      onChangeUser(user);
       localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
-      router.push(currentRoute);
+      router.push(pathname);
       setIsLoging(false);
     }
   }
@@ -83,12 +85,12 @@ const Header: React.FC<HeaderProps> = ({
   async function logout() {
     setUser(null);
     localStorage.removeItem(ZKWHITEBOARD_VAULTID_VARNAME);
-    onChangeUser ? onChangeUser(null) : undefined;
+    onChangeUser(null);
   }
 
   return (
     <div className="header">
-      {currentRoute !== "/" && (
+      {pathname !== "/" && pathname !== "/whiteboards" && (
         <Home
           style={{
             gridColumn: 1,

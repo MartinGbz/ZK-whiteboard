@@ -1,6 +1,6 @@
 "use client";
 import React, { CSSProperties, useRef, useState } from "react";
-import { MAX_Z_INDEX, TRANSPARENCY, redColor } from "@/app/configs/configs";
+import { MAX_Z_INDEX, TRANSPARENCY, redColor } from "@/configs/configs";
 import "./message.css";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Message as MessageType } from "@prisma/client";

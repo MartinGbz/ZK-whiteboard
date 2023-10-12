@@ -1,12 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   WhiteboardOperationType,
   WhiteboardCreateSignedMessage,
   WhiteboardEditSignedMessage,
   User,
-} from "@/app/types/whiteboard-types";
+} from "@/types/whiteboard-types";
 import Header from "../header/header";
 
 import "./whiteboard-creation-edition.css";
@@ -26,7 +26,8 @@ import {
   greenColorDisabled,
   MAX_WHITEBOARD_PER_USER,
   MIN_WHITEBOARD,
-} from "@/app/configs/configs";
+  redColor,
+} from "@/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
   AuthType,
@@ -35,6 +36,10 @@ import {
 } from "@sismo-core/sismo-connect-react";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import axios from "axios";
+import ErrorModal from "../error-modal/error-modal";
+import SuccessAnimation from "../success-animation/success-animation";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -42,6 +47,7 @@ const API_BASE_URL = "/api/whiteboard";
 const API_ENDPOINTS = {
   CREATE: "/create",
   EDIT: "/edit",
+  DELETE: "/delete",
 };
 
 interface Group {
@@ -97,60 +103,78 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [disableValidation, setDisableValidation] = useState<boolean>(false);
+  const [disableValidationEdition, setDisableValidationEdition] =
+    useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
+
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchGroups = async () => {
       setIsWhiteboardDataLoading(true);
+      let response;
       try {
-        const response = await fetch("https://hub.sismo.io/groups/latests", {
-          method: "GET",
+        response = await axios.get("https://hub.sismo.io/groups/latests", {
           headers: {
             "Content-Type": "application/json",
           },
         });
-        const responseDecoded = await response.json();
-        const groups: Group[] = responseDecoded.items;
-        setGroups(groups);
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        console.error("API request error:", error);
+        setErrorMessage("An error occured while fetching Sismo Data Groups");
+        return null;
       }
+      const groups: Group[] = response.data.items;
+      setGroups(groups);
       if (!isEdition) {
         setIsWhiteboardDataLoading(false);
       }
     };
     fetchGroups();
-  }, []);
+  }, [isEdition]);
 
   useEffect(() => {
     const fetchWhiteboard = async (id: number) => {
+      let response;
       try {
-        const response = await fetch("/api/whiteboard", {
-          method: "POST",
+        response = await axios.post("/api/whiteboard", id, {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(id),
-          cache: "no-cache",
         });
-
-        const whiteboard: Whiteboard = await response.json();
-        setInitalWhiteboard(whiteboard);
-        setWhiteboardName(whiteboard?.name || "");
-        setWhiteboardDescription(whiteboard?.description || "");
-        setSelectedGroups(
-          groups.filter((group: Group) =>
-            whiteboard?.groupIds?.includes(group.id)
-          )
-        );
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        console.error("API request error:", error);
+        const defaultErrorMessage =
+          "An error occured while fetching the whiteboard data";
+        const errorMessage = error.response.data.error
+          ? `${defaultErrorMessage}: ${error.response.data.error}`
+          : defaultErrorMessage;
+        setErrorMessage(errorMessage);
+        return null;
       }
+      const whiteboard: Whiteboard = response.data;
+      setInitalWhiteboard(whiteboard);
+      setWhiteboardName(whiteboard?.name || "");
+      setWhiteboardDescription(whiteboard?.description || "");
+      setSelectedGroups(
+        groups.filter((group: Group) =>
+          whiteboard?.groupIds?.includes(group.id)
+        )
+      );
       setIsWhiteboardDataLoading(false);
     };
-    if (isEdition && whiteboardId) {
+    // !isVerifying && !successMessage to avoid fetching data when the user is verifying the proof and will exit the page
+    if (
+      isEdition &&
+      whiteboardId &&
+      groups &&
+      !isVerifying &&
+      !successMessage
+    ) {
       fetchWhiteboard(whiteboardId);
     }
-  }, [groups]);
+  }, [groups, isEdition, isVerifying, successMessage, whiteboardId]);
 
   async function createWhiteboard() {
     const sismoConnectSignedMessage: WhiteboardCreateSignedMessage = {
@@ -179,10 +203,26 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       type: WhiteboardOperationType.EDIT,
       message: {
         ...initalWhiteboard,
-        name: whiteboardName,
         description: whiteboardDescription,
-        groupIds: selectedGroups.map((group: Group) => group.id),
       },
+    };
+    sismoConnect.request({
+      namespace: "main",
+      auth: { authType: AuthType.VAULT },
+      signature: {
+        message: JSON.stringify(sismoConnectSignedMessage),
+      },
+    });
+  }
+
+  async function deleteWhiteboard() {
+    if (!initalWhiteboard) {
+      console.error("No initial whiteboard");
+      return;
+    }
+    const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
+      type: WhiteboardOperationType.DELETE,
+      message: initalWhiteboard,
     };
     sismoConnect.request({
       namespace: "main",
@@ -217,6 +257,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         url += API_ENDPOINTS.CREATE;
       } else if (signedMessage?.type === WhiteboardOperationType.EDIT) {
         url += API_ENDPOINTS.EDIT;
+      } else if (signedMessage?.type === WhiteboardOperationType.DELETE) {
+        url += API_ENDPOINTS.DELETE;
       }
 
       return url;
@@ -235,7 +277,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         } catch (error: any) {
           if (i === retryMax - 1) {
             console.error("API request error:", error);
-            alert("An error occured. Error: " + error.response.data.error);
+            const defaultErrorMessage = "An error occured";
+            const errorMessage = error.response.data.error
+              ? `${defaultErrorMessage}: ${error.response.data.error}`
+              : defaultErrorMessage;
+            setErrorMessage(errorMessage);
+            return false;
           }
         }
       }
@@ -250,8 +297,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           "Content-Type": "application/json",
         },
       });
-      setIsVerifying(false);
-      router.push("/");
+      return true;
     };
 
     const postWhiteboard = async (message: SismoConnectResponse) => {
@@ -259,15 +305,34 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
       const url = constructUrlFromMessage(message);
 
-      await retryRequest(performApiRequest, url, message, 2);
+      const success = await retryRequest(performApiRequest, url, message, 2);
 
       setIsVerifying(false);
-      router.push("/");
+
+      if (!success) {
+        router.push(pathname);
+      } else {
+        const mess = message.signedMessage
+          ? JSON.parse(message.signedMessage)
+          : null;
+        if (mess.type === WhiteboardOperationType.CREATE) {
+          setSuccessMessage("Whiteboard created!");
+        } else if (mess.type === WhiteboardOperationType.EDIT) {
+          setSuccessMessage("Whiteboard edited!");
+        } else if (mess.type === WhiteboardOperationType.DELETE) {
+          setSuccessMessage("Whiteboard deleted!");
+        } else {
+          setSuccessMessage("Success");
+        }
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
+      }
     };
     if (sismoConnectResponseMessage?.signedMessage) {
       postWhiteboard(sismoConnectResponseMessage);
     }
-  }, [sismoConnectResponseMessage]);
+  }, [pathname, router, sismoConnectResponseMessage]);
 
   useEffect(() => {
     if (whiteboardName) {
@@ -309,23 +374,26 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   }, [whiteboardName, whiteboardDescription, selectedGroups]);
 
   useEffect(() => {
-    if (whiteboardNameOk && whiteboardDescriptionOk && selectedGroupsOk) {
+    if (
+      whiteboardNameOk &&
+      whiteboardDescriptionOk &&
+      selectedGroupsOk &&
+      user
+    ) {
       setDisableValidation(false);
     } else {
       setDisableValidation(true);
     }
-  }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk]);
+    if (whiteboardNameOk && whiteboardDescriptionOk) {
+      setDisableValidationEdition(false);
+    } else {
+      setDisableValidationEdition(true);
+    }
+  }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
   return (
     <div className="container">
-      <Header
-        currentRoute={
-          isEdition
-            ? "/whiteboard/settings/" + whiteboardId
-            : "/create-whiteboard"
-        }
-        onChangeUser={(user) => setUser(user)}
-      />
+      <Header onChangeUser={(user) => setUser(user)} />
       <div
         style={{
           display: "flex",
@@ -338,24 +406,31 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             color: "black",
             fontSize: "20px",
           }}>
-          <span>Create a new whiteboard</span>
+          <span>
+            {isEdition ? "Edit a whiteboard" : "Create a new whiteboard"}
+          </span>
           <span
             style={{
               color: "grey",
               fontSize: "11px",
             }}>
-            {!isEdition &&
-              " (Currently only " + MAX_WHITEBOARD_PER_USER + " max per user)"}
+            {isEdition
+              ? " (You can only edit the description for now)"
+              : " (Currently only " +
+                MAX_WHITEBOARD_PER_USER +
+                " max per user)"}
           </span>
         </div>
         <p className="form-labels"> Name </p>
         <input
+          disabled={isEdition}
           type="text"
           className="whiteboard-creation-inputs"
           style={{
             padding: "10px",
             height: "40x",
             fontSize: "14px",
+            cursor: isEdition ? "not-allowed" : "default",
           }}
           onChange={(event) => {
             setWhiteboardName(event.target.value);
@@ -399,9 +474,14 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               flexDirection: "column",
             }}>
             <Autocomplete
+              disabled={isEdition}
               className="inputs"
               ListboxProps={{
-                style: { fontSize: "14px", backgroundColor: "#e9e9e9" },
+                style: {
+                  fontSize: "14px",
+                  backgroundColor: "#e9e9e9",
+                  cursor: isEdition ? "not-allowed" : "default",
+                },
               }}
               noOptionsText={"No groups found"}
               renderInput={(params) => (
@@ -453,7 +533,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 setSelectedGroups(value);
               }}
             />
-            {selectedGroupsChanged && !selectedGroupsOk && (
+            {!isEdition && selectedGroupsChanged && !selectedGroupsOk && (
               <div className="warning-message">
                 {MAX_WHITEBOARD_GROUPS_MESSAGE}
               </div>
@@ -469,72 +549,127 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               What are Groups?
             </a>
           </div>
-          <div
-            style={{
-              marginLeft: "20px",
-            }}>
-            <p
+          {!isEdition && (
+            <div
               style={{
-                fontSize: "12px",
-                color: "black",
-                backgroundColor: "#e9e9e9",
+                marginLeft: "20px",
               }}>
-              No groups fit your needs? Create one here!
-            </p>
-            <a target="_blank" href="https://factory.sismo.io/create-group">
-              <div
-                className="create-group-button"
+              <p
                 style={{
                   fontSize: "12px",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  backgroundColor: purpleColor,
-                  cursor: "pointer",
-                  width: "fit-content",
                   color: "black",
-                  marginTop: "5px",
-                  boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                  backgroundColor: "#e9e9e9",
                 }}>
-                <OpenInNewIcon
-                  sx={{
-                    fontSize: "15px",
-                  }}
-                />{" "}
-                Create a group
-              </div>
-            </a>
-          </div>
+                No groups fit your needs? Create one here!
+              </p>
+              <a target="_blank" href="https://factory.sismo.io/create-group">
+                <div
+                  className="create-group-button"
+                  style={{
+                    fontSize: "12px",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    backgroundColor: purpleColor,
+                    cursor: "pointer",
+                    width: "fit-content",
+                    color: "black",
+                    marginTop: "5px",
+                    boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
+                  }}>
+                  <OpenInNewIcon
+                    sx={{
+                      fontSize: "15px",
+                    }}
+                  />{" "}
+                  Create a group
+                </div>
+              </a>
+            </div>
+          )}
         </div>
         <button
-          className="create-edit-button"
+          className="create-edit-button validate-button"
           style={{
-            padding: "10px",
-            borderRadius: "10px",
-            backgroundColor: disableValidation
-              ? greenColorDisabled
-              : greenColor,
-            cursor: disableValidation ? "default" : "pointer",
-            pointerEvents: disableValidation ? "none" : "auto",
+            backgroundColor:
+              (isEdition && disableValidationEdition) ||
+              (!isEdition && disableValidation)
+                ? greenColorDisabled
+                : greenColor,
+            cursor:
+              (isEdition && disableValidationEdition) ||
+              (!isEdition && disableValidation)
+                ? "default"
+                : "pointer",
+            pointerEvents:
+              (isEdition && disableValidationEdition) ||
+              (!isEdition && disableValidation)
+                ? "none"
+                : "auto",
             alignSelf: "start",
-            width: "fit-content",
-            color: "black",
             marginTop: "20px",
-            boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
             fontSize: "18px",
+
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
           }}
           onClick={() => {
             if (!isEdition) createWhiteboard();
             if (isEdition) saveWhiteboard();
           }}
-          disabled={disableValidation}>
+          disabled={isEdition ? disableValidationEdition : disableValidation}>
+          <CheckCircleIcon
+            style={{
+              fontSize: "18px",
+              marginRight: "2px",
+            }}
+          />
           {!isEdition && "Create"}
           {isEdition && "Save"}
         </button>
+        {isEdition && (
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}>
+            <button
+              className="create-edit-button validate-button"
+              style={{
+                backgroundColor: redColor,
+                cursor: "pointer",
+                pointerEvents: "auto",
+                alignSelf: "start",
+                marginTop: "20px",
+                fontSize: "15px",
+
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={() => {
+                deleteWhiteboard();
+              }}>
+              <DeleteIcon
+                style={{
+                  fontSize: "15px",
+                  marginRight: "2px",
+                }}
+              />{" "}
+              Delete
+            </button>
+          </div>
+        )}
       </div>
       {isWhiteboardDataLoading && !isVerifying && (
         <Loading text="Loading whiteboard" />
       )}
       {isVerifying && <Loading text="Checking the proof..." />}
+      {errorMessage && <ErrorModal text={errorMessage} />}
+      <SuccessAnimation text={successMessage} duration={0.5} />
     </div>
   );
 };

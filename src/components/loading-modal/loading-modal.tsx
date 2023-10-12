@@ -1,7 +1,7 @@
 "use client";
 import React, { CSSProperties } from "react";
 import "./loading-modal.css";
-import { MAX_Z_INDEX } from "@/app/configs/configs";
+import { MAX_Z_INDEX } from "@/configs/configs";
 
 interface LoadingProps {
   text: string;

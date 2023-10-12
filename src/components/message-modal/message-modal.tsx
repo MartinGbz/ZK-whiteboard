@@ -3,7 +3,7 @@ import React, { CSSProperties, useEffect, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { TextareaAutosize } from "@mui/base";
-import { MAX_CHARACTERS, greenColor, redColor } from "@/app/configs/configs";
+import { MAX_CHARACTERS, greenColor, redColor } from "@/configs/configs";
 
 interface MessageModalProps {
   style?: CSSProperties;
