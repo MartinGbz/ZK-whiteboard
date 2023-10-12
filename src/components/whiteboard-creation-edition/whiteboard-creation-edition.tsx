@@ -36,6 +36,7 @@ import {
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import axios from "axios";
 import ErrorModal from "../error-modal/error-modal";
+import SuccessAnimation from "../success-animation/success-animation";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -101,6 +102,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const [disableValidationEdition, setDisableValidationEdition] =
     useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const pathname = usePathname();
 
@@ -280,7 +282,10 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       if (!success) {
         router.push(pathname);
       } else {
-        router.push("/");
+        setSuccessMessage("Whiteboard created!");
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
       }
     };
     if (sismoConnectResponseMessage?.signedMessage) {
@@ -577,6 +582,44 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       )}
       {isVerifying && <Loading text="Checking the proof..." />}
       {errorMessage && <ErrorModal text={errorMessage} />}
+      <SuccessAnimation text={successMessage} duration={0.5} />
+      {/* <div
+        style={{
+          backdropFilter: "blur(10px)",
+          // backgroundColor: "rgba(0, 0, 0, 0.3)",
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+        }}>
+        <div
+          style={{
+            backgroundColor: "red",
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            // transform: "translate(-50%, -50%)",
+            borderRadius: "10px",
+            height: "75px",
+            width: "125px",
+            borderLeft: "5px solid green",
+            borderBottom: "5px solid green",
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+
+            // animation: "3s linear 1s infinite running slidein",
+            transition: "transform 0.5s ease-in-out opacity 0.5s ease-in-out",
+            transform: "rotateZ(-45deg) scale(1.5)",
+            opacity: 1,
+            // opacity: 0,
+            // transform: "rotateZ(0) scale(1)",
+
+            // transformOrigin: "scale(0.5) translate(-100%, -100%)",
+            // transformBox: "rotate(-0.1turn)",
+          }}>
+          hey
+        </div>
+      </div> */}
     </div>
   );
 };
