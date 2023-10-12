@@ -70,7 +70,7 @@ const Whiteboard = ({ params }: pageProps) => {
   const messageModalRef = useRef<HTMLDivElement>(null);
 
   const [currentURL, setCurrentURL] = useState("");
-  const [whiteboardVaultId, setWhiteboardVaultId] = useState<string | null>();
+  const whiteboardVaultId = useRef<string | null>(null);
 
   const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -165,13 +165,11 @@ const Whiteboard = ({ params }: pageProps) => {
 
       const response = await performApiRequest(url, message);
       if (response) {
-        if (!whiteboardVaultId) {
-          localStorage.setItem(
-            WHITEBOARD_VAULTID_VARNAME + params.id,
-            response.vaultId
-          );
-          setWhiteboardVaultId(response.vaultId);
-        }
+        localStorage.setItem(
+          WHITEBOARD_VAULTID_VARNAME + params.id,
+          response.vaultId
+        );
+        whiteboardVaultId.current = response.vaultId;
         handleApiResponse(response.messages);
       }
       setIsVerifying(false);
@@ -180,21 +178,17 @@ const Whiteboard = ({ params }: pageProps) => {
     if (sismoConnectResponseMessage?.signedMessage) {
       postMessage(sismoConnectResponseMessage);
     }
-  }, [
-    redirectToRoot,
-    sismoConnectResponseMessage,
-    params.id,
-    whiteboardVaultId,
-  ]);
+  }, [redirectToRoot, sismoConnectResponseMessage, params.id]);
 
   useEffect(() => {
     if (messages) {
       const isUserMessageExists = messages.some(
-        (message: MessageType) => message.authorVaultId === whiteboardVaultId
+        (message: MessageType) =>
+          message.authorVaultId === whiteboardVaultId.current
       );
       setIsUserMessageExists(isUserMessageExists);
     }
-  }, [messages, whiteboardVaultId]);
+  }, [messages]);
 
   useEffect(() => {
     if (isModalOpen && messageInputRef.current) {
@@ -207,8 +201,8 @@ const Whiteboard = ({ params }: pageProps) => {
   }, [isModalOpen, messagePosition]);
 
   useEffect(() => {
-    setWhiteboardVaultId(
-      localStorage.getItem(WHITEBOARD_VAULTID_VARNAME + params.id)
+    whiteboardVaultId.current = localStorage.getItem(
+      WHITEBOARD_VAULTID_VARNAME + params.id
     );
 
     const fetchMessages = async () => {
@@ -325,7 +319,7 @@ const Whiteboard = ({ params }: pageProps) => {
             <Message
               key={message.authorVaultId}
               message={message}
-              vaultId={whiteboardVaultId ?? ""}
+              vaultId={whiteboardVaultId.current ?? ""}
               onDelete={(message) => requestDeleteMessage(message)}
             />
           ))}
