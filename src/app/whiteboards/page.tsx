@@ -26,7 +26,6 @@ export default function Home() {
 
   const [isFetchingWhiteboards, setIsFetchingWhiteboards] =
     useState<boolean>(false);
-  const [isResolveGroupId, setIsResolveGroupId] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>();
 
   // icon size 30px =so> button 40px =so> div 60px (because padding 10px)
@@ -106,7 +105,6 @@ export default function Home() {
     };
 
     const resolveGroupId = async (groupId: string): Promise<string> => {
-      setIsResolveGroupId(true);
       try {
         const response = await fetch(
           "https://hub.sismo.io/group-snapshots/" + groupId,
@@ -119,11 +117,9 @@ export default function Home() {
           }
         );
         const groupSnapshots = await response.json();
-        setIsResolveGroupId(false);
         return groupSnapshots.items[0].name;
       } catch (error) {
         console.error(error);
-        setIsResolveGroupId(false);
         return "";
       }
     };

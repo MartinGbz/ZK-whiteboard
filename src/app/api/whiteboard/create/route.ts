@@ -22,8 +22,6 @@ import {
 } from "@/configs/configs";
 import { getAppId } from "./utils";
 
-export const dynamic = "force-dynamic";
-
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 export async function POST(req: Request): Promise<NextResponse> {
