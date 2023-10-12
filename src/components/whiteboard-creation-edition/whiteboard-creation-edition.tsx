@@ -639,9 +639,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               className="create-edit-button validate-button"
               style={{
                 backgroundColor: redColor,
-                // borderRadius: "5px",
-                // padding: "5px 10px 5px 10px",
-                // padding: "10px",
                 cursor: "pointer",
                 pointerEvents: "auto",
                 alignSelf: "start",
