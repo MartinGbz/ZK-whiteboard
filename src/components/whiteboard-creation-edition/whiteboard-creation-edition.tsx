@@ -250,7 +250,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               ? `${defaultErrorMessage}: ${error.response.data.error}`
               : defaultErrorMessage;
             setErrorMessage(errorMessage);
-            return null;
+            return false;
           }
         }
       }
@@ -265,8 +265,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           "Content-Type": "application/json",
         },
       });
-      setIsVerifying(false);
-      router.push("/");
+      return true;
     };
 
     const postWhiteboard = async (message: SismoConnectResponse) => {
@@ -276,10 +275,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
       const success = await retryRequest(performApiRequest, url, message, 2);
 
+      setIsVerifying(false);
+
       if (!success) {
         router.push(pathname);
       } else {
-        setIsVerifying(false);
         router.push("/");
       }
     };
