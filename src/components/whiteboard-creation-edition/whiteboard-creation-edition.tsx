@@ -26,6 +26,7 @@ import {
   greenColorDisabled,
   MAX_WHITEBOARD_PER_USER,
   MIN_WHITEBOARD,
+  redColor,
 } from "@/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
@@ -37,6 +38,8 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import axios from "axios";
 import ErrorModal from "../error-modal/error-modal";
 import SuccessAnimation from "../success-animation/success-animation";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -44,6 +47,7 @@ const API_BASE_URL = "/api/whiteboard";
 const API_ENDPOINTS = {
   CREATE: "/create",
   EDIT: "/edit",
+  DELETE: "/delete",
 };
 
 interface Group {
@@ -160,10 +164,17 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       );
       setIsWhiteboardDataLoading(false);
     };
-    if (isEdition && whiteboardId) {
+    // !isVerifying && !successMessage to avoid fetching data when the user is verifying the proof and will exit the page
+    if (
+      isEdition &&
+      whiteboardId &&
+      groups &&
+      !isVerifying &&
+      !successMessage
+    ) {
       fetchWhiteboard(whiteboardId);
     }
-  }, [groups, isEdition, whiteboardId]);
+  }, [groups, isEdition, isVerifying, successMessage, whiteboardId]);
 
   async function createWhiteboard() {
     const sismoConnectSignedMessage: WhiteboardCreateSignedMessage = {
@@ -204,6 +215,24 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     });
   }
 
+  async function deleteWhiteboard() {
+    if (!initalWhiteboard) {
+      console.error("No initial whiteboard");
+      return;
+    }
+    const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
+      type: WhiteboardOperationType.DELETE,
+      message: initalWhiteboard,
+    };
+    sismoConnect.request({
+      namespace: "main",
+      auth: { authType: AuthType.VAULT },
+      signature: {
+        message: JSON.stringify(sismoConnectSignedMessage),
+      },
+    });
+  }
+
   useEffect(() => {
     const responseMessage: SismoConnectResponse | null =
       sismoConnect.getResponse();
@@ -228,6 +257,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         url += API_ENDPOINTS.CREATE;
       } else if (signedMessage?.type === WhiteboardOperationType.EDIT) {
         url += API_ENDPOINTS.EDIT;
+      } else if (signedMessage?.type === WhiteboardOperationType.DELETE) {
+        url += API_ENDPOINTS.DELETE;
       }
 
       return url;
@@ -282,7 +313,18 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       if (!success) {
         router.push(pathname);
       } else {
-        setSuccessMessage("Whiteboard created!");
+        const mess = message.signedMessage
+          ? JSON.parse(message.signedMessage)
+          : null;
+        if (mess.type === WhiteboardOperationType.CREATE) {
+          setSuccessMessage("Whiteboard created!");
+        } else if (mess.type === WhiteboardOperationType.EDIT) {
+          setSuccessMessage("Whiteboard edited!");
+        } else if (mess.type === WhiteboardOperationType.DELETE) {
+          setSuccessMessage("Whiteboard deleted!");
+        } else {
+          setSuccessMessage("Success");
+        }
         setTimeout(() => {
           router.push("/");
         }, 1500);
@@ -567,15 +609,64 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             alignSelf: "start",
             marginTop: "20px",
             fontSize: "18px",
+
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
           }}
           onClick={() => {
             if (!isEdition) createWhiteboard();
             if (isEdition) saveWhiteboard();
           }}
           disabled={isEdition ? disableValidationEdition : disableValidation}>
+          <CheckCircleIcon
+            style={{
+              fontSize: "18px",
+              marginRight: "2px",
+            }}
+          />
           {!isEdition && "Create"}
           {isEdition && "Save"}
         </button>
+        {isEdition && (
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}>
+            <button
+              className="create-edit-button validate-button"
+              style={{
+                backgroundColor: redColor,
+                // borderRadius: "5px",
+                // padding: "5px 10px 5px 10px",
+                // padding: "10px",
+                cursor: "pointer",
+                pointerEvents: "auto",
+                alignSelf: "start",
+                marginTop: "20px",
+                fontSize: "15px",
+
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={() => {
+                deleteWhiteboard();
+              }}>
+              <DeleteIcon
+                style={{
+                  fontSize: "15px",
+                  marginRight: "2px",
+                }}
+              />{" "}
+              Delete
+            </button>
+          </div>
+        )}
       </div>
       {isWhiteboardDataLoading && !isVerifying && (
         <Loading text="Loading whiteboard" />

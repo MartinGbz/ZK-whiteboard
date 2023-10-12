@@ -11,6 +11,7 @@ export enum MessageOperationType {
 export enum WhiteboardOperationType {
   CREATE = "create",
   EDIT = "edit",
+  DELETE = "delete",
 }
 
 export type SignedMessage = {
