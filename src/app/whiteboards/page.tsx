@@ -53,11 +53,12 @@ export default function Home() {
         });
       } catch (error: any) {
         console.error("API request error:", error);
-        if (error.response.data.error) {
-          setErrorMessage(error.response.data.error);
-        } else {
-          setErrorMessage("An error occured while fetching whiteboards");
-        }
+        const defaultErrorMessage =
+          "An error occured while fetching whiteboards";
+        const errorMessage = error.response.data.error
+          ? `${defaultErrorMessage}: ${error.response.data.error}`
+          : defaultErrorMessage;
+        setErrorMessage(errorMessage);
         return null;
       }
 

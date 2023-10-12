@@ -138,18 +138,16 @@ const Whiteboard = ({ params }: pageProps) => {
         });
       } catch (error: any) {
         console.error("API request error:", error);
-        if (error.response.data.error) {
-          setErrorMessage(error.response.data.error);
-        } else if (message.signedMessage) {
-          const signedMessage = JSON.parse(message.signedMessage);
-          const type =
-            signedMessage.message.type === "POST" ? "posting" : "deleting";
-          setErrorMessage(`An error occured while ${type} your message`);
-        } else {
-          setErrorMessage(
-            "An error occured while deleting or posting your message"
-          );
-        }
+        const type = message.signedMessage
+          ? (JSON.parse(message.signedMessage) as SignedMessage).type
+          : null;
+        let errorMessage = type
+          ? `An error occured while ${type} your message`
+          : "An error occured while deleting or posting your message";
+        errorMessage = error.response.data.error
+          ? `${errorMessage}: ${error.response.data.error}`
+          : errorMessage;
+        setErrorMessage(errorMessage);
         return null;
       }
       return response.data as PostDeletionResponse;
@@ -230,13 +228,12 @@ const Whiteboard = ({ params }: pageProps) => {
         }
       } catch (error: any) {
         console.error("API request error:", error);
-        if (error.response.data.error) {
-          setErrorMessage(error.response.data.error);
-        } else {
-          setErrorMessage(
-            "An error occured while fetching the messages of this whiteboard"
-          );
-        }
+        const defaultErrorMessage =
+          "An error occured while fetching the messages of this whiteboard";
+        const errorMessage = error.response.data.error
+          ? `${defaultErrorMessage}: ${error.response.data.error}`
+          : defaultErrorMessage;
+        setErrorMessage(errorMessage);
       }
       setIsFetchingMessages(false);
     };

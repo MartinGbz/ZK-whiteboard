@@ -139,13 +139,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         });
       } catch (error: any) {
         console.error("API request error:", error);
-        if (error.response.data.error) {
-          setErrorMessage(error.response.data.error);
-        } else {
-          setErrorMessage(
-            "An error occured while fetching the whiteboard data"
-          );
-        }
+        const defaultErrorMessage =
+          "An error occured while fetching the whiteboard data";
+        const errorMessage = error.response.data.error
+          ? `${defaultErrorMessage}: ${error.response.data.error}`
+          : defaultErrorMessage;
+        setErrorMessage(errorMessage);
         return null;
       }
       const whiteboard: Whiteboard = response.data;
@@ -245,11 +244,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         } catch (error: any) {
           if (i === retryMax - 1) {
             console.error("API request error:", error);
-            if (error.response.data.error) {
-              setErrorMessage(error.response.data.error);
-            } else {
-              setErrorMessage("An error occured while posting your whiteboard");
-            }
+            const defaultErrorMessage =
+              "An error occured while posting your whiteboard";
+            const errorMessage = error.response.data.error
+              ? `${defaultErrorMessage}: ${error.response.data.error}`
+              : defaultErrorMessage;
+            setErrorMessage(errorMessage);
             return null;
           }
         }
