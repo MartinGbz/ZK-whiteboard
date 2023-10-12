@@ -31,6 +31,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
   const [loginMouseOver, setLoginMouseOver] = useState<boolean>(false);
   const [settingsMouseOver, setSettingsMouseOver] = useState<boolean>(false);
+  const padding = useRef<number>(10);
 
   useEffect(() => {
     setMaxHeights(maxHeightsList);
@@ -67,10 +68,9 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
       className="whiteboard-item"
       style={{
         position: "relative",
-        padding: "10px",
+        padding: padding.current + "px",
         marginBottom: "15px",
         cursor: "pointer",
-        flex: "1",
         fontSize: "15px",
         display: "flex",
         flexDirection: "column",
@@ -151,6 +151,9 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
                   borderRadius: "10px",
                   border: "none",
 
+                  height: baseMaxHeight - 2 * padding.current + "px",
+                  width: baseMaxHeight - 2 * padding.current + "px",
+
                   background: !settingsMouseOver
                     ? "linear-gradient(145deg, #ffffff, #e6e6e6)"
                     : "linear-gradient(145deg, #e6e6e6, #ffffff)",
@@ -168,7 +171,11 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
                   e.stopPropagation();
                   onSettings(whiteboard);
                 }}>
-                <SettingsIcon />
+                <SettingsIcon
+                  style={{
+                    fontSize: "30px",
+                  }}
+                />
               </button>
             </Tooltip>
           )}
@@ -180,6 +187,9 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
                 cursor: "pointer",
                 borderRadius: "10px",
                 border: "none",
+
+                height: baseMaxHeight - 2 * padding.current + "px",
+                width: baseMaxHeight - 2 * padding.current + "px",
 
                 background: !loginMouseOver
                   ? "linear-gradient(145deg, #65d887, #55b671)"
@@ -198,7 +208,11 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
                 e.stopPropagation();
                 whiteboardClick(whiteboard);
               }}>
-              <LoginIcon />
+              <LoginIcon
+                style={{
+                  fontSize: "30px",
+                }}
+              />
             </button>
           </Tooltip>
         </div>

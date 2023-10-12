@@ -167,13 +167,27 @@ export default function Home() {
                       backgroundColor: greenColorDisabled,
                       cursor: "default",
                       filter: "brightness(1.1)",
+
+                      fontSize: "20px",
+                      width: "fit-content",
+                      height: "fit-content",
                     }}
                     disabled={true}
                     onClick={() => {
                       router.push("/create-whiteboard");
                     }}>
-                    <AddIcon />
-                    <span> Create </span>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}>
+                      <AddIcon
+                        style={{
+                          fontSize: "30px",
+                        }}
+                      />
+                      <span> Create </span>
+                    </div>
                   </button>
                 </span>
               </Tooltip>
@@ -186,12 +200,25 @@ export default function Home() {
                     color: "black",
                     backgroundColor: greenColor,
                     cursor: "pointer",
+                    fontSize: "20px",
+                    width: "fit-content",
+                    height: "fit-content",
                   }}
                   onClick={() => {
                     router.push("/create-whiteboard");
                   }}>
-                  <AddIcon />
-                  <span> Create </span>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}>
+                    <AddIcon
+                      style={{
+                        fontSize: "30px",
+                      }}
+                    />
+                    <span> Create </span>
+                  </div>
                 </button>
               )}
           </div>
