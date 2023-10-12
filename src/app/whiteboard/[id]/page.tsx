@@ -10,7 +10,7 @@ import {
   Whiteboard,
   User,
   PostDeletionResponse,
-} from "../../../types/whiteboard-types";
+} from "@/types/whiteboard-types";
 
 import {
   AuthType,
@@ -23,14 +23,14 @@ import {
   MAX_Z_INDEX,
   WHITEBOARD_VAULTID_VARNAME,
   defaultInputColor,
-} from "../../../configs/configs";
-import MessageModal from "../../../components/message-modal/message-modal";
-import Message from "../../../components/message/message";
+} from "@/configs/configs";
+import MessageModal from "@/components/message-modal/message-modal";
+import Message from "@/components/message/message";
 import { usePathname, useRouter } from "next/navigation";
-import Loading from "../../../components/loading-modal/loading-modal";
-import Header from "../../../components/header/header";
+import Loading from "@/components/loading-modal/loading-modal";
+import Header from "@/components/header/header";
 import { Message as MessageType } from "@prisma/client";
-import ShareWhiteboard from "../../../components/share-whiteboard/share-whiteboard";
+import ShareWhiteboard from "@/components/share-whiteboard/share-whiteboard";
 import axios from "axios";
 import ErrorModal from "@/components/error-modal/error-modal";
 

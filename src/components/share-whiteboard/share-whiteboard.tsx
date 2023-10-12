@@ -7,14 +7,14 @@ import {
   preWrittenPostFarcasterSlug,
   preWrittenPostLensSlug,
   preWrittenPostXSlug,
-} from "../../configs/configs";
+} from "@/configs/configs";
 import { SpeedDial, SpeedDialAction } from "@mui/material";
 import FileCopyIcon from "@mui/icons-material/FileCopyOutlined";
 import ShareIcon from "@mui/icons-material/Share";
 import Image from "next/image";
-import xTwitterIcon from "../../medias/icons/x-twitter.svg";
-import lensIcon from "../../medias/icons/lens-icon-T-Green.svg";
-import farcasterIcon from "../../medias/icons/farcaster-icon.svg";
+import xTwitterIcon from "@/medias/icons/x-twitter.svg";
+import lensIcon from "@/medias/icons/lens-icon-T-Green.svg";
+import farcasterIcon from "@/medias/icons/farcaster-icon.svg";
 import "./share-whiteboard.css";
 
 interface ShareWhiteboard {
