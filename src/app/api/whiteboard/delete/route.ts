@@ -78,6 +78,12 @@ async function deleteWhiteboardInDB(
       );
     }
 
+    await prisma.message.deleteMany({
+      where: {
+        whiteboardId: whiteboardId,
+      },
+    });
+
     const deletedWhiteboard = await prisma.whiteboard.delete({
       where: {
         id: whiteboardId,
