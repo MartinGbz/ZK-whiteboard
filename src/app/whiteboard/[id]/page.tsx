@@ -1,9 +1,8 @@
 "use client";
 
-import "../../page.css";
 import "./page.css";
 
-import React, { use, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Position,
   SignedMessage,
@@ -79,13 +78,12 @@ const Whiteboard = ({ params }: pageProps) => {
   const pathname = usePathname();
 
   const redirectToRoot = useCallback(() => {
-    // router.push("/whiteboard/" + params.id);
     router.push(pathname);
   }, [router, pathname]);
 
-  // useEffect(() => {
-  //   setCurrentURL(`${window.location.origin}/whiteboard/${params.id}`);
-  // }, [params.id]);
+  useEffect(() => {
+    setCurrentURL(`${window.location.origin}${pathname}`);
+  }, [pathname]);
 
   useEffect(() => {
     whiteboard?.authorVaultId === user?.vaultId

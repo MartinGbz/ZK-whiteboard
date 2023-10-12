@@ -4,7 +4,7 @@ import {
   SismoConnectServer,
   SismoConnectVerifiedResult,
 } from "@sismo-core/sismo-connect-server";
-import { Whiteboard } from "../../types/whiteboard-types";
+import { Whiteboard } from "@/types/whiteboard-types";
 import { prisma } from "./db";
 
 export async function getWhiteboardById(

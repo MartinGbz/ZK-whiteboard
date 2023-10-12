@@ -1,7 +1,5 @@
-import Header from "@/components/header/header";
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { User } from "@/types/whiteboard-types";
 import { MobileModal } from "@/components/mobile-modal/mobile-modal";
 
 const inter = Inter({ subsets: ["latin"] });

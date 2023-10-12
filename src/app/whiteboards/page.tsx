@@ -1,20 +1,19 @@
 "use client";
 
-import "../page.css";
 import "./page.css";
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Header from "../../components/header/header";
+import Header from "@/components/header/header";
 import { User, Whiteboard, WhiteboardIndex } from "@/types/whiteboard-types";
-import Loading from "../../components/loading-modal/loading-modal";
+import Loading from "@/components/loading-modal/loading-modal";
 import {
   MAX_WHITEBOARD_PER_USER,
   greenColor,
   greenColorDisabled,
 } from "@/configs/configs";
 import AddIcon from "@mui/icons-material/Add";
-import WhiteboardCard from "../../components/whiteboard-card/whiteboard-card";
+import WhiteboardCard from "@/components/whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";
 import ErrorModal from "@/components/error-modal/error-modal";
 import axios from "axios";
