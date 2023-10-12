@@ -583,43 +583,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       {isVerifying && <Loading text="Checking the proof..." />}
       {errorMessage && <ErrorModal text={errorMessage} />}
       <SuccessAnimation text={successMessage} duration={0.5} />
-      {/* <div
-        style={{
-          backdropFilter: "blur(10px)",
-          // backgroundColor: "rgba(0, 0, 0, 0.3)",
-          width: "100%",
-          height: "100%",
-          position: "absolute",
-        }}>
-        <div
-          style={{
-            backgroundColor: "red",
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            // transform: "translate(-50%, -50%)",
-            borderRadius: "10px",
-            height: "75px",
-            width: "125px",
-            borderLeft: "5px solid green",
-            borderBottom: "5px solid green",
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-
-            // animation: "3s linear 1s infinite running slidein",
-            transition: "transform 0.5s ease-in-out opacity 0.5s ease-in-out",
-            transform: "rotateZ(-45deg) scale(1.5)",
-            opacity: 1,
-            // opacity: 0,
-            // transform: "rotateZ(0) scale(1)",
-
-            // transformOrigin: "scale(0.5) translate(-100%, -100%)",
-            // transformBox: "rotate(-0.1turn)",
-          }}>
-          hey
-        </div>
-      </div> */}
     </div>
   );
 };
