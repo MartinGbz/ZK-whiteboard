@@ -24,5 +24,33 @@
 .logout_button {
   font-size: 15px;
   font-weight: bold;
-  color: "black";
+}
+
+.login-button {
+  /* grid-column: 3;
+  justify-self: end; */
+  /* width: 150px; */
+  height: 40px;
+  border-radius: 5px;
+  background-color: gray;
+  color: white;
+  align-self: center;
+  font-size: 15px;
+  justify-content: end;
+  width: fit-content;
+  padding: 10px;
+  display: flex;
+
+  /* @media (max-width: 800px) {
+    background-color: transparent;
+    justify-self: end;
+    width: fit-content;
+  } */
+}
+
+.login-button-text {
+  margin-right: 5px;
+  @media (max-width: 800px) {
+    display: none;
+  }
 }
