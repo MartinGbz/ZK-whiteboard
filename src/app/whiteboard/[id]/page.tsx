@@ -2,7 +2,7 @@
 
 import "./page.css";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import {
   Position,
   SignedMessage,
@@ -309,6 +309,7 @@ const Whiteboard = ({ params }: pageProps) => {
           style={{
             cursor: isUserMessageExists ? "default" : "pointer",
             position: "relative",
+            overflow: "scroll",
           }}
           onClick={(e) =>
             !isUserMessageExists &&
@@ -346,9 +347,9 @@ const Whiteboard = ({ params }: pageProps) => {
               <div>Be the first to post a message!</div>
             </div>
           )}
-          {isVerifying && <Loading text="Checking the proof..." />}
         </div>
       )}
+      {isVerifying && <Loading text="Checking the proof..." />}
       {!isVerifying && isFetchingMessages && messages.length == 0 && (
         <Loading text="Loading messages..." />
       )}
