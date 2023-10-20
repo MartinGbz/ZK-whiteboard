@@ -297,12 +297,13 @@ const Whiteboard = ({ params }: pageProps) => {
     setIsModalOpen(true);
   };
 
+  const onChangeUser = useCallback((user: User | null) => {
+    setUser(user);
+  }, []);
+
   return (
     <div className="whiteboard">
-      <Header
-        onChangeUser={(user) => setUser(user)}
-        whiteboardName={whiteboard?.name}
-      />
+      <Header onChangeUser={onChangeUser} whiteboardName={whiteboard?.name} />
       {messages && (
         <div
           className="messages_container"

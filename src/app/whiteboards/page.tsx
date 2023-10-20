@@ -127,6 +127,7 @@ export default function Home() {
   }, []);
 
   const onChangeUser = useCallback((user: User | null) => {
+    console.log("onChangeUser", user);
     setUser(user);
   }, []);
 
@@ -136,7 +137,7 @@ export default function Home() {
       style={{
         width: "100%",
       }}>
-      <Header onChangeUser={(user) => onChangeUser(user)} />
+      <Header onChangeUser={onChangeUser} />
       <div className="whiteboards_container">
         <div
           style={{

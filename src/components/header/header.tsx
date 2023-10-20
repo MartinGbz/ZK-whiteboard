@@ -13,10 +13,10 @@ import {
 } from "@sismo-core/sismo-connect-react";
 import Title from "../title/title";
 import "./header.css";
-import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
-import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Home } from "@mui/icons-material";
 import { User } from "@/types/whiteboard-types";
@@ -35,37 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
   const [userAddressCropped, setUserAddressCropped] = useState<String | null>(
     null
   );
-  // const [loginButtonText, setLoginButtonText] = useState<String>("");
-
-  // ----------------------------------
-  // const { sismoConnect, response, responseBytes } = useSismoConnect({
-  //   config: {
-  //     appId: sismoConnectConfig.appId,
-  //   },
-  // });
-
-  // let sismoConnect = useRef<SismoConnectClient | null>(null);
-  // sismoConnect.current = SismoConnect({
-  //   config: {
-  //     appId: sismoConnectConfig.appId,
-  //   },
-  // });
-  // sismoConnect = SismoConnect({
-  //   config: {
-  //     appId: sismoConnectConfig.appId,
-  //   },
-  // });
-  // const sismoConnectRef = useRef(null);
-
-  // const onChangeUserRef = useRef(onChangeUser);
-  // // const pathnameRef = useRef(pathname);
-  // // const routerRef = useRef(router);
-
-  // useEffect(() => {
-  //   onChangeUserRef.current = onChangeUser;
-  //   // pathnameRef.current = pathname;
-  //   // routerRef.current = router;
-  // }, [onChangeUser]);
+  const [loginButtonText, setLoginButtonText] = useState<string>("");
 
   useEffect(() => {
     const getUser = async () => {
@@ -89,28 +59,23 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
       setIsLoging(false);
     };
     getUser();
-
-    // need to disable the eslint rule because we want to call getUser only once
-    // if we add onChangeUser to the dependency array, it will be called each time onChangeUser changes
-    // and it creates an infinite loop (not fully understood why)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [onChangeUser]);
 
   useEffect(() => {
     if (window.innerWidth < 800) {
       setUserAddressCropped(user?.vaultId.substring(0, 4) + "...");
-      // setLoginButtonText("");
+      setLoginButtonText("Login");
     } else {
       setUserAddressCropped(user?.vaultId.substring(0, 7) + "...");
-      // setLoginButtonText("Login w/ Sismo");
+      setLoginButtonText("Login w/ Sismo");
     }
     function resizeHandler() {
       if (window.innerWidth < 800) {
         setUserAddressCropped(user?.vaultId.substring(0, 4) + "...");
-        // setLoginButtonText("");
+        setLoginButtonText("Login");
       } else {
         setUserAddressCropped(user?.vaultId.substring(0, 7) + "...");
-        // setLoginButtonText("Login w/ Sismo");
+        setLoginButtonText("Login w/ Sismo");
       }
     }
     if (window.visualViewport) {
@@ -123,69 +88,11 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
     };
   }, [user?.vaultId]);
 
-  // function login() {
-  //   if (!sismoConnect) {
-  //     console.error("Error with sismoConnect");
-  //     return;
-  //   }
-  //   sismoConnect.request({
-  //     namespace: "main",
-  //     auth: { authType: AuthType.VAULT },
-  //   });
-  // }
-
   async function logout() {
     setUser(null);
     localStorage.removeItem(ZKWHITEBOARD_VAULTID_VARNAME);
     onChangeUser(null);
   }
-
-  // useEffect(() => {
-  //   console.log("test");
-  //   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
-  //     console.log("---sismoConnectResponse", sismoConnectResponse);
-  //     // if the reponse does not have a signed message, it means there is no action to perform, only a login
-  //     // if the appId is the same as the one in the config, it means the login is for the app not for a whiteboard
-  //     if (
-  //       sismoConnectResponse.appId === sismoConnectConfig.appId &&
-  //       !sismoConnectResponse.signedMessage
-  //     ) {
-  //       setIsLoging(true);
-  //       const response = await fetch("/api/login", {
-  //         method: "POST",
-  //         body: JSON.stringify(sismoConnectResponse),
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-  //       const res = await response.json();
-  //       const user: User = res.user;
-  //       setUser(user);
-  //       onChangeUser(user);
-  //       localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
-  //       router.push(pathname);
-  //       setIsLoging(false);
-  //     }
-  //   }
-
-  //   if (!sismoConnect.current) return;
-  //   const responseMessage: SismoConnectResponse | null =
-  //     sismoConnect.current.getResponse();
-  //   if (responseMessage) {
-  //     // setSismoConnectResponseMessage(responseMessage);
-  //     loginWithSismo(responseMessage);
-  //   }
-  // }, [onChangeUser, pathname, router]);
-
-  // useEffect(() => {
-  //   console.log({ user });
-  //   onChangeUser(user);
-  //   if (user) {
-  //     localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
-  //   }
-  //   router.push(pathname);
-  //   setIsLoging(false);
-  // }, [onChangeUser, pathname, router, user]);
 
   // const loginWithSismo = useCallback(
   //   async (sismoConnectResponse: SismoConnectResponse) => {
@@ -213,90 +120,76 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
   //       setIsLoging(false);
   //     }
   //   },
-  //   [onChangeUser]
+  //   [onChangeUser, pathname, router]
   // );
 
-  // useEffect(() => {
-  //   async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
-  //     console.log("---sismoConnectResponse", sismoConnectResponse);
-  //     // if the reponse does not have a signed message, it means there is no action to perform, only a login
-  //     // if the appId is the same as the one in the config, it means the login is for the app not for a whiteboard
-  //     if (
-  //       sismoConnectResponse.appId === sismoConnectConfig.appId &&
-  //       !sismoConnectResponse.signedMessage
-  //     ) {
-  //       setIsLoging(true);
-  //       const response = await fetch("/api/login", {
-  //         method: "POST",
-  //         body: JSON.stringify(sismoConnectResponse),
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-  //       const res = await response.json();
-  //       const user: User = res.user;
-  //       setUser(user);
-  //     }
-  //   }
+  let sismoConnect = useRef<SismoConnectClient | null>(null);
+  sismoConnect.current = SismoConnect({
+    config: {
+      appId: sismoConnectConfig.appId,
+    },
+  });
+  sismoConnect.current = SismoConnect({
+    config: {
+      appId: sismoConnectConfig.appId,
+    },
+  });
 
-  //   console.log("getResponse");
-  //   if (!sismoConnect.current) return;
-  //   const responseMessage: SismoConnectResponse | null =
-  //     sismoConnect.current.getResponse();
-
-  //   if (responseMessage) {
-  //     loginWithSismo(responseMessage);
-  //   }
-  //   // need to disable the eslint rule because we want to call loginWithSismo only once
-  //   // if we add loginWithSismo to the dependency array, it will be called each time loginWithSismo changes (and loginWithSismo changes often because of onChangeUser)
-  // }, []);
-
-  async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
-    console.log("---sismoConnectResponse", sismoConnectResponse);
-    // if the reponse does not have a signed message, it means there is no action to perform, only a login
-    // if the appId is the same as the one in the config, it means the login is for the app not for a whiteboard
-    if (
-      sismoConnectResponse.appId === sismoConnectConfig.appId &&
-      !sismoConnectResponse.signedMessage
-    ) {
-      setIsLoging(true);
-      const response = await fetch("/api/login", {
-        method: "POST",
-        body: JSON.stringify(sismoConnectResponse),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const res = await response.json();
-      const user: User = res.user;
-      setUser(user);
-      onChangeUser(user);
-      localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
-      router.push(pathname);
-      setIsLoging(false);
+  function login() {
+    if (!sismoConnect.current) {
+      console.error("Error with sismoConnect");
+      return;
     }
+    sismoConnect.current.request({
+      namespace: "main",
+      auth: { authType: AuthType.VAULT },
+    });
   }
 
-  // useEffect(() => {
-  //   console.log("getResponse");
+  useEffect(() => {
+    async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
+      console.log("---sismoConnectResponse", sismoConnectResponse);
+      // if the reponse does not have a signed message, it means there is no action to perform, only a login
+      // if the appId is the same as the one in the config, it means the login is for the app not for a whiteboard
+      if (
+        sismoConnectResponse.appId === sismoConnectConfig.appId &&
+        !sismoConnectResponse.signedMessage
+      ) {
+        setIsLoging(true);
+        const response = await fetch("/api/login", {
+          method: "POST",
+          body: JSON.stringify(sismoConnectResponse),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const res = await response.json();
+        const user: User = res.user;
+        setUser(user);
+        onChangeUser(user);
+        localStorage.setItem(ZKWHITEBOARD_VAULTID_VARNAME, user.vaultId);
+        router.push(pathname);
+        setIsLoging(false);
+      }
+    }
+    console.log("getResponse");
+    // console.log(pathname);
+    // console.log(router);
 
-  //   if (!response) return;
-  //   loginWithSismo(response);
-  // }, [response]);
+    if (!sismoConnect.current) return;
+    const responseMessage: SismoConnectResponse | null =
+      sismoConnect.current.getResponse();
+
+    if (responseMessage) {
+      loginWithSismo(responseMessage);
+    }
+
+    // Because react strictmode is enabled by default since nextjs 13.4, he call is made twice on dev (on prod 1 call should be done)
+    // It means the useEffec shouldn't be used here but I don't know how to do it otherwise for now
+  }, [onChangeUser, pathname, router]);
 
   return (
     <div className="header">
-      {/* <button
-        style={{
-          backgroundColor: "red",
-          width: "200px",
-          height: "50px",
-        }}
-        onClick={() => {
-          console.log("logout");
-          onChangeUser(null);
-        }}
-      /> */}
       {pathname !== "/" && pathname !== "/whiteboards" && (
         <Home
           style={{
@@ -340,34 +233,34 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
         )}
       </div>
       {!user && !isLoging && (
-        <SismoConnectButton
-          overrideStyle={{
-            gridColumn: "3",
-            width: "fit-content",
-            justifySelf: "end",
-            height: "15px",
-            backgroundColor: "lightgray",
-            color: "black",
-            alignSelf: "center",
-            fontSize: "10px",
-          }}
-          text="Login"
-          config={sismoConnectConfig}
-          auth={{ authType: AuthType.VAULT }}
-          namespace="main"
-          onResponse={(response: SismoConnectResponse) => {
-            loginWithSismo(response);
-          }}
-        />
-        // <button className="login login-button" onClick={login}>
-        //   <span className="login-button-text">Login w/ Sismo</span>
-        //   <LoginIcon
-        //     style={{
-        //       fontSize: "20px",
-        //       alignSelf: "center",
-        //     }}
-        //   />
-        // </button>
+        // <SismoConnectButton
+        //   overrideStyle={{
+        //     gridColumn: "3",
+        //     width: "fit-content",
+        //     justifySelf: "end",
+        //     height: "15px",
+        //     backgroundColor: "lightgray",
+        //     color: "black",
+        //     alignSelf: "center",
+        //     fontSize: "10px",
+        //   }}
+        //   text={loginButtonText}
+        //   config={sismoConnectConfig}
+        //   auth={{ authType: AuthType.VAULT }}
+        //   namespace="main"
+        //   onResponse={(response: SismoConnectResponse) => {
+        //     loginWithSismo(response);
+        //   }}
+        // />
+        <button className="login login-button" onClick={login}>
+          <span className="login-button-text">Login w/ Sismo</span>
+          <LoginIcon
+            style={{
+              fontSize: "20px",
+              alignSelf: "center",
+            }}
+          />
+        </button>
       )}
       {user && !isLoging && (
         <div className="login">

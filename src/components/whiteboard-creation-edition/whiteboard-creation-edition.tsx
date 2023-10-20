@@ -391,9 +391,13 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     }
   }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
+  const onChangeUser = useCallback((user: User | null) => {
+    setUser(user);
+  }, []);
+
   return (
     <div className="container">
-      <Header onChangeUser={(user) => setUser(user)} />
+      <Header onChangeUser={onChangeUser} />
       <div
         style={{
           display: "flex",
