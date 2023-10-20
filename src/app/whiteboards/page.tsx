@@ -36,12 +36,27 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
+    if (whiteboards.length == 0) return;
     setMaxHeights(Array(whiteboards.length).fill(baseMaxHeight));
   }, [whiteboards]);
 
   useEffect(() => {
-    const fetchWhiteboards = async () => {
+    async function getWhiteboards() {
       setIsFetchingWhiteboards(true);
+      const whiteboards = await fetchWhiteboards();
+      if (!whiteboards) return;
+      const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =
+        await convertWhiteboardIdsToNames(whiteboards);
+      if (!whiteboardsWithResolvedGroupIds) return;
+      const whiteboardsSorted = await sortWhiteboards(
+        whiteboardsWithResolvedGroupIds
+      );
+
+      setWhiteboards(whiteboardsSorted);
+      setIsFetchingWhiteboards(false);
+    }
+
+    const fetchWhiteboards = async () => {
       let response;
       try {
         response = await axios.get("/api/whiteboard", {
@@ -59,9 +74,11 @@ export default function Home() {
         setErrorMessage(errorMessage);
         return null;
       }
-
       const whiteboards: Whiteboard[] = await response.data;
+      return whiteboards;
+    };
 
+    async function convertWhiteboardIdsToNames(whiteboards: Whiteboard[]) {
       const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =
         await Promise.all(
           whiteboards.map(async (whiteboard: Whiteboard) => {
@@ -82,7 +99,12 @@ export default function Home() {
             };
           })
         );
+      return whiteboardsWithResolvedGroupIds;
+    }
 
+    async function sortWhiteboards(
+      whiteboardsWithResolvedGroupIds: WhiteboardIndex[]
+    ) {
       // sort by curated and then by creation date (oldest first) and then by name
       whiteboardsWithResolvedGroupIds.sort((a, b) => {
         if (a.curated && !b.curated) {
@@ -99,9 +121,8 @@ export default function Home() {
           }
         }
       });
-      setWhiteboards(whiteboardsWithResolvedGroupIds);
-      setIsFetchingWhiteboards(false);
-    };
+      return whiteboardsWithResolvedGroupIds;
+    }
 
     const resolveGroupId = async (groupId: string): Promise<string> => {
       try {
@@ -123,7 +144,7 @@ export default function Home() {
       }
     };
 
-    fetchWhiteboards();
+    getWhiteboards();
   }, []);
 
   const onChangeUser = useCallback((user: User | null) => {
