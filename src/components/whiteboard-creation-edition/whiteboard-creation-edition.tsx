@@ -10,8 +10,6 @@ import {
 import Header from "../header/header";
 
 import "./whiteboard-creation-edition.css";
-import { Autocomplete, Chip, TextField } from "@mui/material";
-import { TextareaAutosize } from "@mui/base";
 import { Whiteboard } from "@prisma/client";
 import {
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
@@ -25,7 +23,6 @@ import {
   MAX_WHITEBOARD_GROUPS,
   greenColorDisabled,
   MAX_WHITEBOARD_PER_USER,
-  MIN_WHITEBOARD,
   redColor,
 } from "@/configs/configs";
 import Loading from "../loading-modal/loading-modal";
@@ -40,6 +37,7 @@ import ErrorModal from "../error-modal/error-modal";
 import SuccessAnimation from "../success-animation/success-animation";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WhiteboardCreationEditionInput from "../whiteboard-creation-edition-input/whiteboard-creation-edition-input";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -83,18 +81,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const [groups, setGroups] = useState<Group[]>([]);
   const [whiteboardName, setWhiteboardName] = useState<string>("");
   const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(false);
-  const [whiteboardNameChanged, setWhiteboardNameChanged] =
-    useState<boolean>(false);
   const [whiteboardDescription, setWhiteboardDescription] =
     useState<string>("");
   const [whiteboardDescriptionOk, setWhiteboardDescriptionOk] =
     useState<boolean>(false);
-  const [whiteboardDescriptionChanged, setWhiteboardDescriptionChanged] =
-    useState<boolean>(false);
   const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
   const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(false);
-  const [selectedGroupsChanged, setSelectedGroupsChanged] =
-    useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
   const [isWhiteboardDataLoading, setIsWhiteboardDataLoading] =
@@ -335,45 +327,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   }, [pathname, router, sismoConnectResponseMessage]);
 
   useEffect(() => {
-    if (whiteboardName) {
-      setWhiteboardNameChanged(true);
-    }
-    if (whiteboardDescription) {
-      setWhiteboardDescriptionChanged(true);
-    }
-    if (selectedGroups.length > 0) {
-      setSelectedGroupsChanged(true);
-    }
-
-    if (
-      whiteboardName.length > MAX_CHARACTERS_WHITEBOARD_NAME ||
-      whiteboardName.length < MIN_WHITEBOARD
-    ) {
-      setWhiteboardNameOk(false);
-    } else {
-      setWhiteboardNameOk(true);
-    }
-
-    if (
-      whiteboardDescription.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION ||
-      whiteboardDescription.length < MIN_WHITEBOARD
-    ) {
-      setWhiteboardDescriptionOk(false);
-    } else {
-      setWhiteboardDescriptionOk(true);
-    }
-
-    if (
-      selectedGroups.length > MAX_WHITEBOARD_GROUPS ||
-      selectedGroups.length < MIN_WHITEBOARD
-    ) {
-      setSelectedGroupsOk(false);
-    } else {
-      setSelectedGroupsOk(true);
-    }
-  }, [whiteboardName, whiteboardDescription, selectedGroups]);
-
-  useEffect(() => {
     if (
       whiteboardNameOk &&
       whiteboardDescriptionOk &&
@@ -411,103 +364,39 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 " max per user)"}
           </span>
         </div>
-        <p className="form-labels"> Name </p>
-        <input
-          disabled={isEdition}
-          type="text"
-          className="whiteboard-creation-inputs"
-          style={{
-            height: "40x",
-            cursor: isEdition ? "not-allowed" : "default",
-          }}
-          onChange={(event) => {
-            setWhiteboardName(event.target.value);
-          }}
-          value={whiteboardName}
+        <WhiteboardCreationEditionInput
+          isEdition={isEdition}
+          type="name"
+          title="Name"
+          maxNumber={MAX_CHARACTERS_WHITEBOARD_NAME}
+          warningMessage={MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
+          inputOk={setWhiteboardNameOk}
+          onChange={setWhiteboardName}
+          baseValue={whiteboardName}
         />
-        {whiteboardNameChanged && !whiteboardNameOk && (
-          <div className="warning-message">
-            {MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
-          </div>
-        )}
-        <p className="form-labels"> Description </p>
-        <TextareaAutosize
-          className="whiteboard-creation-inputs"
-          onChange={(event) => {
-            setWhiteboardDescription(event.target.value);
-          }}
-          value={whiteboardDescription}
+        <WhiteboardCreationEditionInput
+          isEdition={isEdition}
+          type="description"
+          title="Description"
+          maxNumber={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION}
+          warningMessage={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
+          inputOk={setWhiteboardDescriptionOk}
+          onChange={setWhiteboardDescription}
+          baseValue={whiteboardDescription}
         />
-        {whiteboardDescriptionChanged && !whiteboardDescriptionOk && (
-          <div className="warning-message">
-            {MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
-          </div>
-        )}
-        <p className="form-labels"> Group(s) </p>
         <div className="groups-input-container">
           <div>
-            <Autocomplete
-              disabled={isEdition}
-              className="inputs"
-              ListboxProps={{
-                style: {
-                  fontSize: "14px",
-                  backgroundColor: "#e9e9e9",
-                  cursor: isEdition ? "not-allowed" : "default",
-                },
-              }}
-              noOptionsText={"No groups found"}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: {
-                      borderRadius: "5px",
-                      backgroundColor: "#e9e9e9",
-                      width: "300px",
-                      fontSize: "14px",
-                      padding: "10px",
-                    },
-                  }}
-                />
-              )}
-              options={groups}
-              multiple={true}
-              size="small"
-              getOptionLabel={(option) => option.name}
-              renderOption={(props, option) => (
-                <li
-                  style={{
-                    backgroundColor: "#e9e9e9",
-                  }}
-                  {...props}
-                  key={option.id}>
-                  {option.name}
-                </li>
-              )}
-              value={selectedGroups}
-              renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => (
-                  <Chip
-                    style={{
-                      fontSize: "12px",
-                    }}
-                    {...getTagProps({ index })}
-                    key={option.id}
-                    label={option.name}
-                  />
-                ))
-              }
-              onChange={(event, value) => {
-                setSelectedGroups(value);
-              }}
+            <WhiteboardCreationEditionInput
+              isEdition={isEdition}
+              type="groups"
+              title="Group(s)"
+              maxNumber={MAX_WHITEBOARD_GROUPS}
+              warningMessage={MAX_WHITEBOARD_GROUPS_MESSAGE}
+              inputOk={setSelectedGroupsOk}
+              onChange={setSelectedGroups}
+              baseValue={selectedGroups}
+              groups={groups}
             />
-            {!isEdition && selectedGroupsChanged && !selectedGroupsOk && (
-              <div className="warning-message">
-                {MAX_WHITEBOARD_GROUPS_MESSAGE}
-              </div>
-            )}
             <a
               style={{
                 fontSize: "11px",
