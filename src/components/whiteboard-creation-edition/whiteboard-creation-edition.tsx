@@ -398,26 +398,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   return (
     <div className="container">
       <Header onChangeUser={onChangeUser} />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          margin: "10px",
-          width: "fit-content",
-        }}>
-        <div
-          style={{
-            color: "black",
-            fontSize: "20px",
-          }}>
+      <div className="edition-container">
+        <div className="edition-title">
           <span>
             {isEdition ? "Edit a whiteboard" : "Create a new whiteboard"}
           </span>
-          <span
-            style={{
-              color: "grey",
-              fontSize: "11px",
-            }}>
+          <span>
             {isEdition
               ? " (You can only edit the description for now)"
               : " (Currently only " +
@@ -431,9 +417,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           type="text"
           className="whiteboard-creation-inputs"
           style={{
-            padding: "10px",
             height: "40x",
-            fontSize: "14px",
             cursor: isEdition ? "not-allowed" : "default",
           }}
           onChange={(event) => {
@@ -449,13 +433,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         <p className="form-labels"> Description </p>
         <TextareaAutosize
           className="whiteboard-creation-inputs"
-          style={{
-            fontSize: "14px",
-            paddingBottom: "10px",
-            paddingTop: "10px",
-            paddingLeft: "10px",
-            paddingRight: "10px",
-          }}
           onChange={(event) => {
             setWhiteboardDescription(event.target.value);
           }}
@@ -467,16 +444,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           </div>
         )}
         <p className="form-labels"> Group(s) </p>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}>
+        <div className="groups-input-container">
+          <div>
             <Autocomplete
               disabled={isEdition}
               className="inputs"
@@ -498,10 +467,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                       backgroundColor: "#e9e9e9",
                       width: "300px",
                       fontSize: "14px",
-                      paddingBottom: "10px",
-                      paddingTop: "10px",
-                      paddingLeft: "10px",
-                      paddingRight: "10px",
+                      padding: "10px",
                     },
                   }}
                 />
@@ -570,15 +536,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 <div
                   className="create-group-button"
                   style={{
-                    fontSize: "12px",
-                    padding: "10px",
-                    borderRadius: "10px",
                     backgroundColor: purpleColor,
-                    cursor: "pointer",
-                    width: "fit-content",
-                    color: "black",
-                    marginTop: "5px",
-                    boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
                   }}>
                   <OpenInNewIcon
                     sx={{
@@ -609,14 +567,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               (!isEdition && disableValidation)
                 ? "none"
                 : "auto",
-            alignSelf: "start",
-            marginTop: "20px",
-            fontSize: "18px",
-
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
           }}
           onClick={() => {
             if (!isEdition) createWhiteboard();
@@ -633,39 +583,25 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           {isEdition && "Save"}
         </button>
         {isEdition && (
-          <div
+          <button
+            className="create-edit-button validate-button"
             style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "flex-end",
+              backgroundColor: redColor,
+              cursor: "pointer",
+              pointerEvents: "auto",
+              alignSelf: "end",
+            }}
+            onClick={() => {
+              deleteWhiteboard();
             }}>
-            <button
-              className="create-edit-button validate-button"
+            <DeleteIcon
               style={{
-                backgroundColor: redColor,
-                cursor: "pointer",
-                pointerEvents: "auto",
-                alignSelf: "start",
-                marginTop: "20px",
                 fontSize: "15px",
-
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
+                marginRight: "2px",
               }}
-              onClick={() => {
-                deleteWhiteboard();
-              }}>
-              <DeleteIcon
-                style={{
-                  fontSize: "15px",
-                  marginRight: "2px",
-                }}
-              />{" "}
-              Delete
-            </button>
-          </div>
+            />{" "}
+            Delete
+          </button>
         )}
       </div>
       {isWhiteboardDataLoading && !isVerifying && (
