@@ -127,7 +127,6 @@ export default function Home() {
   }, []);
 
   const onChangeUser = useCallback((user: User | null) => {
-    console.log("onChangeUser", user);
     setUser(user);
   }, []);
 
