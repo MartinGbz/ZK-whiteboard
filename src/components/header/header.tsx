@@ -16,7 +16,7 @@ import "./header.css";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Home } from "@mui/icons-material";
 import { User } from "@/types/whiteboard-types";
@@ -36,6 +36,8 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
     null
   );
   const [loginButtonText, setLoginButtonText] = useState<string>("");
+  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
+    useState<SismoConnectResponse | null>(null);
 
   useEffect(() => {
     const getUser = async () => {
@@ -118,6 +120,16 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
   }
 
   useEffect(() => {
+    if (!sismoConnect.current) return;
+    const responseMessage: SismoConnectResponse | null =
+      sismoConnect.current.getResponse();
+
+    if (responseMessage) {
+      setSismoConnectResponseMessage(responseMessage);
+    }
+  }, []);
+
+  useEffect(() => {
     async function loginWithSismo(sismoConnectResponse: SismoConnectResponse) {
       // if the reponse does not have a signed message, it means there is no action to perform, only a login
       // if the appId is the same as the one in the config, it means the login is for the app not for a whiteboard
@@ -143,17 +155,10 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
       }
     }
 
-    if (!sismoConnect.current) return;
-    const responseMessage: SismoConnectResponse | null =
-      sismoConnect.current.getResponse();
-
-    if (responseMessage) {
-      loginWithSismo(responseMessage);
+    if (sismoConnectResponseMessage) {
+      loginWithSismo(sismoConnectResponseMessage);
     }
-
-    // Because react strictmode is enabled by default since nextjs 13.4, he call is made twice on dev (on prod 1 call should be done)
-    // It means the useEffec shouldn't be used here but I don't know how to do it otherwise for now
-  }, [onChangeUser, pathname, router]);
+  }, [onChangeUser, pathname, router, sismoConnectResponseMessage]);
 
   return (
     <div className="header">

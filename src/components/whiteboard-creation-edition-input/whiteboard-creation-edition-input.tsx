@@ -30,9 +30,6 @@ const WhiteboardCreationEdition: React.FC<
   inputOk,
   baseValue,
 }) => {
-  // if (type == "name") {
-  //   console.log(baseValue);
-  // }
   const [inputData, setInputData] = useState<any>(
     baseValue ? baseValue : type == "groups" ? [] : ""
   );
@@ -42,7 +39,6 @@ const WhiteboardCreationEdition: React.FC<
   useEffect(() => {
     if (baseValue) {
       setInputData(baseValue);
-      console.log(baseValue);
     }
   }, [baseValue]);
 

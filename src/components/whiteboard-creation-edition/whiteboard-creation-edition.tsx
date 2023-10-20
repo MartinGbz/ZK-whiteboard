@@ -103,31 +103,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const pathname = usePathname();
 
   useEffect(() => {
-    const fetchGroups = async () => {
-      setIsWhiteboardDataLoading(true);
-      let response;
-      try {
-        response = await axios.get("https://hub.sismo.io/groups/latests", {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      } catch (error: any) {
-        console.error("API request error:", error);
-        setErrorMessage("An error occured while fetching Sismo Data Groups");
-        return null;
-      }
-      const groups: Group[] = response.data.items;
-      setGroups(groups);
-      if (!isEdition) {
-        setIsWhiteboardDataLoading(false);
-      }
-    };
-    fetchGroups();
-  }, [isEdition]);
-
-  useEffect(() => {
-    const fetchWhiteboard = async (id: number) => {
+    const fetchWhiteboard = async (id: number, groups: Group[]) => {
       let response;
       try {
         response = await axios.post("/api/whiteboard", id, {
@@ -156,17 +132,33 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       );
       setIsWhiteboardDataLoading(false);
     };
-    // !isVerifying && !successMessage to avoid fetching data when the user is verifying the proof and will exit the page
-    if (
-      isEdition &&
-      whiteboardId &&
-      groups &&
-      !isVerifying &&
-      !successMessage
-    ) {
-      fetchWhiteboard(whiteboardId);
-    }
-  }, [groups, isEdition, isVerifying, successMessage, whiteboardId]);
+
+    const fetchGroups = async () => {
+      setIsWhiteboardDataLoading(true);
+      let response;
+      try {
+        response = await axios.get("https://hub.sismo.io/groups/latests", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } catch (error: any) {
+        console.error("API request error:", error);
+        setErrorMessage("An error occured while fetching Sismo Data Groups");
+        return null;
+      }
+      const groups: Group[] = response.data.items;
+
+      setGroups(groups);
+
+      if (isEdition && whiteboardId) {
+        fetchWhiteboard(whiteboardId, groups);
+      } else {
+        setIsWhiteboardDataLoading(false);
+      }
+    };
+    fetchGroups();
+  }, [isEdition, whiteboardId]);
 
   async function createWhiteboard() {
     const sismoConnectSignedMessage: WhiteboardCreateSignedMessage = {
@@ -344,6 +336,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     }
   }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
+  // useCallBack to avoid infinite loop in header component
   const onChangeUser = useCallback((user: User | null) => {
     setUser(user);
   }, []);
