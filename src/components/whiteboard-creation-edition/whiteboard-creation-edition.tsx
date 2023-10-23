@@ -163,73 +163,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     fetchGroups();
   }, [isEdition, whiteboardId]);
 
-  async function createWhiteboard() {
-    const sismoConnectSignedMessage: WhiteboardCreateSignedMessage = {
-      type: WhiteboardOperationType.CREATE,
-      message: {
-        name: whiteboardName,
-        description: whiteboardDescription,
-        groupIds: selectedGroups.map((group: Group) => group.id),
-      },
-    };
-    sismoConnect.request({
-      namespace: "main",
-      auth: { authType: AuthType.VAULT },
-      signature: {
-        message: JSON.stringify(sismoConnectSignedMessage),
-      },
-    });
-  }
-
-  async function saveWhiteboard() {
-    if (!initalWhiteboard) {
-      console.error("No initial whiteboard");
-      return;
-    }
-    const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
-      type: WhiteboardOperationType.EDIT,
-      message: {
-        ...initalWhiteboard,
-        description: whiteboardDescription,
-      },
-    };
-    sismoConnect.request({
-      namespace: "main",
-      auth: { authType: AuthType.VAULT },
-      signature: {
-        message: JSON.stringify(sismoConnectSignedMessage),
-      },
-    });
-  }
-
-  async function deleteWhiteboard() {
-    if (!initalWhiteboard) {
-      console.error("No initial whiteboard");
-      return;
-    }
-    const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
-      type: WhiteboardOperationType.DELETE,
-      message: initalWhiteboard,
-    };
-    sismoConnect.request({
-      namespace: "main",
-      auth: { authType: AuthType.VAULT },
-      signature: {
-        message: JSON.stringify(sismoConnectSignedMessage),
-      },
-    });
-  }
-
   function performAction(type: WhiteboardOperationType) {
-    // if ((type == actionsType.EDIT || type == actionsType.DELETE) && !initalWhiteboard) {
-    //   console.error("No initial whiteboard");
-    //   return;
-    // }
-    // if(type != actionsType.DELETE && type != actionsType.EDIT && type != actionsType.CREATE) {
-    //   return;
-    // }
-
-    // Validation des types d'actions
     if (
       ![actionsType.CREATE, actionsType.EDIT, actionsType.DELETE].includes(type)
     ) {
@@ -237,7 +171,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       return;
     }
 
-    // Vérification pour les actions EDIT et DELETE
     if (
       (type === actionsType.EDIT || type === actionsType.DELETE) &&
       !initalWhiteboard
@@ -246,7 +179,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       return;
     }
 
-    // Création du message en fonction du type d'action
     let sismoConnectSignedMessage;
     switch (type) {
       case actionsType.CREATE:
@@ -284,12 +216,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       return;
     }
 
-    // // Envoi de la requête à l'API
-    // const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
-    //   type: type,
-    //   message: message,
-    // };
-
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
@@ -297,32 +223,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         message: JSON.stringify(sismoConnectSignedMessage),
       },
     });
-
-    // const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
-    //   type: WhiteboardOperationType.DELETE,
-    //   message:
-    //     type == actionsType.DELETE
-    //       ? initalWhiteboard
-    //       : type == actionsType.EDIT
-    //       ? {
-    //           ...initalWhiteboard,
-    //           description: whiteboardDescription,
-    //         }
-    //       : actionsType.CREATE
-    //       ? {
-    //           name: whiteboardName,
-    //           description: whiteboardDescription,
-    //           groupIds: selectedGroups.map((group: Group) => group.id),
-    //         }
-    //       : initalWhiteboard,
-    // };
-    // sismoConnect.request({
-    //   namespace: "main",
-    //   auth: { authType: AuthType.VAULT },
-    //   signature: {
-    //     message: JSON.stringify(sismoConnectSignedMessage),
-    //   },
-    // });
   }
 
   useEffect(() => {
