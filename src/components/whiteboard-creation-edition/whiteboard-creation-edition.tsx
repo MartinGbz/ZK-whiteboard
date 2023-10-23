@@ -78,13 +78,17 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const router = useRouter();
   const [groups, setGroups] = useState<Group[]>([]);
   const [whiteboardName, setWhiteboardName] = useState<string>("");
-  const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(false);
+  const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(
+    isEdition ? true : false
+  );
   const [whiteboardDescription, setWhiteboardDescription] =
     useState<string>("");
   const [whiteboardDescriptionOk, setWhiteboardDescriptionOk] =
-    useState<boolean>(false);
+    useState<boolean>(isEdition ? true : false);
   const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
-  const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(false);
+  const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(
+    isEdition ? true : false
+  );
   const [user, setUser] = useState<User | null>(null);
   const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
   const [isWhiteboardDataLoading, setIsWhiteboardDataLoading] =
@@ -337,7 +341,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     } else {
       setDisableValidation(true);
     }
-    if (whiteboardNameOk && whiteboardDescriptionOk) {
+    if (whiteboardDescriptionOk) {
       setDisableValidationEdition(false);
     } else {
       setDisableValidationEdition(true);
@@ -373,7 +377,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           warningMessage={MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
           inputOk={setWhiteboardNameOk}
           onChange={setWhiteboardName}
-          baseValue={whiteboardName}
+          value={whiteboardName}
         />
         <WhiteboardCreationEditionInput
           isEdition={isEdition}
@@ -383,7 +387,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           warningMessage={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
           inputOk={setWhiteboardDescriptionOk}
           onChange={setWhiteboardDescription}
-          baseValue={whiteboardDescription}
+          value={whiteboardDescription}
         />
         <div className="groups-input-container">
           <div>
@@ -395,7 +399,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               warningMessage={MAX_WHITEBOARD_GROUPS_MESSAGE}
               inputOk={setSelectedGroupsOk}
               onChange={setSelectedGroups}
-              baseValue={selectedGroups}
+              value={selectedGroups}
               groups={groups}
             />
             <a

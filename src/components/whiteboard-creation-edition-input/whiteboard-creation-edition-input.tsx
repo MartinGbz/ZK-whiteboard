@@ -16,7 +16,7 @@ interface WhiteboardCreationEditionInputProps {
   groups?: any;
   onChange: (data: any) => void;
   inputOk: (state: boolean) => void;
-  baseValue?: any;
+  value?: any;
 }
 
 const WhiteboardCreationEdition: React.FC<
@@ -30,34 +30,53 @@ const WhiteboardCreationEdition: React.FC<
   groups,
   onChange,
   inputOk,
-  baseValue,
+  value,
 }) => {
-  const [inputData, setInputData] = useState<any>(
-    baseValue ? baseValue : type == "groups" ? [] : ""
-  );
+  // const [inputData, setInputData] = useState<any>(
+  //   baseValue ? baseValue : type == "groups" ? [] : ""
+  // );
   const [inputDataOk, setInputDataOk] = useState<boolean>(false);
   const [inputDataChanged, setInputDataChanged] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (baseValue) {
-      setInputData(baseValue);
-    }
-  }, [baseValue]);
+  // useEffect(() => {
+  //   if (baseValue && !inputData) {
+  //     console.log({ baseValue });
+  //     setInputData(baseValue);
+  //   }
+  // }, [baseValue, inputData]);
 
-  useEffect(() => {
-    onChange(inputData);
-    if (inputData?.length > 0) {
+  // useEffect(() => {
+  //   if (inputData?.length > 0) {
+  //     setInputDataChanged(true);
+  //   }
+
+  //   if (inputData?.length > maxNumber || inputData?.length < MIN_WHITEBOARD) {
+  //     setInputDataOk(false);
+  //     inputOk(false);
+  //   } else {
+  //     setInputDataOk(true);
+  //     inputOk(true);
+  //   }
+
+  //   // console.log(type);
+  //   // console.log({ inputData });
+  // }, [ maxNumber, inputOk, onChange]);
+
+  function onInputChange(value: any) {
+    if (value?.length > 0) {
       setInputDataChanged(true);
     }
 
-    if (inputData?.length > maxNumber || inputData?.length < MIN_WHITEBOARD) {
+    if (value?.length > maxNumber || value?.length < MIN_WHITEBOARD) {
       setInputDataOk(false);
       inputOk(false);
     } else {
       setInputDataOk(true);
       inputOk(true);
     }
-  }, [maxNumber, inputData?.length, inputData, inputOk, onChange]);
+
+    onChange(value);
+  }
 
   return (
     <div className="input-container">
@@ -72,18 +91,18 @@ const WhiteboardCreationEdition: React.FC<
             cursor: isEdition ? "not-allowed" : "default",
           }}
           onChange={(event) => {
-            setInputData(event.target.value);
+            onInputChange(event.target.value);
           }}
-          value={inputData}
+          value={value ? value : ""}
         />
       )}
       {type == "description" && (
         <TextareaAutosize
           className="whiteboard-creation-inputs"
           onChange={(event) => {
-            setInputData(event.target.value);
+            onInputChange(event.target.value);
           }}
-          value={inputData}
+          value={value ? value : ""}
         />
       )}
       {type == "groups" && (
@@ -127,7 +146,7 @@ const WhiteboardCreationEdition: React.FC<
               {option.name}
             </li>
           )}
-          value={inputData}
+          value={value ? value : []}
           renderTags={(tagValue, getTagProps) =>
             tagValue.map((option, index) => (
               <Chip
@@ -141,7 +160,7 @@ const WhiteboardCreationEdition: React.FC<
             ))
           }
           onChange={(event, value) => {
-            setInputData(value);
+            onInputChange(value);
           }}
         />
       )}
