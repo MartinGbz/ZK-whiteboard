@@ -337,6 +337,7 @@ const Whiteboard = ({ params }: pageProps) => {
                 flexDirection: "column",
                 alignItems: "center",
                 cursor: "pointer",
+                width: "max-content",
               }}>
               <div
                 style={{
