@@ -45,11 +45,6 @@ const API_ENDPOINTS = {
   EDIT: "/edit",
   DELETE: "/delete",
 };
-const actionsType = {
-  CREATE: "create",
-  EDIT: "edit",
-  DELETE: "delete",
-};
 
 interface Group {
   id: string;
@@ -165,14 +160,19 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
   function performAction(type: WhiteboardOperationType) {
     if (
-      ![actionsType.CREATE, actionsType.EDIT, actionsType.DELETE].includes(type)
+      ![
+        WhiteboardOperationType.CREATE,
+        WhiteboardOperationType.EDIT,
+        WhiteboardOperationType.DELETE,
+      ].includes(type)
     ) {
       console.error("Invalid action type");
       return;
     }
 
     if (
-      (type === actionsType.EDIT || type === actionsType.DELETE) &&
+      (type === WhiteboardOperationType.EDIT ||
+        type === WhiteboardOperationType.DELETE) &&
       !initalWhiteboard
     ) {
       console.error("No initial whiteboard");
@@ -181,7 +181,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
     let sismoConnectSignedMessage;
     switch (type) {
-      case actionsType.CREATE:
+      case WhiteboardOperationType.CREATE:
         sismoConnectSignedMessage = {
           type: type,
           message: {
@@ -191,7 +191,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           },
         } as WhiteboardCreateSignedMessage;
         break;
-      case actionsType.EDIT:
+      case WhiteboardOperationType.EDIT:
         sismoConnectSignedMessage = {
           type: type,
           message: {
@@ -200,7 +200,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           },
         } as WhiteboardEditSignedMessage;
         break;
-      case actionsType.DELETE:
+      case WhiteboardOperationType.DELETE:
         sismoConnectSignedMessage = {
           type: type,
           message: initalWhiteboard,
