@@ -23,7 +23,6 @@ import {
   MAX_WHITEBOARD_GROUPS,
   greenColorDisabled,
   MAX_WHITEBOARD_PER_USER,
-  redColor,
 } from "@/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
@@ -45,6 +44,11 @@ const API_ENDPOINTS = {
   CREATE: "/create",
   EDIT: "/edit",
   DELETE: "/delete",
+};
+const actionsType = {
+  CREATE: "create",
+  EDIT: "edit",
+  DELETE: "delete",
 };
 
 interface Group {
@@ -214,6 +218,111 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         message: JSON.stringify(sismoConnectSignedMessage),
       },
     });
+  }
+
+  function performAction(type: WhiteboardOperationType) {
+    // if ((type == actionsType.EDIT || type == actionsType.DELETE) && !initalWhiteboard) {
+    //   console.error("No initial whiteboard");
+    //   return;
+    // }
+    // if(type != actionsType.DELETE && type != actionsType.EDIT && type != actionsType.CREATE) {
+    //   return;
+    // }
+
+    // Validation des types d'actions
+    if (
+      ![actionsType.CREATE, actionsType.EDIT, actionsType.DELETE].includes(type)
+    ) {
+      console.error("Invalid action type");
+      return;
+    }
+
+    // Vérification pour les actions EDIT et DELETE
+    if (
+      (type === actionsType.EDIT || type === actionsType.DELETE) &&
+      !initalWhiteboard
+    ) {
+      console.error("No initial whiteboard");
+      return;
+    }
+
+    // Création du message en fonction du type d'action
+    let sismoConnectSignedMessage;
+    switch (type) {
+      case actionsType.CREATE:
+        sismoConnectSignedMessage = {
+          type: type,
+          message: {
+            name: whiteboardName,
+            description: whiteboardDescription,
+            groupIds: selectedGroups.map((group: Group) => group.id),
+          },
+        } as WhiteboardCreateSignedMessage;
+        break;
+      case actionsType.EDIT:
+        sismoConnectSignedMessage = {
+          type: type,
+          message: {
+            ...initalWhiteboard,
+            description: whiteboardDescription,
+          },
+        } as WhiteboardEditSignedMessage;
+        break;
+      case actionsType.DELETE:
+        sismoConnectSignedMessage = {
+          type: type,
+          message: initalWhiteboard,
+        } as WhiteboardEditSignedMessage;
+        break;
+      default:
+        console.error("Invalid action type");
+        return;
+    }
+
+    if (!sismoConnectSignedMessage) {
+      console.error("No message");
+      return;
+    }
+
+    // // Envoi de la requête à l'API
+    // const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
+    //   type: type,
+    //   message: message,
+    // };
+
+    sismoConnect.request({
+      namespace: "main",
+      auth: { authType: AuthType.VAULT },
+      signature: {
+        message: JSON.stringify(sismoConnectSignedMessage),
+      },
+    });
+
+    // const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
+    //   type: WhiteboardOperationType.DELETE,
+    //   message:
+    //     type == actionsType.DELETE
+    //       ? initalWhiteboard
+    //       : type == actionsType.EDIT
+    //       ? {
+    //           ...initalWhiteboard,
+    //           description: whiteboardDescription,
+    //         }
+    //       : actionsType.CREATE
+    //       ? {
+    //           name: whiteboardName,
+    //           description: whiteboardDescription,
+    //           groupIds: selectedGroups.map((group: Group) => group.id),
+    //         }
+    //       : initalWhiteboard,
+    // };
+    // sismoConnect.request({
+    //   namespace: "main",
+    //   auth: { authType: AuthType.VAULT },
+    //   signature: {
+    //     message: JSON.stringify(sismoConnectSignedMessage),
+    //   },
+    // });
   }
 
   useEffect(() => {
@@ -451,8 +560,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             marginTop: "20px",
           }}
           onClick={() => {
-            if (!isEdition) createWhiteboard();
-            if (isEdition) saveWhiteboard();
+            if (!isEdition) performAction(WhiteboardOperationType.CREATE);
+            if (isEdition) performAction(WhiteboardOperationType.EDIT);
           }}
           disabled={isEdition ? disableValidationEdition : disableValidation}
           type="validate"
@@ -464,7 +573,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             className="create-edit-button"
             type="delete"
             title="Delete"
-            onClick={deleteWhiteboard}
+            onClick={() => {
+              performAction(WhiteboardOperationType.DELETE);
+            }}
             fontSize="15px"
             style={{
               alignSelf: "end",
