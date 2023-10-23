@@ -2,8 +2,8 @@
 import React, { CSSProperties } from "react";
 
 import "./button.css";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import { greenColor, redColor } from "@/configs/configs";
 
@@ -56,7 +56,7 @@ const WhiteboardCreationEdition: React.FC<
           justifyContent: "center",
         }}>
         {type == "validate" && (
-          <CheckCircleIcon
+          <CheckCircleOutlineIcon
             className="icon"
             style={{
               fontSize: iconSize ? iconSize : fontSize ? fontSize : "",
@@ -74,7 +74,7 @@ const WhiteboardCreationEdition: React.FC<
           />
         )}
         {type == "delete" && (
-          <DeleteIcon
+          <DeleteOutlineIcon
             className="icon"
             style={{
               fontSize: iconSize ? iconSize : fontSize ? fontSize : "",

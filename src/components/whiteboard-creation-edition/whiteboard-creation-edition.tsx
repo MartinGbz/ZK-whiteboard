@@ -358,16 +358,16 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       <Header onChangeUser={onChangeUser} />
       <div className="edition-container">
         <div className="edition-title">
-          <span>
+          <div>
             {isEdition ? "Edit a whiteboard" : "Create a new whiteboard"}
-          </span>
-          <span>
+          </div>
+          <div>
             {isEdition
               ? " (You can only edit the description for now)"
               : " (Currently only " +
                 MAX_WHITEBOARD_PER_USER +
                 " max per user)"}
-          </span>
+          </div>
         </div>
         <WhiteboardCreationEditionInput
           isEdition={isEdition}
@@ -414,11 +414,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             </a>
           </div>
           {!isEdition && (
-            <div
-              style={{
-                marginLeft: "20px",
-                justifyContent: "center",
-              }}>
+            <div>
               <p
                 style={{
                   fontSize: "12px",
