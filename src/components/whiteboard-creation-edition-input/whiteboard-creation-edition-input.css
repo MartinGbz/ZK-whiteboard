@@ -1,6 +1,5 @@
 .form-labels {
   color: black;
-  margin-top: 10px;
   margin-bottom: 5px;
   font-size: 17px;
 }
@@ -17,4 +16,8 @@
   font-size: 14px;
   font-family: Inter-Regular;
   padding: 10px;
+}
+
+.input-container {
+  margin-top: 10px;
 }

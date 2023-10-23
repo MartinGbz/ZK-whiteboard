@@ -5,6 +5,8 @@ import { User } from "@/types/whiteboard-types";
 import { MIN_WHITEBOARD } from "@/configs/configs";
 import { Autocomplete, Chip, TextField, TextareaAutosize } from "@mui/material";
 
+import "./whiteboard-creation-edition-input.css";
+
 interface WhiteboardCreationEditionInputProps {
   isEdition?: boolean;
   type: string;
@@ -58,7 +60,7 @@ const WhiteboardCreationEdition: React.FC<
   }, [maxNumber, inputData?.length, inputData, inputOk, onChange]);
 
   return (
-    <div>
+    <div className="input-container">
       <p className="form-labels"> {title} </p>
       {type == "name" && (
         <input

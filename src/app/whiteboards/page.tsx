@@ -17,6 +17,7 @@ import WhiteboardCard from "@/components/whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";
 import ErrorModal from "@/components/error-modal/error-modal";
 import axios from "axios";
+import Button from "@/components/button/button";
 
 export default function Home() {
   const router = useRouter();
@@ -181,66 +182,32 @@ export default function Home() {
                       " whiteboards"
                 }>
                 <span>
-                  <button
-                    className="whiteboards_create_button validate-button"
+                  <Button
+                    type="create"
+                    title="Create"
+                    onClick={() => {
+                      router.push("/create-whiteboard");
+                    }}
+                    fontSize="20px"
+                    disabled={true}
                     style={{
-                      color: "black",
                       backgroundColor: greenColorDisabled,
                       cursor: "default",
                       filter: "brightness(1.1)",
-
-                      fontSize: "20px",
-                      width: "fit-content",
-                      height: "fit-content",
-                    }}
-                    disabled={true}
-                    onClick={() => {
-                      router.push("/create-whiteboard");
-                    }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}>
-                      <AddIcon
-                        style={{
-                          fontSize: "30px",
-                        }}
-                      />
-                      <span> Create </span>
-                    </div>
-                  </button>
+                    }}></Button>
                 </span>
               </Tooltip>
             )}
             {user &&
               user.createdWhiteboards.length < MAX_WHITEBOARD_PER_USER && (
-                <button
-                  className="whiteboards_create_button validate-button"
-                  style={{
-                    color: "black",
-                    backgroundColor: greenColor,
-                    cursor: "pointer",
-                    fontSize: "20px",
-                    width: "fit-content",
-                    height: "fit-content",
-                  }}
+                <Button
+                  type="create"
+                  title="Create"
                   onClick={() => {
                     router.push("/create-whiteboard");
-                  }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                    }}>
-                    <AddIcon
-                      style={{
-                        fontSize: "30px",
-                      }}
-                    />
-                    <span> Create </span>
-                  </div>
-                </button>
+                  }}
+                  iconSize="30px"
+                  fontSize="20px"></Button>
               )}
           </div>
         </div>

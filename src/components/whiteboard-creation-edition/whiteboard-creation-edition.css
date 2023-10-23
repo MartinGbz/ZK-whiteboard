@@ -9,17 +9,6 @@
   background-color: white;
 }
 
-.form-labels {
-  color: black;
-  margin-top: 10px;
-  margin-bottom: 5px;
-  font-size: 17px;
-}
-
-.create-edit-button:hover {
-  filter: brightness(1.1);
-}
-
 .create-group-button:hover {
   filter: brightness(1.1);
 }
@@ -55,10 +44,6 @@
   margin-top: 5px;
 }
 
-.MuiAutocomplete-noOptions {
-  font-size: 14px;
-}
-
 .edition-container {
   display: flex;
   flex-direction: column;
@@ -83,18 +68,13 @@
   > div {
     display: flex;
     flex-direction: column;
+
+    > div {
+      margin-top: 0px;
+    }
   }
 }
 
-/* .groups-input {
-  border-radius: 5px;
-  background-color: #e9e9e9;
-  width: 300px;
+.MuiAutocomplete-noOptions {
   font-size: 14px;
-  padding: 10px;
-} */
-
-.create-edit-button {
-  margin-top: 20px;
-  font-size: 15px;
 }

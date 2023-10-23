@@ -35,9 +35,8 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import axios from "axios";
 import ErrorModal from "../error-modal/error-modal";
 import SuccessAnimation from "../success-animation/success-animation";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import WhiteboardCreationEditionInput from "../whiteboard-creation-edition-input/whiteboard-creation-edition-input";
+import Button from "../button/button";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -405,6 +404,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             <div
               style={{
                 marginLeft: "20px",
+                justifyContent: "center",
               }}>
               <p
                 style={{
@@ -431,8 +431,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             </div>
           )}
         </div>
-        <button
-          className="create-edit-button validate-button"
+        <Button
           style={{
             backgroundColor:
               (isEdition && disableValidationEdition) ||
@@ -449,41 +448,29 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               (!isEdition && disableValidation)
                 ? "none"
                 : "auto",
+            marginTop: "20px",
           }}
           onClick={() => {
             if (!isEdition) createWhiteboard();
             if (isEdition) saveWhiteboard();
           }}
-          disabled={isEdition ? disableValidationEdition : disableValidation}>
-          <CheckCircleIcon
+          disabled={isEdition ? disableValidationEdition : disableValidation}
+          type="validate"
+          title={isEdition ? "Save" : "Create"}
+          fontSize="15px"
+          iconSpace="4px"></Button>
+        {isEdition && (
+          <Button
+            className="create-edit-button"
+            type="delete"
+            title="Delete"
+            onClick={deleteWhiteboard}
+            fontSize="15px"
             style={{
-              fontSize: "18px",
-              marginRight: "2px",
+              alignSelf: "end",
+              marginTop: "20px",
             }}
           />
-          {!isEdition && "Create"}
-          {isEdition && "Save"}
-        </button>
-        {isEdition && (
-          <button
-            className="create-edit-button validate-button"
-            style={{
-              backgroundColor: redColor,
-              cursor: "pointer",
-              pointerEvents: "auto",
-              alignSelf: "end",
-            }}
-            onClick={() => {
-              deleteWhiteboard();
-            }}>
-            <DeleteIcon
-              style={{
-                fontSize: "15px",
-                marginRight: "2px",
-              }}
-            />{" "}
-            Delete
-          </button>
         )}
       </div>
       {isWhiteboardDataLoading && !isVerifying && (
