@@ -32,35 +32,8 @@ const WhiteboardCreationEdition: React.FC<
   inputOk,
   value,
 }) => {
-  // const [inputData, setInputData] = useState<any>(
-  //   baseValue ? baseValue : type == "groups" ? [] : ""
-  // );
   const [inputDataOk, setInputDataOk] = useState<boolean>(false);
   const [inputDataChanged, setInputDataChanged] = useState<boolean>(false);
-
-  // useEffect(() => {
-  //   if (baseValue && !inputData) {
-  //     console.log({ baseValue });
-  //     setInputData(baseValue);
-  //   }
-  // }, [baseValue, inputData]);
-
-  // useEffect(() => {
-  //   if (inputData?.length > 0) {
-  //     setInputDataChanged(true);
-  //   }
-
-  //   if (inputData?.length > maxNumber || inputData?.length < MIN_WHITEBOARD) {
-  //     setInputDataOk(false);
-  //     inputOk(false);
-  //   } else {
-  //     setInputDataOk(true);
-  //     inputOk(true);
-  //   }
-
-  //   // console.log(type);
-  //   // console.log({ inputData });
-  // }, [ maxNumber, inputOk, onChange]);
 
   function onInputChange(value: any) {
     if (value?.length > 0) {
