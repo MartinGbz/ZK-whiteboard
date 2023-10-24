@@ -43,8 +43,13 @@ export interface Whiteboard extends WhiteboardPrisma {
   messages: Message[];
 }
 
+export interface whiteboardWithMessageCount extends WhiteboardPrisma {
+  messagesCount: number;
+}
+
 export type WhiteboardIndex = Omit<WhiteboardPrisma, "groupIds"> & {
   groupNames: string[];
+  messagesCount: number;
 };
 
 export interface User extends UserPrisma {

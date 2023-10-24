@@ -7,6 +7,8 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import LoginIcon from "@mui/icons-material/Login";
 import { Tooltip } from "@mui/material";
 
+import "./whiteboard-card.css";
+
 interface WhiteboardCardProps {
   vaultId: string | null;
   whiteboard: WhiteboardIndex;
@@ -65,23 +67,10 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
 
   return (
     <div
-      className="whiteboard-item"
+      className="whiteboard-card"
       style={{
-        position: "relative",
         padding: padding.current + "px",
-        marginBottom: "15px",
-        cursor: "pointer",
-        fontSize: "15px",
-        display: "flex",
-        flexDirection: "column",
-        overflowY: "hidden",
         maxHeight: maxHeights[index],
-        transition: "max-height 0.7s ease",
-
-        color: "black",
-        borderRadius: "10px",
-        backgroundColor: "lightgrey",
-        boxShadow: "rgba(0, 0, 0, 0.25) 3px 3px 5px 1px",
       }}
       onMouseEnter={() => handleMouseEnter(whiteboard.id)}
       onMouseLeave={() => handleMouseLeave()}
@@ -93,8 +82,9 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
           marginBottom: "15px",
           fontSize: "15px",
           display: "grid",
+          // gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr",
+          gridAutoColumns: "minmax(0, 1fr)",
         }}>
-        {" "}
         <div
           style={{
             gridRow: 1,
@@ -130,14 +120,31 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
               width: "fit-content",
             }}>
             {whiteboard.authorVaultId !== vaultId
-              ? "from:" + whiteboard.authorVaultId.substring(0, 7) + "..."
+              ? "from: " + whiteboard.authorVaultId.substring(0, 7) + "..."
               : "from: You"}
           </div>
         </div>
         <div
           style={{
+            color: "gray",
+            fontSize: "10px",
+            gridRow: 2,
+            gridColumn: "2 / 6",
+            display: "flex",
+            justifySelf: "start",
+          }}>
+          <div
+            title={whiteboard.authorVaultId}
+            style={{
+              width: "fit-content",
+            }}>
+            {whiteboard.messagesCount + " messages"}
+          </div>
+        </div>
+        <div
+          style={{
             gridRow: "1 / 3",
-            gridColumn: "2",
+            gridColumn: "6",
             justifySelf: "end",
             display: "flex",
           }}>
@@ -221,8 +228,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
         style={{
           color: "gray",
           fontSize: "12px",
-          gridRow: 3,
-          gridColumn: 3,
         }}>
         <div>
           <span

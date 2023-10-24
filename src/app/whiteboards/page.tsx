@@ -5,7 +5,12 @@ import "./page.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/header/header";
-import { User, Whiteboard, WhiteboardIndex } from "@/types/whiteboard-types";
+import {
+  User,
+  Whiteboard,
+  WhiteboardIndex,
+  whiteboardWithMessageCount,
+} from "@/types/whiteboard-types";
 import Loading from "@/components/loading-modal/loading-modal";
 import {
   MAX_WHITEBOARD_PER_USER,
@@ -75,14 +80,16 @@ export default function Home() {
         setErrorMessage(errorMessage);
         return null;
       }
-      const whiteboards: Whiteboard[] = await response.data;
+      const whiteboards: whiteboardWithMessageCount[] = await response.data;
       return whiteboards;
     };
 
-    async function convertWhiteboardIdsToNames(whiteboards: Whiteboard[]) {
+    async function convertWhiteboardIdsToNames(
+      whiteboards: whiteboardWithMessageCount[]
+    ) {
       const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =
         await Promise.all(
-          whiteboards.map(async (whiteboard: Whiteboard) => {
+          whiteboards.map(async (whiteboard: whiteboardWithMessageCount) => {
             const resolvedGroupNames = await Promise.all(
               whiteboard.groupIds.map(async (groupId: string) => {
                 const groupName = await resolveGroupId(groupId);
@@ -97,6 +104,7 @@ export default function Home() {
               authorVaultId: whiteboard.authorVaultId,
               curated: whiteboard.curated,
               groupNames: resolvedGroupNames,
+              messagesCount: whiteboard.messagesCount,
             };
           })
         );
@@ -106,6 +114,10 @@ export default function Home() {
     async function sortWhiteboards(
       whiteboardsWithResolvedGroupIds: WhiteboardIndex[]
     ) {
+      console.log(
+        "whiteboardsWithResolvedGroupIds:",
+        whiteboardsWithResolvedGroupIds
+      );
       // sort by curated and then by creation date (oldest first) and then by name
       whiteboardsWithResolvedGroupIds.sort((a, b) => {
         if (a.curated && !b.curated) {
@@ -113,12 +125,18 @@ export default function Home() {
         } else if (!a.curated && b.curated) {
           return 1;
         } else {
-          if (a.id < b.id) {
+          if (a.messagesCount > b.messagesCount) {
             return -1;
-          } else if (a.id > b.id) {
+          } else if (a.messagesCount < b.messagesCount) {
             return 1;
           } else {
-            return 0;
+            if (a.id < b.id) {
+              return -1;
+            } else if (a.id > b.id) {
+              return 1;
+            } else {
+              return 0;
+            }
           }
         }
       });
