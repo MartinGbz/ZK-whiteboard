@@ -82,7 +82,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
           marginBottom: "15px",
           fontSize: "15px",
           display: "grid",
-          // gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr",
           gridAutoColumns: "minmax(0, 1fr)",
         }}>
         <div

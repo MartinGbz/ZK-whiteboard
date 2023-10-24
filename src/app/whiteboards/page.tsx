@@ -7,17 +7,11 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/header/header";
 import {
   User,
-  Whiteboard,
   WhiteboardIndex,
   whiteboardWithMessageCount,
 } from "@/types/whiteboard-types";
 import Loading from "@/components/loading-modal/loading-modal";
-import {
-  MAX_WHITEBOARD_PER_USER,
-  greenColor,
-  greenColorDisabled,
-} from "@/configs/configs";
-import AddIcon from "@mui/icons-material/Add";
+import { MAX_WHITEBOARD_PER_USER, greenColorDisabled } from "@/configs/configs";
 import WhiteboardCard from "@/components/whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";
 import ErrorModal from "@/components/error-modal/error-modal";
@@ -114,10 +108,6 @@ export default function Home() {
     async function sortWhiteboards(
       whiteboardsWithResolvedGroupIds: WhiteboardIndex[]
     ) {
-      console.log(
-        "whiteboardsWithResolvedGroupIds:",
-        whiteboardsWithResolvedGroupIds
-      );
       // sort by curated and then by creation date (oldest first) and then by name
       whiteboardsWithResolvedGroupIds.sort((a, b) => {
         if (a.curated && !b.curated) {

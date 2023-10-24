@@ -4,27 +4,6 @@ import { prisma } from "../db";
 import { getWhiteboardById } from "../common";
 
 export async function GET(): Promise<NextResponse> {
-  // const whiteboards = await prisma.whiteboard.findMany();
-  // return NextResponse.json(whiteboards, { status: 200 });
-
-  // const whiteboardsWithMessageCount = await prisma.whiteboard.findMany({
-  //   include: {
-  //     messages: {
-  //       select: {
-  //         id: true,
-  //       },
-  //     },
-  //   },
-  // });
-
-  // const whiteboardsWithCount = whiteboardsWithMessageCount.map(
-  //   (whiteboard) => ({
-  //     ...whiteboard,
-  //     messageCount: whiteboard.messages.length,
-  //   })
-  // );
-  // return NextResponse.json(whiteboardsWithCount, { status: 200 });
-
   const whiteboardsWithMessagesCount: any = await prisma.$queryRaw`
     SELECT
       w.id,
@@ -44,7 +23,6 @@ export async function GET(): Promise<NextResponse> {
     GROUP BY
       w.id, w.name, w.description, w.curated, w."authorVaultId";
   `;
-  console.log(whiteboardsWithMessagesCount);
 
   const whiteboardsWithCount = whiteboardsWithMessagesCount.map(
     (whiteboard: any) => ({
