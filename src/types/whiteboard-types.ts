@@ -2,6 +2,7 @@ import {
   Message,
   Whiteboard as WhiteboardPrisma,
   User as UserPrisma,
+  Reaction,
 } from "@prisma/client";
 
 export enum MessageOperationType {
@@ -16,7 +17,10 @@ export enum WhiteboardOperationType {
 
 export type SignedMessage = {
   type: MessageOperationType;
-  message: Omit<Message, "id" | "authorVaultId" | "order">;
+  message: Omit<
+    Message,
+    "id" | "authorVaultId" | "order" | "createdAt" | "updatedAt"
+  >;
 };
 
 export type PostDeletionResponse = {
@@ -26,7 +30,10 @@ export type PostDeletionResponse = {
 
 export type WhiteboardCreateSignedMessage = {
   type: WhiteboardOperationType;
-  message: Omit<WhiteboardPrisma, "id" | "authorVaultId" | "curated" | "appId">;
+  message: Omit<
+    WhiteboardPrisma,
+    "id" | "authorVaultId" | "curated" | "appId" | "createdAt" | "updatedAt"
+  >;
 };
 
 export type WhiteboardEditSignedMessage = {
@@ -55,3 +62,23 @@ export type WhiteboardIndex = Omit<WhiteboardPrisma, "groupIds"> & {
 export interface User extends UserPrisma {
   createdWhiteboards: Whiteboard[];
 }
+
+export type ReactionCounts = {
+  type: string;
+  _count: number;
+};
+
+export type ReactionsStats = {
+  reactionCounts: ReactionCounts[];
+  userReaction: Reaction;
+};
+
+export enum ReactionOperationType {
+  POST = "post",
+  DELETE = "delete",
+}
+
+export type ReactionSignedMessage = {
+  type: ReactionOperationType;
+  message: Omit<Reaction, "id" | "userId" | "createdAt" | "updatedAt">;
+};

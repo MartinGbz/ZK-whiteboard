@@ -17,6 +17,8 @@ model Message {
   color         String
   whiteboard    Whiteboard @relation(fields: [whiteboardId], references: [id])
   whiteboardId  Int
+  createdAt     DateTime   @default(now()) // Date de création de la 
+  updatedAt     DateTime   @default(now()) @updatedAt // Date de mise à jour de la réaction
 }
 
 model Whiteboard {
@@ -29,9 +31,22 @@ model Whiteboard {
   authorVaultId String
   messages      Message[]
   curated       Boolean
+  createdAt     DateTime  @default(now()) // Date de création de la réaction
+  updatedAt     DateTime  @default(now()) @updatedAt // Date de mise à jour de la réaction
 }
 
 model User {
   vaultId            String       @id
   createdWhiteboards Whiteboard[]
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  type      String // Type de la réaction (par exemple, "okHand", "thumbsUp", "purpleHeart")
+  messageId Int // Clé étrangère faisant référence à l'ID du message associé
+  userId    String // Identifiant de l'utilisateur qui a ajouté la réaction
+  createdAt DateTime @default(now()) // Date de création de la 
+  updatedAt DateTime @default(now()) @updatedAt // Date de mise à jour de la réaction
+
+  @@unique([messageId, userId]) // Assure l'unicité d'une réaction par message, utilisateur et type
 }

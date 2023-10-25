@@ -8,6 +8,8 @@ export const ZKWHITEBOARD_VAULTID_VARNAME = "zkWhiteboardVaultId";
 export const WHITEBOARD_VAULTID_VARNAME = "vaultId-whiteboard-";
 export const CURRENT_APPID_VARNAME = "currentAppId";
 
+export const reactionsType = ["👍", "💜", "👌"];
+
 export const MAX_Z_INDEX = 1000;
 export const TRANSPARENCY = "E6";
 

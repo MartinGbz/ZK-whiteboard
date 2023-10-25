@@ -4,7 +4,7 @@
   padding: 10px;
   position: fixed;
   width: fit-content;
-  min-width: 100px;
+  min-width: 120px;
   max-width: 200px;
   border-radius: 10px;
   color: black;
@@ -32,4 +32,54 @@
   30% {
     box-shadow: var(--shadow-color) 0px 0px 0px 0px;
   }
+}
+
+.top-button {
+  cursor: pointer;
+  display: inline-flex;
+  padding: 5px;
+  box-shadow: rgba(0, 0, 0, 0.25) -5px 5px 15px 3px;
+  transition: opacity 0.2s transform 0.2s translate 0.2s;
+  border-radius: 50%;
+  text-align: center;
+  position: absolute;
+}
+
+.buttons-container {
+  > button {
+    margin-left: 7px;
+  }
+}
+
+.count {
+  margin-left: 4px;
+}
+
+@keyframes rotateEmoji {
+  0% {
+    rotate: 0deg;
+  }
+
+  25% {
+    rotate: 50deg;
+  }
+
+  50% {
+    rotate: -50deg;
+  }
+
+  75% {
+    rotate: 0deg;
+  }
+
+  100% {
+    rotate: 0deg;
+  }
+}
+
+.emoji-animation:hover {
+  animation-duration: 2s;
+  animation-name: rotateEmoji;
+  animation-iteration-count: infinite;
+  /* animation-direction: alternate; */
 }

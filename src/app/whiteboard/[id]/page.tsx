@@ -102,7 +102,12 @@ const Whiteboard = ({ params }: pageProps) => {
       const responseMessage: SismoConnectResponse | null =
         sismoConnect.getResponse();
       if (responseMessage?.signedMessage) {
-        setSismoConnectResponseMessage(responseMessage);
+        // check if the message is not a reaction
+        if (!JSON.parse(responseMessage.signedMessage).message.type) {
+          console.log("----df-ze-fez--- responseMessage");
+          // if(responseMessage.signedMessage)
+          setSismoConnectResponseMessage(responseMessage);
+        }
       }
     }
   }, [whiteboard]);
@@ -321,6 +326,7 @@ const Whiteboard = ({ params }: pageProps) => {
             <Message
               key={message.authorVaultId}
               message={message}
+              appId={whiteboard?.appId ?? ""}
               vaultId={whiteboardVaultId.current ?? ""}
               onDelete={(message) => requestDeleteMessage(message)}
             />
