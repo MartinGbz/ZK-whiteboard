@@ -8,7 +8,6 @@ import {
   SismoConnectServer,
 } from "@sismo-core/sismo-connect-server";
 import {
-  MessageOperationType,
   ReactionOperationType,
   ReactionSignedMessage,
 } from "@/types/whiteboard-types";
@@ -95,7 +94,6 @@ async function getReactionStats(messageId: number, userId: string) {
     reactionCounts: reactionCounts,
     userReaction: userReaction,
   };
-  console.log(reactionsStats);
 
   return reactionsStats;
 }
@@ -166,8 +164,6 @@ async function updateReaction(
         { status: 500 }
       );
     }
-
-    console.log("DELETE reaction ", reaction);
   }
 
   const newReactions = await getReactionStats(
@@ -178,68 +174,5 @@ async function updateReaction(
     return NextResponse.json({ error: "Reactions not found" }, { status: 500 });
   }
 
-  console.log(newReactions);
   return NextResponse.json(newReactions, { status: 200 });
 }
-
-// async function addReaction(
-//   signedMessage: ReactionSignedMessage,
-//   vaultId: string
-// ) {
-//   const reaction = await prisma.reaction.create({
-//     data: {
-//       type: signedMessage.message.type,
-//       messageId: signedMessage.message.messageId,
-//       userId: vaultId,
-//     },
-//   });
-//   if (!reaction) {
-//     return NextResponse.json(
-//       { error: "Reaction not created" },
-//       { status: 500 }
-//     );
-//   }
-
-//   const newReactions = await getReactionStats(
-//     signedMessage.message.messageId,
-//     vaultId
-//   );
-//   if (!newReactions) {
-//     return NextResponse.json({ error: "Reactions not found" }, { status: 500 });
-//   }
-
-//   console.log(newReactions);
-//   return NextResponse.json(newReactions, { status: 200 });
-// }
-
-// async function removeReaction(
-//   signedMessage: ReactionSignedMessage,
-//   vaultId: string
-// ) {
-//   const reaction = await prisma.reaction.delete({
-//     where: {
-//       messageId_userId: {
-//         userId: vaultId,
-//         messageId: signedMessage.message.messageId,
-//       },
-//     },
-//   });
-//   console.log("DELETE reaction ", reaction);
-//   if (!reaction) {
-//     return NextResponse.json(
-//       { error: "Reaction not created" },
-//       { status: 500 }
-//     );
-//   }
-
-//   const newReactions = await getReactionStats(
-//     signedMessage.message.messageId,
-//     vaultId
-//   );
-//   if (!newReactions) {
-//     return NextResponse.json({ error: "Reactions not found" }, { status: 500 });
-//   }
-
-//   console.log(newReactions);
-//   return NextResponse.json(newReactions, { status: 200 });
-// }

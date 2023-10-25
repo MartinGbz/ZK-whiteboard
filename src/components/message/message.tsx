@@ -36,6 +36,7 @@ interface MessageProps {
   appId: string;
   vaultId: string | null;
   onDelete?: (message: MessageType) => void;
+  onError?: (error: string) => void;
 }
 
 let sismoConnect: SismoConnectClient | null = null;
@@ -45,26 +46,19 @@ const Message: React.FC<MessageProps> = ({
   appId,
   vaultId,
   onDelete,
+  onError,
 }) => {
   const [x, setX] = useState(message.positionX);
   const [y, setY] = useState(message.positionY);
-
   const [isMessageHovering, setIsMessageHovering] = useState(false);
-
   const messageRef = useRef<HTMLInputElement>(null);
-
-  // const messageReactions = useRef<Array<any>>([]);
-
-  // const thumbsUpReaction = useRef<any>(null);
-  // const purpleHeartReaction = useRef<any>(null);
-  // const okHandReaction = useRef<any>(null);
 
   const [reactionsStats, setReactionsStats] = useState<ReactionsStats | null>(
     null
   );
-  // const [clickedReactions, setClickedReactions] = useState<{
-  //   [type: string]: boolean;
-  // }>({});
+
+  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
+    useState<SismoConnectResponse | null>(null);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -72,16 +66,6 @@ const Message: React.FC<MessageProps> = ({
   const redirectToRoot = useCallback(() => {
     router.push(pathname);
   }, [router, pathname]);
-
-  // const [thumbsUpReaction, setThumbsUpReaction] = useState<Reaction | null>(
-  //   null
-  // );
-  // const [purpleHeartReaction, setPurpleHeartReaction] =
-  //   useState<Reaction | null>(null);
-  // const [okHandReaction, setOkHandReaction] = useState<Reaction | null>(null);
-
-  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
-    useState<SismoConnectResponse | null>(null);
 
   const messageStyle: CSSProperties = {
     backgroundColor: "#" + message.color + TRANSPARENCY,
@@ -100,38 +84,8 @@ const Message: React.FC<MessageProps> = ({
 
   const topButtonStyle: CSSProperties = {
     zIndex: MAX_Z_INDEX + 1,
-    // opacity: isMessageHovering ? "1" : "0",
+    opacity: isMessageHovering ? "1" : "0",
     transform: isMessageHovering ? "scale(1.1)" : "scale(1)",
-
-    cursor: "pointer",
-    display: "inline-flex",
-    padding: "5px",
-    boxShadow: "rgba(0, 0, 0, 0.25) -5px 5px 15px 3px",
-    transition: "opacity 0.2s transform 0.2s translate 0.2s",
-    borderRadius: "50%",
-    textAlign: "center",
-
-    alignItems: "center",
-    justifyContent: "center",
-  };
-
-  const deleteButtonStyle: CSSProperties = {
-    position: "absolute",
-    backgroundColor: redColor,
-    top: "-10px",
-    right: "-10px",
-  };
-
-  const reactionButtonStyle: CSSProperties = {
-    fontSize: "12px",
-    textAlign: "center",
-    top: "-10px",
-    height: "25px",
-    // width: "25px",
-
-    minWidth: "25px",
-    width: "fit-content",
-    borderRadius: "2em",
   };
 
   const handleMessageClick = (
@@ -151,46 +105,32 @@ const Message: React.FC<MessageProps> = ({
   useEffect(() => {
     // get message reactions
     const getReaction = async () => {
-      const res = await axios.get(
-        "/api/message/reaction?id=" + message.id + "&userId=" + vaultId,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      // messageReactions.current = reactions.data;
-      const reactions: ReactionsStats = res.data;
-      setReactionsStats(reactions);
-      // if (!reactions) return;
-      // setThumbsUpReaction(reactions.find((r) => r.type == "👍") ?? null);
-      // setPurpleHeartReaction(reactions.find((r) => r.type == "💜") ?? null);
-      // setOkHandReaction(reactions.find((r) => r.type == "👌") ?? null);
+      try {
+        const res = await axios.get(
+          "/api/message/reaction?id=" + message.id + "&userId=" + vaultId,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const reactions: ReactionsStats = res.data;
+        setReactionsStats(reactions);
+      } catch (error: any) {
+        const defaultErrorMessage =
+          "An error occured while fetching the messages reactions";
+        const errorMessage = error.response.data.error
+          ? `${defaultErrorMessage}: ${error.response.data.error}`
+          : defaultErrorMessage;
+        onError && onError(errorMessage);
+      }
     };
 
     getReaction();
-  }, [message.id, vaultId]);
+  }, [message.id, onError, vaultId]);
 
   function reactionClick(type: string): void {
     let requestType: ReactionOperationType;
-    // if type is already clicked, remove reaction
-    // if (clickedReactions[type]) {
-    //   console.log("remove reaction");
-    //   Object.keys(clickedReactions).forEach((key) => {
-    //     clickedReactions[key] = false;
-    //   });
-    //   setClickedReactions({ ...clickedReactions });
-    //   requestType = ReactionOperationType.DELETE;
-    // } else {
-    //   console.log("add reaction");
-    //   // reset all clicked reactions
-    //   const newClickedReactions = { ...clickedReactions };
-    //   Object.keys(newClickedReactions).forEach((key) => {
-    //     newClickedReactions[key] = false;
-    //   });
-    //   setClickedReactions({ ...newClickedReactions, [type]: true });
-    //   requestType = ReactionOperationType.POST;
-    // }
 
     // detect if the user already reacted with this reaction
     if (reactionsStats?.userReaction?.type.toString() === type.toString()) {
@@ -207,7 +147,6 @@ const Message: React.FC<MessageProps> = ({
       },
     };
     if (!sismoConnect) {
-      console.error("Error with sismoConnect");
       return;
     }
     sismoConnect.request({
@@ -219,24 +158,16 @@ const Message: React.FC<MessageProps> = ({
     });
   }
 
-  // useEffect(() => {
-  //   // set clicked reactions
-  //   if (!reactionsStats) return;
-  //   Object.keys(newClickedReactions).forEach((key) => {
-  //     newClickedReactions[key] = false;
-  //   });
-  //   if (reactionsStats.userReaction) {
-  //     newClickedReactions[reactionsStats.userReaction.type] = true;
-  //   }
-  //   setClickedReactions({ ...newClickedReactions });
-  // }, [reactionsStats]);
-
   useEffect(() => {
+    if (!appId) return;
+    if (!message.id) return;
+
     sismoConnect = SismoConnect({
       config: {
         appId: appId,
       },
     });
+
     const responseMessage: SismoConnectResponse | null =
       sismoConnect.getResponse();
     if (responseMessage?.signedMessage) {
@@ -245,34 +176,39 @@ const Message: React.FC<MessageProps> = ({
       if (signedMessage.message.type) {
         // check if we are verifying the right message
         if (signedMessage.message.messageId === message.id) {
-          console.log("signedMessage");
-          console.log(message.id);
-          console.log("responseMessage");
-          console.log(responseMessage);
           setSismoConnectResponseMessage(responseMessage);
         }
       }
     }
-  }, [appId]);
+  }, [appId, message.id]);
 
   useEffect(() => {
     const verifyProof = async () => {
-      if (!sismoConnectResponseMessage) return;
-      const res = await axios.post(
-        "/api/message/reaction",
-        sismoConnectResponseMessage,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const reactions: ReactionsStats = res.data;
-      setReactionsStats(reactions);
-      redirectToRoot();
+      try {
+        if (!sismoConnectResponseMessage) return;
+        const res = await axios.post(
+          "/api/message/reaction",
+          sismoConnectResponseMessage,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const reactions: ReactionsStats = res.data;
+        setReactionsStats(reactions);
+        redirectToRoot();
+      } catch (error: any) {
+        const defaultErrorMessage =
+          "An error occured while posting your reaction";
+        const errorMessage = error.response.data.error
+          ? `${defaultErrorMessage}: ${error.response.data.error}`
+          : defaultErrorMessage;
+        onError && onError(errorMessage);
+      }
     };
     verifyProof();
-  }, [redirectToRoot, sismoConnectResponseMessage]);
+  }, [onError, redirectToRoot, sismoConnectResponseMessage]);
 
   return (
     <div
@@ -304,8 +240,8 @@ const Message: React.FC<MessageProps> = ({
       </div>
       {vaultId === message.authorVaultId && (
         <button
-          className="delete-button"
-          style={{ ...topButtonStyle, ...deleteButtonStyle }}
+          className="top-button delete-button"
+          style={{ ...topButtonStyle, backgroundColor: redColor }}
           onClick={onDelete ? () => onDelete(message) : undefined}>
           <DeleteIcon
             style={{
@@ -316,38 +252,6 @@ const Message: React.FC<MessageProps> = ({
         </button>
       )}
       {vaultId !== message.authorVaultId && (
-        // <div
-        //   style={{
-        //     width: "fit-content",
-        //     height: "fit-content",
-        //     // position: "absolute",
-        //     // display: "flex",
-        //   }}>
-        //   <button
-        //     style={{
-        //       ...topButtonStyle,
-        //       ...reactionButtonStyle,
-        //       right: "-10px",
-        //     }}>
-        //     <span>👍</span>
-        //   </button>
-        //   <button
-        //     style={{
-        //       ...topButtonStyle,
-        //       ...reactionButtonStyle,
-        //       right: -10 + 25 + 4 + "px",
-        //     }}>
-        //     <span>💜</span>
-        //   </button>
-        //   <button
-        //     style={{
-        //       ...topButtonStyle,
-        //       ...reactionButtonStyle,
-        //       right: -10 + 2 * 25 + 2 * 4 + "px",
-        //     }}>
-        //     <span>👌</span>
-        //   </button>
-        // </div>
         <div
           style={{
             position: "absolute",
@@ -359,10 +263,10 @@ const Message: React.FC<MessageProps> = ({
           {reactionsStats?.reactionCounts?.map((reaction) => {
             return (
               <button
+                className="top-button reaction-button"
                 key={reaction.type}
                 style={{
                   ...topButtonStyle,
-                  ...reactionButtonStyle,
                   backgroundColor:
                     reactionsStats?.userReaction?.type.toString() ===
                     reaction.type.toString()
@@ -377,37 +281,6 @@ const Message: React.FC<MessageProps> = ({
               </button>
             );
           })}
-          {/* <button
-            style={{
-              ...topButtonStyle,
-              ...reactionButtonStyle,
-            }}
-            onClick={(e) => reactionClick(e)}>
-            <span className="emoji-animation">👍</span>
-            {thumbsUpReaction && (
-              <span className="count">{thumbsUpReaction._count}</span>
-            )}
-          </button>
-          <button
-            style={{
-              ...topButtonStyle,
-              ...reactionButtonStyle,
-            }}>
-            <span className="emoji-animation">💜</span>
-            {purpleHeartReaction && (
-              <span className="count">{purpleHeartReaction._count}</span>
-            )}
-          </button>
-          <button
-            style={{
-              ...topButtonStyle,
-              ...reactionButtonStyle,
-            }}>
-            <span className="emoji-animation">👌</span>
-            {okHandReaction && (
-              <span className="count">{okHandReaction._count}</span>
-            )}
-          </button> */}
         </div>
       )}
     </div>

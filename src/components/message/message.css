@@ -18,10 +18,6 @@
   box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 15px 5px;
 }
 
-.delete-button:hover {
-  filter: brightness(1.1);
-}
-
 @keyframes shine {
   0% {
     box-shadow: var(--shadow-color) 0px 0px 0px 0px;
@@ -42,7 +38,29 @@
   transition: opacity 0.2s transform 0.2s translate 0.2s;
   border-radius: 50%;
   text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.reaction-button {
+  font-size: 12px;
+  text-align: center;
+  top: -10px;
+  height: 25px;
+
+  min-width: 25px;
+  width: fit-content;
+  border-radius: 2em;
+}
+
+.delete-button {
   position: absolute;
+  top: -10px;
+  right: -10px;
+}
+
+.delete-button:hover {
+  filter: brightness(1.25);
 }
 
 .buttons-container {

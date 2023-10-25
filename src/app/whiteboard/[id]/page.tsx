@@ -104,8 +104,6 @@ const Whiteboard = ({ params }: pageProps) => {
       if (responseMessage?.signedMessage) {
         // check if the message is not a reaction
         if (!JSON.parse(responseMessage.signedMessage).message.type) {
-          console.log("----df-ze-fez--- responseMessage");
-          // if(responseMessage.signedMessage)
           setSismoConnectResponseMessage(responseMessage);
         }
       }
@@ -329,6 +327,7 @@ const Whiteboard = ({ params }: pageProps) => {
               appId={whiteboard?.appId ?? ""}
               vaultId={whiteboardVaultId.current ?? ""}
               onDelete={(message) => requestDeleteMessage(message)}
+              onError={setErrorMessage}
             />
           ))}
           {messages.length == 0 && !isFetchingMessages && (
