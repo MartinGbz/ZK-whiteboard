@@ -200,12 +200,6 @@ const Whiteboard = ({ params }: pageProps) => {
     if (isModalOpen && messageInputRef.current) {
       messageInputRef.current.focus();
     }
-    // if (isModalOpen && messageModalRef.current && messagePosition) {
-    //   messageModalRef.current.style.top = `${messagePosition.y}px`;
-    //   console.log(messageModalRef.current.style.top);
-    //   messageModalRef.current.style.left = `${messagePosition.x}px`;
-    //   console.log(messageModalRef.current.style.left);
-    // }
   }, [isModalOpen, messagePosition]);
 
   useEffect(() => {
@@ -296,13 +290,11 @@ const Whiteboard = ({ params }: pageProps) => {
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    console.log("---startMessageCreation");
     const containerRect = event.currentTarget.getBoundingClientRect();
     const initialPosition = {
       x: event.clientX - containerRect.left,
       y: event.clientY - containerRect.top,
     };
-    // console.log(initialPosition);
     setMessagePosition(initialPosition);
     setIsModalOpen((m) => !m);
   };
