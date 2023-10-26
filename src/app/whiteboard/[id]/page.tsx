@@ -6,10 +6,10 @@ import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import {
   Position,
   SignedMessage,
-  MessageOperationType,
   Whiteboard,
   User,
   PostDeletionResponse,
+  OperationType,
 } from "@/types/whiteboard-types";
 
 import {
@@ -117,9 +117,9 @@ const Whiteboard = ({ params }: pageProps) => {
         ? (JSON.parse(message.signedMessage) as SignedMessage)
         : null;
 
-      if (signedMessage?.type === MessageOperationType.POST) {
+      if (signedMessage?.type === OperationType.POST) {
         url += API_ENDPOINTS.POST;
-      } else if (signedMessage?.type === MessageOperationType.DELETE) {
+      } else if (signedMessage?.type === OperationType.DELETE) {
         url += API_ENDPOINTS.DELETE;
       }
 
@@ -238,7 +238,7 @@ const Whiteboard = ({ params }: pageProps) => {
 
   const requestAddMessage = async () => {
     const sismoConnectSignedMessage: SignedMessage = {
-      type: MessageOperationType.POST,
+      type: OperationType.POST,
       message: {
         text: messageInputValue,
         positionX: messagePosition.x,
@@ -266,7 +266,7 @@ const Whiteboard = ({ params }: pageProps) => {
 
   const requestDeleteMessage = async (message: MessageType) => {
     const sismoConnectSignedMessage: SignedMessage = {
-      type: MessageOperationType.DELETE,
+      type: OperationType.DELETE,
       message: {
         text: message.text,
         positionX: message.positionX,

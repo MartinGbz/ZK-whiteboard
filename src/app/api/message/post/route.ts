@@ -1,5 +1,5 @@
 import {
-  MessageOperationType,
+  OperationType,
   SignedMessage,
   Whiteboard,
 } from "@/types/whiteboard-types";
@@ -48,7 +48,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         { status: 500 }
       );
     }
-    if (signedMessage.type === MessageOperationType.POST) {
+    if (signedMessage.type === OperationType.POST) {
       return await addMessage(sismoConnectResponse, signedMessage);
     } else if (!signedMessage.type) {
       return NextResponse.json({ error: "No type provided" }, { status: 400 });

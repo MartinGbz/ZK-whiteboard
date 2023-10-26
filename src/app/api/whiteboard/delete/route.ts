@@ -1,5 +1,5 @@
 import {
-  WhiteboardOperationType,
+  OperationType,
   WhiteboardEditSignedMessage,
 } from "@/types/whiteboard-types";
 import {
@@ -17,7 +17,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     const signedMessage = JSON.parse(
       sismoConnectResponse.signedMessage
     ) as WhiteboardEditSignedMessage;
-    if (signedMessage.type === WhiteboardOperationType.DELETE) {
+    if (signedMessage.type === OperationType.DELETE) {
       return await deleteWhiteboard(sismoConnectResponse, signedMessage);
     } else if (!signedMessage.type) {
       return NextResponse.json({ error: "No type provided" }, { status: 400 });

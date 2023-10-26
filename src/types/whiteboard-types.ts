@@ -5,18 +5,14 @@ import {
   Reaction,
 } from "@prisma/client";
 
-export enum MessageOperationType {
+export enum OperationType {
   POST = "post",
-  DELETE = "delete",
-}
-export enum WhiteboardOperationType {
-  CREATE = "create",
   EDIT = "edit",
   DELETE = "delete",
 }
 
 export type SignedMessage = {
-  type: MessageOperationType;
+  type: OperationType;
   message: Omit<
     Message,
     "id" | "authorVaultId" | "order" | "createdAt" | "updatedAt"
@@ -29,7 +25,7 @@ export type PostDeletionResponse = {
 };
 
 export type WhiteboardCreateSignedMessage = {
-  type: WhiteboardOperationType;
+  type: OperationType;
   message: Omit<
     WhiteboardPrisma,
     "id" | "authorVaultId" | "curated" | "appId" | "createdAt" | "updatedAt"
@@ -37,7 +33,7 @@ export type WhiteboardCreateSignedMessage = {
 };
 
 export type WhiteboardEditSignedMessage = {
-  type: WhiteboardOperationType;
+  type: OperationType;
   message: WhiteboardPrisma;
 };
 
@@ -73,12 +69,7 @@ export type ReactionsStats = {
   userReaction: Reaction;
 };
 
-export enum ReactionOperationType {
-  POST = "post",
-  DELETE = "delete",
-}
-
 export type ReactionSignedMessage = {
-  type: ReactionOperationType;
+  type: OperationType;
   message: Omit<Reaction, "id" | "userId" | "createdAt" | "updatedAt">;
 };

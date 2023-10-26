@@ -1,6 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { User } from "@/types/whiteboard-types";
+import React, { useState } from "react";
 
 import { MIN_WHITEBOARD } from "@/configs/configs";
 import { Autocomplete, Chip, TextField, TextareaAutosize } from "@mui/material";

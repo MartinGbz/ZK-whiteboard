@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "../../db";
 import {
+  OperationType,
   WhiteboardCreateSignedMessage,
-  WhiteboardOperationType,
 } from "@/types/whiteboard-types";
 import {
   SismoConnect,
@@ -30,7 +30,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     const signedMessage = JSON.parse(
       sismoConnectResponse.signedMessage
     ) as WhiteboardCreateSignedMessage;
-    if (signedMessage.type === WhiteboardOperationType.CREATE) {
+    if (signedMessage.type === OperationType.POST) {
       return await saveWhiteboard(sismoConnectResponse, signedMessage);
     } else if (!signedMessage.type) {
       return NextResponse.json({ error: "No type provided" }, { status: 400 });

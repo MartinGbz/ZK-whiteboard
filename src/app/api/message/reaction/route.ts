@@ -7,10 +7,7 @@ import {
   SismoConnectResponse,
   SismoConnectServer,
 } from "@sismo-core/sismo-connect-server";
-import {
-  ReactionOperationType,
-  ReactionSignedMessage,
-} from "@/types/whiteboard-types";
+import { OperationType, ReactionSignedMessage } from "@/types/whiteboard-types";
 import { verifyResponseMessage } from "../../common";
 
 let sismoConnect: SismoConnectServer | null = null;
@@ -52,9 +49,9 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
     if (!vaultId)
       return NextResponse.json({ error: "No vaultId" }, { status: 400 });
-    if (signedMessage.type === ReactionOperationType.POST) {
+    if (signedMessage.type === OperationType.POST) {
       return await updateReaction(signedMessage, vaultId, true);
-    } else if (signedMessage.type === ReactionOperationType.DELETE) {
+    } else if (signedMessage.type === OperationType.DELETE) {
       return await updateReaction(signedMessage, vaultId, false);
     } else if (!signedMessage.type) {
       return NextResponse.json({ error: "No type provided" }, { status: 400 });

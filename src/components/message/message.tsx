@@ -19,7 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Message as MessageType } from "@prisma/client";
 import axios from "axios";
 import {
-  ReactionOperationType,
+  OperationType,
   ReactionSignedMessage,
   ReactionsStats,
 } from "@/types/whiteboard-types";
@@ -130,13 +130,13 @@ const Message: React.FC<MessageProps> = ({
   }, [message.id, onError, vaultId]);
 
   function reactionClick(type: string): void {
-    let requestType: ReactionOperationType;
+    let requestType: OperationType;
 
     // detect if the user already reacted with this reaction
     if (reactionsStats?.userReaction?.type.toString() === type.toString()) {
-      requestType = ReactionOperationType.DELETE;
+      requestType = OperationType.DELETE;
     } else {
-      requestType = ReactionOperationType.POST;
+      requestType = OperationType.POST;
     }
 
     const sismoConnectSignedMessage: ReactionSignedMessage = {

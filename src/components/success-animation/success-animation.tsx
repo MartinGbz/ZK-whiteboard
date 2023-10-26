@@ -1,5 +1,3 @@
-import { greenColor } from "@/configs/configs";
-
 interface SuccessProps {
   text: string;
   duration?: number;

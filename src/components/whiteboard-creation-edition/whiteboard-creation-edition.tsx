@@ -2,10 +2,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  WhiteboardOperationType,
   WhiteboardCreateSignedMessage,
   WhiteboardEditSignedMessage,
   User,
+  OperationType,
 } from "@/types/whiteboard-types";
 import Header from "../header/header";
 
@@ -41,7 +41,7 @@ const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 const API_BASE_URL = "/api/whiteboard";
 const API_ENDPOINTS = {
-  CREATE: "/create",
+  POST: "/post",
   EDIT: "/edit",
   DELETE: "/delete",
 };
@@ -162,21 +162,18 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     fetchGroups();
   }, [isEdition, whiteboardId]);
 
-  function performAction(type: WhiteboardOperationType) {
+  function performAction(type: OperationType) {
     if (
-      ![
-        WhiteboardOperationType.CREATE,
-        WhiteboardOperationType.EDIT,
-        WhiteboardOperationType.DELETE,
-      ].includes(type)
+      ![OperationType.POST, OperationType.EDIT, OperationType.DELETE].includes(
+        type
+      )
     ) {
       console.error("Invalid action type");
       return;
     }
 
     if (
-      (type === WhiteboardOperationType.EDIT ||
-        type === WhiteboardOperationType.DELETE) &&
+      (type === OperationType.EDIT || type === OperationType.DELETE) &&
       !initalWhiteboard
     ) {
       console.error("No initial whiteboard");
@@ -185,7 +182,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
     let sismoConnectSignedMessage;
     switch (type) {
-      case WhiteboardOperationType.CREATE:
+      case OperationType.POST:
         sismoConnectSignedMessage = {
           type: type,
           message: {
@@ -195,7 +192,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           },
         } as WhiteboardCreateSignedMessage;
         break;
-      case WhiteboardOperationType.EDIT:
+      case OperationType.EDIT:
         sismoConnectSignedMessage = {
           type: type,
           message: {
@@ -204,7 +201,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           },
         } as WhiteboardEditSignedMessage;
         break;
-      case WhiteboardOperationType.DELETE:
+      case OperationType.DELETE:
         sismoConnectSignedMessage = {
           type: type,
           message: initalWhiteboard,
@@ -249,11 +246,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         ? (JSON.parse(message.signedMessage) as WhiteboardCreateSignedMessage)
         : null;
 
-      if (signedMessage?.type === WhiteboardOperationType.CREATE) {
-        url += API_ENDPOINTS.CREATE;
-      } else if (signedMessage?.type === WhiteboardOperationType.EDIT) {
+      if (signedMessage?.type === OperationType.POST) {
+        url += API_ENDPOINTS.POST;
+      } else if (signedMessage?.type === OperationType.EDIT) {
         url += API_ENDPOINTS.EDIT;
-      } else if (signedMessage?.type === WhiteboardOperationType.DELETE) {
+      } else if (signedMessage?.type === OperationType.DELETE) {
         url += API_ENDPOINTS.DELETE;
       }
 
@@ -311,11 +308,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         const mess = message.signedMessage
           ? JSON.parse(message.signedMessage)
           : null;
-        if (mess.type === WhiteboardOperationType.CREATE) {
+        if (mess.type === OperationType.POST) {
           setSuccessMessage("Whiteboard created!");
-        } else if (mess.type === WhiteboardOperationType.EDIT) {
+        } else if (mess.type === OperationType.EDIT) {
           setSuccessMessage("Whiteboard edited!");
-        } else if (mess.type === WhiteboardOperationType.DELETE) {
+        } else if (mess.type === OperationType.DELETE) {
           setSuccessMessage("Whiteboard deleted!");
         } else {
           setSuccessMessage("Success");
@@ -460,8 +457,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             marginTop: "20px",
           }}
           onClick={() => {
-            if (!isEdition) performAction(WhiteboardOperationType.CREATE);
-            if (isEdition) performAction(WhiteboardOperationType.EDIT);
+            if (!isEdition) performAction(OperationType.POST);
+            if (isEdition) performAction(OperationType.EDIT);
           }}
           disabled={isEdition ? disableValidationEdition : disableValidation}
           type="validate"
@@ -474,7 +471,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             type="delete"
             title="Delete"
             onClick={() => {
-              performAction(WhiteboardOperationType.DELETE);
+              performAction(OperationType.DELETE);
             }}
             fontSize="15px"
             style={{

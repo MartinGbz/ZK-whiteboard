@@ -1,5 +1,5 @@
 import {
-  MessageOperationType,
+  OperationType,
   SignedMessage,
   Whiteboard,
 } from "@/types/whiteboard-types";
@@ -47,7 +47,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         { status: 500 }
       );
     }
-    if (signedMessage.type === MessageOperationType.DELETE) {
+    if (signedMessage.type === OperationType.DELETE) {
       return await deleteMessage(sismoConnectResponse);
     } else if (!signedMessage.type) {
       return NextResponse.json(
