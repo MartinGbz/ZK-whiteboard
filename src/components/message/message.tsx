@@ -145,6 +145,7 @@ const Message: React.FC<MessageProps> = ({
         type: type,
         messageId: message.id,
       },
+      whiteboardId: message.whiteboardId,
     };
     if (!sismoConnect) {
       return;

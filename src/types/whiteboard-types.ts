@@ -72,4 +72,5 @@ export type ReactionsStats = {
 export type ReactionSignedMessage = {
   type: OperationType;
   message: Omit<Reaction, "id" | "userId" | "createdAt" | "updatedAt">;
+  whiteboardId: number;
 };

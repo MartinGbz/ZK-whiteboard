@@ -7,10 +7,13 @@ import {
   SismoConnectResponse,
   SismoConnectServer,
 } from "@sismo-core/sismo-connect-server";
-import { OperationType, ReactionSignedMessage } from "@/types/whiteboard-types";
-import { verifyResponseMessage } from "../../common";
-
-let sismoConnect: SismoConnectServer | null = null;
+import { ReactionSignedMessage } from "@/types/whiteboard-types";
+import {
+  getWhiteboardById,
+  post,
+  verifyResponse,
+  verifyResponseMessage,
+} from "../../common";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -27,40 +30,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
-  const sismoConnectResponse: SismoConnectResponse = await req.json();
-  if (sismoConnectResponse.signedMessage) {
-    const signedMessage = JSON.parse(
-      sismoConnectResponse.signedMessage
-    ) as ReactionSignedMessage;
-    sismoConnect = SismoConnect({
-      config: {
-        appId: sismoConnectResponse.appId,
-      },
-    });
-    if (!sismoConnect) {
-      return NextResponse.json(
-        { error: "SismoConnect not defined" },
-        { status: 500 }
-      );
-    }
-    const vaultId = await verifyResponseMessage(
-      sismoConnect,
-      sismoConnectResponse
-    );
-    if (!vaultId)
-      return NextResponse.json({ error: "No vaultId" }, { status: 400 });
-    if (signedMessage.type === OperationType.POST) {
-      return await updateReaction(signedMessage, vaultId, true);
-    } else if (signedMessage.type === OperationType.DELETE) {
-      return await updateReaction(signedMessage, vaultId, false);
-    } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type provided" }, { status: 400 });
-    } else {
-      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
-    }
-  } else {
-    return NextResponse.json({ error: "No signed message" }, { status: 400 });
-  }
+  return await post(req, addReaction, deleteReaction);
 }
 
 async function getReactionStats(messageId: number, userId: string) {
@@ -95,57 +65,39 @@ async function getReactionStats(messageId: number, userId: string) {
   return reactionsStats;
 }
 
-async function updateReaction(
-  signedMessage: ReactionSignedMessage,
-  vaultId: string,
-  add: boolean
+async function addReaction(
+  sismoConnectResponse: SismoConnectResponse,
+  signedMessage: ReactionSignedMessage
 ) {
+  const whiteboard = await getWhiteboardById(signedMessage.whiteboardId);
+  if (!whiteboard) {
+    return NextResponse.json(
+      { error: "Whiteboard not found" },
+      { status: 404 }
+    );
+  }
+  if (!whiteboard.appId) {
+    return NextResponse.json(
+      { error: "Whiteboard appId not found" },
+      { status: 404 }
+    );
+  }
+  const vaultId = await verifyResponse(sismoConnectResponse, whiteboard.appId);
+  if (!vaultId)
+    return NextResponse.json({ error: "No vaultId found" }, { status: 400 });
   let reaction;
-  if (add) {
-    // check if reaction already exists
-    const existingReaction = await prisma.reaction.findUnique({
-      where: {
-        messageId_userId: {
-          userId: vaultId,
-          messageId: signedMessage.message.messageId,
-        },
-      },
-    });
-
-    // if reaction already exists, delete it
-    if (existingReaction) {
-      reaction = await prisma.reaction.delete({
-        where: {
-          messageId_userId: {
-            userId: vaultId,
-            messageId: signedMessage.message.messageId,
-          },
-        },
-      });
-
-      if (!reaction) {
-        return NextResponse.json(
-          { error: "Error while posting the reaction: old one deletetion" },
-          { status: 500 }
-        );
-      }
-    }
-
-    reaction = await prisma.reaction.create({
-      data: {
-        type: signedMessage.message.type,
-        messageId: signedMessage.message.messageId,
+  // check if reaction already exists
+  const existingReaction = await prisma.reaction.findUnique({
+    where: {
+      messageId_userId: {
         userId: vaultId,
+        messageId: signedMessage.message.messageId,
       },
-    });
+    },
+  });
 
-    if (!reaction) {
-      return NextResponse.json(
-        { error: "Reaction not created" },
-        { status: 500 }
-      );
-    }
-  } else {
+  // if reaction already exists, delete it
+  if (existingReaction) {
     reaction = await prisma.reaction.delete({
       where: {
         messageId_userId: {
@@ -157,12 +109,70 @@ async function updateReaction(
 
     if (!reaction) {
       return NextResponse.json(
-        { error: "Reaction not delete" },
+        { error: "Error while posting the reaction: old one deletetion" },
         { status: 500 }
       );
     }
   }
 
+  reaction = await prisma.reaction.create({
+    data: {
+      type: signedMessage.message.type,
+      messageId: signedMessage.message.messageId,
+      userId: vaultId,
+    },
+  });
+
+  if (!reaction) {
+    return NextResponse.json(
+      { error: "Reaction not created" },
+      { status: 500 }
+    );
+  }
+
+  const newReactions = await getReactionStats(
+    signedMessage.message.messageId,
+    vaultId
+  );
+  if (!newReactions) {
+    return NextResponse.json({ error: "Reactions not found" }, { status: 500 });
+  }
+
+  return NextResponse.json(newReactions, { status: 200 });
+}
+
+async function deleteReaction(
+  sismoConnectResponse: SismoConnectResponse,
+  signedMessage: ReactionSignedMessage
+) {
+  const whiteboard = await getWhiteboardById(signedMessage.whiteboardId);
+  if (!whiteboard) {
+    return NextResponse.json(
+      { error: "Whiteboard not found" },
+      { status: 404 }
+    );
+  }
+  if (!whiteboard.appId) {
+    return NextResponse.json(
+      { error: "Whiteboard appId not found" },
+      { status: 404 }
+    );
+  }
+  const vaultId = await verifyResponse(sismoConnectResponse, whiteboard.appId);
+  if (!vaultId)
+    return NextResponse.json({ error: "No vaultId found" }, { status: 400 });
+  const reaction = await prisma.reaction.delete({
+    where: {
+      messageId_userId: {
+        userId: vaultId,
+        messageId: signedMessage.message.messageId,
+      },
+    },
+  });
+
+  if (!reaction) {
+    return NextResponse.json({ error: "Reaction not delete" }, { status: 500 });
+  }
   const newReactions = await getReactionStats(
     signedMessage.message.messageId,
     vaultId
