@@ -1,12 +1,9 @@
 import { WhiteboardEditSignedMessage } from "@/types/whiteboard-types";
-import {
-  SismoConnect,
-  SismoConnectResponse,
-} from "@sismo-core/sismo-connect-server";
+import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import { sismoConnectConfig } from "@/configs/configs";
-import { post, verifyResponse, verifyResponseMessage } from "../../common";
+import { post, verifyResponse } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {
   return await post(req, undefined, deleteWhiteboard);

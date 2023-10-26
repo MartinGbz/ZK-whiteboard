@@ -1,8 +1,5 @@
 import { WhiteboardEditSignedMessage } from "@/types/whiteboard-types";
-import {
-  SismoConnect,
-  SismoConnectResponse,
-} from "@sismo-core/sismo-connect-server";
+import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import {

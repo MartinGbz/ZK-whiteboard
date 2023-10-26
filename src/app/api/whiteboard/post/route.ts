@@ -2,11 +2,8 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "../../db";
 import { WhiteboardCreateSignedMessage } from "@/types/whiteboard-types";
-import {
-  SismoConnect,
-  SismoConnectResponse,
-} from "@sismo-core/sismo-connect-server";
-import { post, verifyResponse, verifyResponseMessage } from "../../common";
+import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
+import { post, verifyResponse } from "../../common";
 import {
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,

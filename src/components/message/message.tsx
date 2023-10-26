@@ -1,7 +1,6 @@
 "use client";
 import React, {
   CSSProperties,
-  use,
   useCallback,
   useEffect,
   useRef,
@@ -103,7 +102,6 @@ const Message: React.FC<MessageProps> = ({
   };
 
   useEffect(() => {
-    // get message reactions
     const getReaction = async () => {
       try {
         const res = await axios.get(

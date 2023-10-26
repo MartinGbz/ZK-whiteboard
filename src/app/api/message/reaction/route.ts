@@ -2,18 +2,9 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "../../db";
 import { reactionsType } from "@/configs/configs";
-import {
-  SismoConnect,
-  SismoConnectResponse,
-  SismoConnectServer,
-} from "@sismo-core/sismo-connect-server";
+import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
 import { ReactionSignedMessage } from "@/types/whiteboard-types";
-import {
-  getWhiteboardById,
-  post,
-  verifyResponse,
-  verifyResponseMessage,
-} from "../../common";
+import { getWhiteboardById, post, verifyResponse } from "../../common";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

@@ -1,15 +1,5 @@
-import {
-  OperationType,
-  SignedMessage,
-  Whiteboard,
-} from "@/types/whiteboard-types";
-import {
-  AuthType,
-  SismoConnect,
-  SismoConnectResponse,
-  SismoConnectServer,
-  SismoConnectVerifiedResult,
-} from "@sismo-core/sismo-connect-server";
+import { SignedMessage, Whiteboard } from "@/types/whiteboard-types";
+import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import { MAX_CHARACTERS } from "@/configs/configs";

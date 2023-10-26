@@ -6,13 +6,7 @@ import {
   SismoConnectServer,
   SismoConnectVerifiedResult,
 } from "@sismo-core/sismo-connect-server";
-import {
-  OperationType,
-  ReactionSignedMessage,
-  SignedMessage,
-  Whiteboard,
-  WhiteboardEditSignedMessage,
-} from "@/types/whiteboard-types";
+import { OperationType, Whiteboard } from "@/types/whiteboard-types";
 import { prisma } from "./db";
 import { NextResponse } from "next/server";
 
@@ -81,17 +75,10 @@ async function verifyResponseClaims(
   sismoConnect: SismoConnectServer,
   claims?: ClaimRequest[]
 ): Promise<string | undefined> {
-  console.log("sismoConnect");
-  console.log(sismoConnect);
-  console.log("sismoConnectResponse");
-  console.log(sismoConnectResponse);
   const message = sismoConnectResponse.signedMessage
     ? sismoConnectResponse.signedMessage
     : "";
   if (sismoConnectResponse.signedMessage) {
-    // const claims = whiteboard?.groupIds?.map((groupId) => ({
-    //   groupId: groupId,
-    // }));
     const result: SismoConnectVerifiedResult = await sismoConnect.verify(
       sismoConnectResponse,
       {

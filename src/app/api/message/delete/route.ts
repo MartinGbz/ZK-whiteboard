@@ -1,11 +1,6 @@
-import {
-  OperationType,
-  SignedMessage,
-  Whiteboard,
-} from "@/types/whiteboard-types";
+import { SignedMessage, Whiteboard } from "@/types/whiteboard-types";
 import {
   AuthType,
-  SismoConnect,
   SismoConnectResponse,
   SismoConnectServer,
   SismoConnectVerifiedResult,
