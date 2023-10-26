@@ -48,11 +48,8 @@ export default function Home() {
       const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =
         await convertWhiteboardIdsToNames(whiteboards);
       if (!whiteboardsWithResolvedGroupIds) return;
-      const whiteboardsSorted = await sortWhiteboards(
-        whiteboardsWithResolvedGroupIds
-      );
 
-      setWhiteboards(whiteboardsSorted);
+      setWhiteboards(whiteboardsWithResolvedGroupIds);
       setIsFetchingWhiteboards(false);
     }
 
@@ -97,39 +94,13 @@ export default function Home() {
               appId: whiteboard.appId,
               authorVaultId: whiteboard.authorVaultId,
               curated: whiteboard.curated,
+              createdAt: whiteboard.createdAt,
+              updatedAt: whiteboard.updatedAt,
               groupNames: resolvedGroupNames,
               messagesCount: whiteboard.messagesCount,
             };
           })
         );
-      return whiteboardsWithResolvedGroupIds;
-    }
-
-    async function sortWhiteboards(
-      whiteboardsWithResolvedGroupIds: WhiteboardIndex[]
-    ) {
-      // sort by curated and then by creation date (oldest first) and then by name
-      whiteboardsWithResolvedGroupIds.sort((a, b) => {
-        if (a.curated && !b.curated) {
-          return -1;
-        } else if (!a.curated && b.curated) {
-          return 1;
-        } else {
-          if (a.messagesCount > b.messagesCount) {
-            return -1;
-          } else if (a.messagesCount < b.messagesCount) {
-            return 1;
-          } else {
-            if (a.id < b.id) {
-              return -1;
-            } else if (a.id > b.id) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }
-        }
-      });
       return whiteboardsWithResolvedGroupIds;
     }
 

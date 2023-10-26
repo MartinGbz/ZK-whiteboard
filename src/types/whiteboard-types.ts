@@ -66,7 +66,7 @@ export type ReactionCounts = {
 
 export type ReactionsStats = {
   reactionCounts: ReactionCounts[];
-  userReaction: Reaction;
+  userReaction: Reaction | null;
 };
 
 export type ReactionSignedMessage = {

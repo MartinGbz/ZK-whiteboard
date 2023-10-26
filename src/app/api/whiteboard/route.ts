@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "../db";
 import { getWhiteboardById } from "../common";
+import { WhiteboardIndex } from "@/types/whiteboard-types";
 
 export async function GET(): Promise<NextResponse> {
   const whiteboardsWithMessagesCount: any = await prisma.$queryRaw`
@@ -13,6 +14,8 @@ export async function GET(): Promise<NextResponse> {
       w."appId",
       w."authorVaultId",
       w.curated,
+      w."createdAt",
+      w."updatedAt",
       COUNT(m.id) as "messagesCount"
     FROM
       "Whiteboard" w
@@ -24,14 +27,18 @@ export async function GET(): Promise<NextResponse> {
       w.id, w.name, w.description, w.curated, w."authorVaultId";
   `;
 
-  const whiteboardsWithCount = whiteboardsWithMessagesCount.map(
-    (whiteboard: any) => ({
+  const whiteboardsWithCount: WhiteboardIndex[] =
+    whiteboardsWithMessagesCount.map((whiteboard: any) => ({
       ...whiteboard,
       messagesCount: Number(whiteboard.messagesCount),
-    })
-  );
+    }));
 
-  return NextResponse.json(whiteboardsWithCount, { status: 200 });
+  console.log(whiteboardsWithCount);
+  const whiteboardsSorted = sortWhiteboards(whiteboardsWithCount);
+
+  console.log(whiteboardsSorted);
+
+  return NextResponse.json(whiteboardsSorted, { status: 200 });
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -44,4 +51,30 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
   }
   return NextResponse.json(whiteboard, { status: 200 });
+}
+
+function sortWhiteboards(whiteboardsWithResolvedGroupIds: WhiteboardIndex[]) {
+  // sort by curated, then by message count, then creation date (oldest first), and then by name
+  whiteboardsWithResolvedGroupIds.sort((a, b) => {
+    if (a.curated && !b.curated) {
+      return -1;
+    } else if (!a.curated && b.curated) {
+      return 1;
+    } else {
+      if (a.messagesCount > b.messagesCount) {
+        return -1;
+      } else if (a.messagesCount < b.messagesCount) {
+        return 1;
+      } else {
+        if (a.id < b.id) {
+          return -1;
+        } else if (a.id > b.id) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+    }
+  });
+  return whiteboardsWithResolvedGroupIds;
 }

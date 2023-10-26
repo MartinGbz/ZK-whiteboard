@@ -3,7 +3,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import { reactionsType } from "@/configs/configs";
 import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
-import { ReactionSignedMessage } from "@/types/whiteboard-types";
+import {
+  ReactionCounts,
+  ReactionSignedMessage,
+  ReactionsStats,
+} from "@/types/whiteboard-types";
 import { getWhiteboardById, post, verifyResponse } from "../../common";
 
 export async function GET(request: Request) {
@@ -37,6 +41,7 @@ async function getReactionStats(messageId: number, userId: string) {
   });
 
   if (!userId) return NextResponse.json(reactionCounts, { status: 500 });
+
   const userReaction = await prisma.reaction.findFirst({
     where: { messageId: messageId, userId: userId },
   });
@@ -48,12 +53,14 @@ async function getReactionStats(messageId: number, userId: string) {
     }
   });
 
-  const reactionsStats = {
+  const reactionsStats: ReactionsStats = {
     reactionCounts: reactionCounts,
     userReaction: userReaction,
   };
 
-  return reactionsStats;
+  const sortReactionsSorted = sortReactions(reactionsStats);
+
+  return sortReactionsSorted;
 }
 
 async function addReaction(
@@ -173,4 +180,24 @@ async function deleteReaction(
   }
 
   return NextResponse.json(newReactions, { status: 200 });
+}
+
+function sortReactions(reactions: ReactionsStats) {
+  // sort by user reaction first, then by count, then by type
+  reactions.reactionCounts.sort((a, b) => {
+    if (a.type === reactions.userReaction?.type) {
+      return -1;
+    } else if (a.type !== reactions.userReaction?.type) {
+      return 1;
+    } else {
+      if (a._count > b._count) {
+        return -1;
+      } else if (a._count < b._count) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  });
+  return reactions;
 }
