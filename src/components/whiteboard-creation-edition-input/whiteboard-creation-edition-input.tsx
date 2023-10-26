@@ -60,7 +60,7 @@ const WhiteboardCreationEdition: React.FC<
           className="whiteboard-creation-inputs"
           style={{
             height: "40x",
-            cursor: isEdition ? "not-allowed" : "default",
+            cursor: isEdition ? "not-allowed" : "text",
           }}
           onChange={(event) => {
             onInputChange(event.target.value);
@@ -85,7 +85,7 @@ const WhiteboardCreationEdition: React.FC<
             style: {
               fontSize: "14px",
               backgroundColor: "#e9e9e9",
-              cursor: isEdition ? "not-allowed" : "default",
+              cursor: isEdition ? "not-allowed" : "text",
             },
           }}
           noOptionsText={"No groups found"}
