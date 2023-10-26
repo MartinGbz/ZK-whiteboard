@@ -297,7 +297,7 @@ const Whiteboard = ({ params }: pageProps) => {
       y: event.clientY - containerRect.top,
     };
     setMessagePosition(initialPosition);
-    setIsModalOpen(true);
+    setIsModalOpen((m) => !m);
   };
 
   const onChangeUser = useCallback((user: User | null) => {
@@ -311,7 +311,7 @@ const Whiteboard = ({ params }: pageProps) => {
         <div
           className="messages_container"
           style={{
-            cursor: isUserMessageExists ? "default" : "pointer",
+            cursor: isModalOpen ? "default" : "pointer",
             position: "relative",
             overflow: "scroll",
           }}
