@@ -5,6 +5,8 @@
   background-color: #000000;
   justify-items: center;
   height: 60px;
+  min-height: 60px;
+  max-height: 60px;
 }
 
 .login {

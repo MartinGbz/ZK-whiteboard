@@ -1,16 +1,20 @@
 .whiteboard {
-  position: absolute;
+  /* position: absolute; */
+  position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
+  /* height: 100%;
+  width: 100%; */
+  width: 100vw;
+  height: 100vh;
   max-width: 10000px;
   max-height: 7000px;
   background-color: #e9e9e9;
 }
 
 .messages_container {
-  position: relative;
+  /* position: relative; */
+  position: absolute;
   height: 100%;
   width: 100%;
   background-color: white;

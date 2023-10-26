@@ -2,7 +2,7 @@
 
 import "./page.css";
 
-import React, { use, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Position,
   SignedMessage,
@@ -46,6 +46,8 @@ interface pageProps {
   params: { id: number };
 }
 
+const messageModalWidth = 275;
+
 const Whiteboard = ({ params }: pageProps) => {
   const [whiteboard, setWhiteboard] = useState<Whiteboard>();
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -68,6 +70,7 @@ const Whiteboard = ({ params }: pageProps) => {
 
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const messageModalRef = useRef<HTMLDivElement>(null);
+  const containerMessageModalRef = useRef<HTMLDivElement>(null);
 
   const [currentURL, setCurrentURL] = useState("");
   const whiteboardVaultId = useRef<string | null>(null);
@@ -197,10 +200,12 @@ const Whiteboard = ({ params }: pageProps) => {
     if (isModalOpen && messageInputRef.current) {
       messageInputRef.current.focus();
     }
-    if (isModalOpen && messageModalRef.current && messagePosition) {
-      messageModalRef.current.style.top = `${messagePosition.y}px`;
-      messageModalRef.current.style.left = `${messagePosition.x}px`;
-    }
+    // if (isModalOpen && messageModalRef.current && messagePosition) {
+    //   messageModalRef.current.style.top = `${messagePosition.y}px`;
+    //   console.log(messageModalRef.current.style.top);
+    //   messageModalRef.current.style.left = `${messagePosition.x}px`;
+    //   console.log(messageModalRef.current.style.left);
+    // }
   }, [isModalOpen, messagePosition]);
 
   useEffect(() => {
@@ -291,11 +296,13 @@ const Whiteboard = ({ params }: pageProps) => {
   const startMessageCreation = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
+    console.log("---startMessageCreation");
     const containerRect = event.currentTarget.getBoundingClientRect();
     const initialPosition = {
       x: event.clientX - containerRect.left,
       y: event.clientY - containerRect.top,
     };
+    // console.log(initialPosition);
     setMessagePosition(initialPosition);
     setIsModalOpen((m) => !m);
   };
@@ -310,6 +317,7 @@ const Whiteboard = ({ params }: pageProps) => {
       {messages && (
         <div
           className="messages_container"
+          ref={containerMessageModalRef}
           style={{
             cursor: isModalOpen ? "default" : "pointer",
             position: "relative",
@@ -354,30 +362,33 @@ const Whiteboard = ({ params }: pageProps) => {
               <div>Be the first to post a message!</div>
             </div>
           )}
+          {isModalOpen && (
+            <MessageModal
+              modalRef={messageModalRef}
+              containerRef={containerMessageModalRef}
+              style={{
+                position: "absolute",
+                zIndex: MAX_Z_INDEX + 2,
+                display: "flex",
+                height: "fit-content",
+                width: messageModalWidth + "px",
+              }}
+              initialPositionX={messagePosition?.x}
+              initialPositionY={messagePosition?.y}
+              inputValue={messageInputValue}
+              inputColorValue={messageInputColorValue}
+              onChange={(e) => setMessageInputValue(e.target.value)}
+              onColorChange={(e) => setMessageInputColorValue(e.target.value)}
+              inputRef={messageInputRef}
+              onClickCancel={() => setIsModalOpen(false)}
+              onClickSave={() => requestAddMessage()}
+            />
+          )}
         </div>
       )}
       {isVerifying && <Loading text="Checking the proof..." />}
       {!isVerifying && isFetchingMessages && messages.length == 0 && (
         <Loading text="Loading messages..." />
-      )}
-      {isModalOpen && (
-        <MessageModal
-          modalRef={messageModalRef}
-          style={{
-            position: "absolute",
-            zIndex: MAX_Z_INDEX + 2,
-            display: "flex",
-          }}
-          initialPositionX={messagePosition?.x}
-          initialPositionY={messagePosition?.y}
-          inputValue={messageInputValue}
-          inputColorValue={messageInputColorValue}
-          onChange={(e) => setMessageInputValue(e.target.value)}
-          onColorChange={(e) => setMessageInputColorValue(e.target.value)}
-          inputRef={messageInputRef}
-          onClickCancel={() => setIsModalOpen(false)}
-          onClickSave={() => requestAddMessage()}
-        />
       )}
       {whiteboard && (
         <ShareWhiteboard

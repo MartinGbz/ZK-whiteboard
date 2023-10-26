@@ -1,16 +1,16 @@
 "use client";
-import { MAX_Z_INDEX } from "@/configs/configs";
+import { MAX_Z_INDEX, mobileWidthThreshold } from "@/configs/configs";
 import { useEffect, useState } from "react";
 
 export const MobileModal = () => {
   const [isDisplay, setIsDisplay] = useState(false);
 
   useEffect(() => {
-    if (window.innerWidth < 800) {
+    if (window.innerWidth < mobileWidthThreshold) {
       setIsDisplay(true);
     }
     function resizeHandler() {
-      if (window.innerWidth < 800) {
+      if (window.innerWidth < mobileWidthThreshold) {
         setIsDisplay(true);
       } else {
         setIsDisplay(false);

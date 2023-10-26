@@ -10,6 +10,8 @@ export const CURRENT_APPID_VARNAME = "currentAppId";
 
 export const reactionsType = ["👍", "💜", "👌"];
 
+export const mobileWidthThreshold = 800;
+
 export const MAX_Z_INDEX = 1000;
 export const TRANSPARENCY = "E6";
 

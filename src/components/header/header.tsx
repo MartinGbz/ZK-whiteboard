@@ -1,6 +1,7 @@
 "use client";
 import {
   ZKWHITEBOARD_VAULTID_VARNAME,
+  mobileWidthThreshold,
   sismoConnectConfig,
 } from "@/configs/configs";
 import {
@@ -64,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
   }, [onChangeUser]);
 
   useEffect(() => {
-    if (window.innerWidth < 800) {
+    if (window.innerWidth < mobileWidthThreshold) {
       setUserAddressCropped(user?.vaultId.substring(0, 4) + "...");
       setLoginButtonText("Login");
     } else {
@@ -72,7 +73,7 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
       setLoginButtonText("Login w/ Sismo");
     }
     function resizeHandler() {
-      if (window.innerWidth < 800) {
+      if (window.innerWidth < mobileWidthThreshold) {
         setUserAddressCropped(user?.vaultId.substring(0, 4) + "...");
         setLoginButtonText("Login");
       } else {

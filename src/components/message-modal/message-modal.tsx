@@ -8,6 +8,7 @@ import { MAX_CHARACTERS, greenColor, redColor } from "@/configs/configs";
 interface MessageModalProps {
   style?: CSSProperties;
   modalRef?: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement>;
   inputValue?: string;
   inputColorValue?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -22,6 +23,7 @@ interface MessageModalProps {
 const MessageModal: React.FC<MessageModalProps> = ({
   style,
   modalRef,
+  containerRef,
   inputValue,
   inputColorValue,
   onChange,
@@ -42,15 +44,16 @@ const MessageModal: React.FC<MessageModalProps> = ({
 
   const baseStyle: CSSProperties = {
     backgroundColor: "rgb(200 200 200 / 30%)",
+    // backgroundColor: "red",
     backdropFilter: "blur(15px)",
     padding: "15px",
-    border: "1px solid transparent",
+    // border: "1px solid transparent",
     borderRadius: "10px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    height: "fit-content",
-    width: "300px",
+    // height: "fit-content",
+    // width: "300px",
     boxShadow: "5px 5px 35px 1px grey",
     color: "black",
     position: "fixed",
@@ -82,20 +85,49 @@ const MessageModal: React.FC<MessageModalProps> = ({
   const combinedStyle: CSSProperties = { ...baseStyle, ...style };
 
   useEffect(() => {
-    if (modalRef?.current) {
+    if (modalRef?.current && containerRef?.current) {
       const divRect = modalRef.current.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
 
-      let newX = initialPositionX;
-      let newY = initialPositionY;
+      let newX = initialPositionX - divRect.width / 2;
+      let newY = initialPositionY - divRect.height / 2;
 
-      if (divRect.width + initialPositionX > windowWidth) {
-        newX = windowWidth - divRect.width;
+      // let newX = initialPositionX;
+      // let newY = initialPositionY;
+
+      console.log("divRect", divRect.width, divRect.height);
+      console.log("window", windowWidth, windowHeight);
+      console.log("containerRect", containerRect.width, containerRect.height);
+      console.log("initial", initialPositionX, initialPositionY);
+
+      if (divRect.width / 2 + initialPositionX > containerRect.width) {
+        newX = containerRect.width - divRect.width;
       }
-      if (divRect.height + initialPositionY > windowHeight) {
-        newY = windowHeight - divRect.height;
+      if (initialPositionX - divRect.width / 2 < 0) {
+        newX = 0;
       }
+      if (divRect.height / 2 + initialPositionY > containerRect.height) {
+        // need to add 8px (I don't know where this gap comes from)
+        newY = containerRect.height - divRect.height - 8;
+      }
+      if (initialPositionY - divRect.height / 2 < 0) {
+        newY = 0;
+      }
+
+      // newX = containerRect.width;
+      // newY = containerRect.height;
+
+      // if (divRect.width + initialPositionX > windowWidth) {
+      //   newX = windowWidth - divRect.width;
+      // }
+      // if (initialPositionX - divRect.width < 0) {
+      //   newX = 0;
+      // }
+      // if (divRect.height + initialPositionY > windowHeight) {
+      //   newY = windowHeight - divRect.height;
+      // }
 
       setX(newX);
       setY(newY);
@@ -196,7 +228,14 @@ const MessageModal: React.FC<MessageModalProps> = ({
           justifyContent: "space-evenly",
         }}>
         <button
-          onClick={onClickCancel ? (e) => onClickCancel() : undefined}
+          onClick={
+            onClickCancel
+              ? (e) => {
+                  e.stopPropagation();
+                  onClickCancel();
+                }
+              : undefined
+          }
           onMouseEnter={() => setCancelButtonBrightness("brightness(1.05)")}
           onMouseLeave={() => setCancelButtonBrightness("brightness(1)")}
           style={{ ...cancelButtonStyle, ...buttonStyle }}
@@ -210,7 +249,14 @@ const MessageModal: React.FC<MessageModalProps> = ({
           Cancel
         </button>
         <button
-          onClick={onClickSave ? () => onClickSave() : undefined}
+          onClick={
+            onClickSave
+              ? (e) => {
+                  e.stopPropagation();
+                  onClickSave();
+                }
+              : undefined
+          }
           onMouseEnter={() => setSaveButtonBrightness("brightness(1.05)")}
           onMouseLeave={() => setSaveButtonBrightness("brightness(1)")}
           style={{ ...saveButtonStyle, ...buttonStyle }}
