@@ -178,7 +178,7 @@ const Whiteboard = ({ params }: pageProps) => {
       setIsVerifying(false);
       redirectToRoot();
     };
-    if (sismoConnectResponseMessage?.signedMessage) {
+    if (sismoConnectResponseMessage?.signedMessage && params.id) {
       postMessage(sismoConnectResponseMessage);
     }
   }, [redirectToRoot, sismoConnectResponseMessage, params.id]);
