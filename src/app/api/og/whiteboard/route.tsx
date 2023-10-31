@@ -25,18 +25,6 @@ export async function GET(request: Request) {
     new URL("../../../../fonts/Damion-Regular.ttf", import.meta.url)
   ).then((res) => res.arrayBuffer());
 
-  const image = await fetch(
-    new URL(
-      "../../../../medias/icons/ZK-whiteboard-500x500.png",
-      import.meta.url
-    )
-  ).then((res) => res.arrayBuffer());
-
-  const imageBuffer = Buffer.from(image); // Utilisation de Buffer pour Node.js
-
-  const base64Image = imageBuffer.toString("base64");
-  const imageSrc = `data:image/png;base64,${base64Image}`;
-
   return new ImageResponse(
     (
       <div
@@ -56,7 +44,6 @@ export async function GET(request: Request) {
             "radial-gradient(circle at 25px 25px, lightgray 2%, transparent 0%), radial-gradient(circle at 75px 75px, lightgray 2%, transparent 0%)",
           backgroundSize: "100px 100px",
         }}>
-        {/* <img src={imageSrc} style={{ width: "200px", height: "200px" }} /> */}
         <svg
           version="1.0"
           xmlns="http://www.w3.org/2000/svg"
