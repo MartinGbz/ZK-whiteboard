@@ -1,8 +1,5 @@
 .header {
   display: grid;
-  /* grid-template-columns: 1fr 1fr 1fr;
-  grid-auto-columns: max-content;
-  justify-content: space-between; */
   width: 100%;
   padding: 10px;
   background-color: #000000;
@@ -33,9 +30,6 @@
 }
 
 .login-button {
-  /* grid-column: 3;
-  justify-self: end; */
-  /* width: 150px; */
   height: 40px;
   border-radius: 5px;
   background-color: gray;
@@ -46,12 +40,6 @@
   width: fit-content;
   padding: 10px;
   display: flex;
-
-  /* @media (max-width: 800px) {
-    background-color: transparent;
-    justify-self: end;
-    width: fit-content;
-  } */
 }
 
 .login-button-text {

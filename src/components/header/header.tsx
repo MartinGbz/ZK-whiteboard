@@ -7,17 +7,15 @@ import {
 import {
   AuthType,
   SismoConnect,
-  SismoConnectButton,
   SismoConnectClient,
   SismoConnectResponse,
-  useSismoConnect,
 } from "@sismo-core/sismo-connect-react";
 import Title from "../title/title";
 import "./header.css";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Home } from "@mui/icons-material";
 import { User } from "@/types/whiteboard-types";
@@ -44,14 +42,6 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
     useState<string>("");
 
   const [titleFontSize, setTitleFontSize] = useState<number>(20);
-
-  // useEffect(() => {
-  //   if (whiteboardName) {
-  //     setWhiteboardNameCropped(whiteboardName ?? "");
-  //     console.log("whiteboardName");
-  //     console.log(whiteboardName);
-  //   }
-  // }, [whiteboardName]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -81,29 +71,33 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
     if (window.innerWidth < mobileWidthThreshold) {
       setUserAddressCropped(user?.vaultId.substring(0, 4) + "...");
       setLoginButtonText("Login");
-      setWhiteboardNameCropped(whiteboardName?.substring(0, 10) + "...");
       setTitleFontSize(15);
-      console.log("1");
+      whiteboardName?.length &&
+        setWhiteboardNameCropped(
+          whiteboardName?.substring(0, 10) +
+            (whiteboardName?.length > 10 ? "..." : "")
+        );
     } else {
       setUserAddressCropped(user?.vaultId.substring(0, 5) + "...");
       setLoginButtonText("Login w/ Sismo");
-      setWhiteboardNameCropped(whiteboardName ?? "");
       setTitleFontSize(20);
-      console.log("2");
+      setWhiteboardNameCropped(whiteboardName ?? "");
     }
     function resizeHandler() {
       if (window.innerWidth < mobileWidthThreshold) {
         setUserAddressCropped(user?.vaultId.substring(0, 4) + "...");
         setLoginButtonText("Login");
-        setWhiteboardNameCropped(whiteboardName?.substring(0, 10) + "...");
         setTitleFontSize(15);
-        console.log("3");
+        whiteboardName?.length &&
+          setWhiteboardNameCropped(
+            whiteboardName?.substring(0, 10) +
+              (whiteboardName?.length > 10 ? "..." : "")
+          );
       } else {
         setUserAddressCropped(user?.vaultId.substring(0, 7) + "...");
         setLoginButtonText("Login w/ Sismo");
-        setWhiteboardNameCropped(whiteboardName ?? "");
         setTitleFontSize(20);
-        console.log("4");
+        setWhiteboardNameCropped(whiteboardName ?? "");
       }
     }
     if (window.visualViewport) {
@@ -214,6 +208,7 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
           gridColumn: 2,
           width: "max-content",
           display: "inline-flex",
+          fontSize: titleFontSize,
         }}>
         <Title
           text="ZK-whiteboard"

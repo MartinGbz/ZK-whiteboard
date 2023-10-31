@@ -33,10 +33,7 @@ export async function GET(): Promise<NextResponse> {
       messagesCount: Number(whiteboard.messagesCount),
     }));
 
-  console.log(whiteboardsWithCount);
   const whiteboardsSorted = sortWhiteboards(whiteboardsWithCount);
-
-  console.log(whiteboardsSorted);
 
   return NextResponse.json(whiteboardsSorted, { status: 200 });
 }

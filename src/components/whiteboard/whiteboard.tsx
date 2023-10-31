@@ -48,10 +48,7 @@ const API_ENDPOINTS = {
 
 const messageModalWidth = 275;
 
-console.log("messageModalWidth", messageModalWidth);
-
 const Whiteboard = ({ params }: whiteboardProps) => {
-  console.log("---params", params);
   const [whiteboard, setWhiteboard] = useState<Whiteboard>();
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

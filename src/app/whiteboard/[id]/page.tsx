@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import "./page.css";
 
 import Whiteboard from "@/components/whiteboard/whiteboard";
 
@@ -11,32 +10,30 @@ export async function generateMetadata({
   params,
 }: pageProps): Promise<Metadata> {
   return {
-    // return your metadata here
-    // title: "ZK-whiteboard",
-    // description: "Express yourself freely & anonymously",
-    // ...
-    // <meta property="og:image" content={`https://next-dynamic-og-image.vercel.app/api/og?title=${title}`} />
     openGraph: {
-      // title: "Next.js",
-      // description: "The React Framework for the Web",
-      url: "https://nextjs.org",
-      siteName: "Next.js",
+      title: "ZK-whiteboard",
+      description: "Express yourself freely & anonymously",
+      siteName: "zk-whiteboard",
+      type: "website",
       images: [
         {
           url:
-            "https://zk-whiteboard.vercel.app/api/og?whiteboardId=" + params.id,
+            process.env.WEBSITE_DOMAIN +
+            "/api/og/whiteboard/?whiteboardId=" +
+            params.id,
         },
       ],
+      url: process.env.WEBSITE_DOMAIN,
     },
     twitter: {
       card: "summary_large_image",
       title: "ZK-whiteboard",
       description: "Express yourself freely & anonymously",
-      // siteId: '1467726470533754880',
-      // creator: '@nextjs',
-      // creatorId: '1467726470533754880',
+      creator: "@0xMartinGbz",
       images: [
-        "https://zk-whiteboard.vercel.app/api/og?whiteboardId=" + params.id,
+        process.env.WEBSITE_DOMAIN +
+          "/api/og/whiteboard?whiteboardId=" +
+          params.id,
       ],
     },
   };

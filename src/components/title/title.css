@@ -1,16 +1,14 @@
 .waviy {
-  font-size: 20px;
+  .first-font {
+    font-family: "Damion-Regular", sans-serif;
+    font-size: 110%;
+  }
 }
 .waviy span {
   position: relative;
   display: inline-block;
   color: #fff;
   animation: waviy 8s infinite;
-}
-
-.first-font {
-  font-family: "Damion-Regular", sans-serif;
-  font-size: 25px;
 }
 
 @keyframes waviy {
