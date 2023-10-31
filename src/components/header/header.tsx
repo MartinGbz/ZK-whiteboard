@@ -40,6 +40,19 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
 
+  const [whiteboardNameCropped, setWhiteboardNameCropped] =
+    useState<string>("");
+
+  const [titleFontSize, setTitleFontSize] = useState<number>(20);
+
+  // useEffect(() => {
+  //   if (whiteboardName) {
+  //     setWhiteboardNameCropped(whiteboardName ?? "");
+  //     console.log("whiteboardName");
+  //     console.log(whiteboardName);
+  //   }
+  // }, [whiteboardName]);
+
   useEffect(() => {
     const getUser = async () => {
       setIsLoging(true);
@@ -68,17 +81,29 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
     if (window.innerWidth < mobileWidthThreshold) {
       setUserAddressCropped(user?.vaultId.substring(0, 4) + "...");
       setLoginButtonText("Login");
+      setWhiteboardNameCropped(whiteboardName?.substring(0, 10) + "...");
+      setTitleFontSize(15);
+      console.log("1");
     } else {
-      setUserAddressCropped(user?.vaultId.substring(0, 7) + "...");
+      setUserAddressCropped(user?.vaultId.substring(0, 5) + "...");
       setLoginButtonText("Login w/ Sismo");
+      setWhiteboardNameCropped(whiteboardName ?? "");
+      setTitleFontSize(20);
+      console.log("2");
     }
     function resizeHandler() {
       if (window.innerWidth < mobileWidthThreshold) {
         setUserAddressCropped(user?.vaultId.substring(0, 4) + "...");
         setLoginButtonText("Login");
+        setWhiteboardNameCropped(whiteboardName?.substring(0, 10) + "...");
+        setTitleFontSize(15);
+        console.log("3");
       } else {
         setUserAddressCropped(user?.vaultId.substring(0, 7) + "...");
         setLoginButtonText("Login w/ Sismo");
+        setWhiteboardNameCropped(whiteboardName ?? "");
+        setTitleFontSize(20);
+        console.log("4");
       }
     }
     if (window.visualViewport) {
@@ -89,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
         window.visualViewport.removeEventListener("resize", resizeHandler);
       }
     };
-  }, [user?.vaultId]);
+  }, [user?.vaultId, whiteboardName]);
 
   async function logout() {
     setUser(null);
@@ -162,7 +187,13 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
   }, [onChangeUser, pathname, router, sismoConnectResponseMessage]);
 
   return (
-    <div className="header">
+    <div
+      className="header"
+      style={{
+        gridTemplateColumns: !whiteboardName ? "1fr 1fr 1fr" : "",
+        gridAutoColumns: whiteboardName ? "max-content" : "",
+        justifyContent: whiteboardName ? "space-between" : "",
+      }}>
       {pathname !== "/" && pathname !== "/whiteboards" && (
         <Home
           style={{
@@ -188,12 +219,13 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
           text="ZK-whiteboard"
           style={{
             cursor: "pointer",
+            fontSize: titleFontSize,
           }}
           onClick={() => {
             router.push("/");
           }}
         />
-        {whiteboardName && (
+        {whiteboardName && whiteboardNameCropped && (
           <div
             style={{
               color: "gray",
@@ -201,7 +233,7 @@ const Header: React.FC<HeaderProps> = ({ onChangeUser, whiteboardName }) => {
               marginLeft: "5px",
             }}>
             {" "}
-            / {whiteboardName}
+            / {whiteboardNameCropped}
           </div>
         )}
       </div>

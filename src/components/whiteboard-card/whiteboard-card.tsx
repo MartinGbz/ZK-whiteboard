@@ -80,18 +80,24 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
       <div
         style={{
           marginBottom: "15px",
-          fontSize: "15px",
+          fontSize: whiteboard.name.length > 25 ? "10px" : "15px",
           display: "grid",
           gridAutoColumns: "minmax(0, 1fr)",
         }}>
         <div
           style={{
             gridRow: 1,
-            gridColumn: 1,
+            gridColumn: "1 / 5",
             display: "flex",
             alignItems: "center",
           }}>
-          <div>{whiteboard.name}</div>
+          <div
+          // style={{
+          //   whiteSpace: "nowrap",
+          // }}
+          >
+            {whiteboard.name}
+          </div>
           {whiteboard.curated && (
             <div
               style={{
@@ -111,7 +117,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             color: "gray",
             fontSize: "10px",
             gridRow: 2,
-            gridColumn: 1,
+            gridColumn: "1 / 3",
           }}>
           <div
             title={whiteboard.authorVaultId}
@@ -128,7 +134,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             color: "gray",
             fontSize: "10px",
             gridRow: 2,
-            gridColumn: "2 / 6",
+            gridColumn: "3 / 5",
             display: "flex",
             justifySelf: "start",
           }}>

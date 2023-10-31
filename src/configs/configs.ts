@@ -26,7 +26,7 @@ export const blueColor = "#82a5ff";
 export const MIN_WHITEBOARD = 1;
 export const MAX_WHITEBOARD_PER_USER = 5;
 export const MAX_CHARACTERS = 100;
-export const MAX_CHARACTERS_WHITEBOARD_NAME = 50;
+export const MAX_CHARACTERS_WHITEBOARD_NAME = 30;
 export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION = 300;
 export const MAX_WHITEBOARD_GROUPS = 10;
 
