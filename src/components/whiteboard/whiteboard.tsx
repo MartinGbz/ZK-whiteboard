@@ -305,7 +305,7 @@ const Whiteboard = ({ params }: whiteboardProps) => {
 
   return (
     <div className="whiteboard">
-      <Header onChangeUser={onChangeUser} whiteboardName={whiteboard?.name} />
+      <Header />
       {messages && (
         <div
           className="messages_container"
