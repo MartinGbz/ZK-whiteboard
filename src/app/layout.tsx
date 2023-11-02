@@ -8,6 +8,21 @@ export const metadata = {
   title: "ZK-whiteboard",
   description:
     "Powered by Sismo. Create ZK Proofs using Sismo Connect to post a message. Express yourself freely & anonymously.",
+  openGraph: {
+    title: "ZK-whiteboard",
+    description: "Express yourself freely & anonymously",
+    type: "website",
+    image: process.env.WEBSITE_DOMAIN + "/api/og/default",
+    url: process.env.WEBSITE_DOMAIN,
+    site_name: "zk-whiteboard",
+  },
+  twitter: {
+    title: "ZK-whiteboard",
+    description: "Express yourself freely & anonymously",
+    creator: "@0xMartinGbz",
+    image: process.env.WEBSITE_DOMAIN + "/api/og/default",
+    url: process.env.WEBSITE_DOMAIN,
+  },
   metadataBase: new URL(process.env.WEBSITE_DOMAIN ?? "http://localhost:3000"),
 };
 
@@ -20,31 +35,6 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="./favicon.ico" />
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description} />
-        <meta property="og:title" content={"ZK-whiteboard"} />
-        <meta
-          property="og:description"
-          content={"Express yourself freely & anonymously"}
-        />
-        <meta property="og:type" content={"website"} />
-        <meta
-          property="og:image"
-          content={process.env.WEBSITE_DOMAIN + "/api/og/default"}
-        />
-        <meta property="og:url" content={process.env.WEBSITE_DOMAIN} />
-        <meta property="og:site_name" content={"zk-whiteboard"} />
-        <meta name="twitter:title" content={"ZK-whiteboard"} />
-        <meta
-          name="twitter:description"
-          content={"Express yourself freely & anonymously"}
-        />
-        <meta name="twitter:creator" content={"0xMartinGbz"} />
-        <meta
-          name="twitter:image"
-          content={process.env.WEBSITE_DOMAIN + "/api/og/default"}
-        />
-        <meta name="twitter:url" content={process.env.WEBSITE_DOMAIN} />
       </head>
       <body className={inter.className}>
         <GlobalContextProvider>{children}</GlobalContextProvider>
