@@ -1,4 +1,3 @@
-import { useLogin } from "@/hooks/useLogin";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { GlobalContextProvider } from "@/context/login-context";
@@ -17,7 +16,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // const login = useLogin();
   return (
     <html lang="en">
       <head>

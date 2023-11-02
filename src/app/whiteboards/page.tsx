@@ -2,7 +2,7 @@
 
 import "./page.css";
 
-import React, { use, useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/header/header";
 import {
@@ -11,17 +11,12 @@ import {
   whiteboardWithMessageCount,
 } from "@/types/whiteboard-types";
 import Loading from "@/components/loading-modal/loading-modal";
-import {
-  MAX_WHITEBOARD_PER_USER,
-  ZKWHITEBOARD_VAULTID_VARNAME,
-  greenColorDisabled,
-} from "@/configs/configs";
+import { MAX_WHITEBOARD_PER_USER, greenColorDisabled } from "@/configs/configs";
 import WhiteboardCard from "@/components/whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";
 import ErrorModal from "@/components/error-modal/error-modal";
 import axios from "axios";
 import Button from "@/components/button/button";
-import { useLogin } from "@/hooks/useLogin";
 import { useLoginContext } from "@/context/login-context";
 
 export default function Home() {
@@ -31,7 +26,6 @@ export default function Home() {
 
   const [isFetchingWhiteboards, setIsFetchingWhiteboards] =
     useState<boolean>(false);
-  // const [user, setUser] = useState<User | null>();
 
   // icon size 30px =so> button 40px =so> div 60px (because padding 10px)
   const baseMaxHeight = 60;
@@ -41,17 +35,7 @@ export default function Home() {
 
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const userName = localStorage.getItem(ZKWHITEBOARD_VAULTID_VARNAME);
-  // console.log("---userName", userName);
-
-  // const [user, login, logout] = useLogin(userName ?? null);
-  // const [user, isLoging, login, logout] = useLogin();
-
-  const { user, isLoging, login, logout } = useLoginContext();
-
-  // useEffect(() => {
-  //   console.log("--user", user);
-  // }, [user]);
+  const { user } = useLoginContext();
 
   useEffect(() => {
     if (whiteboards.length == 0) return;
@@ -144,10 +128,6 @@ export default function Home() {
 
     getWhiteboards();
   }, []);
-
-  // const onChangeUser = useCallback((user: User | null) => {
-  //   setUser(user);
-  // }, []);
 
   return (
     <div

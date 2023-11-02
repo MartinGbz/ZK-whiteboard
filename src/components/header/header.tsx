@@ -8,11 +8,11 @@ import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Home } from "@mui/icons-material";
-import { User, Whiteboard } from "@/types/whiteboard-types";
+import { Whiteboard } from "@/types/whiteboard-types";
 import { useLoginContext } from "@/context/login-context";
 import axios from "axios";
 
-const Header: React.FC = () => {
+const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -29,16 +29,17 @@ const Header: React.FC = () => {
   const { user, isLoging, login, logout } = useLoginContext();
 
   useEffect(() => {
-    console.log("isLoging", isLoging);
-  }, [isLoging]);
+    function extractNumberFromPath(path: string): number | null {
+      const regex = /^\/whiteboard\/(\d+)$/;
+      const match = path.match(regex);
 
-  useEffect(() => {
-    console.log("user", user);
-  }, [user]);
+      if (match && match[1]) {
+        return parseInt(match[1], 10);
+      } else {
+        return null;
+      }
+    }
 
-  // console.log("$$$$$$ pathname", pathname);
-
-  useEffect(() => {
     const getWhiteboardName = async (whiteboardId: number) => {
       try {
         const response = await axios.post("/api/whiteboard", whiteboardId, {
@@ -59,23 +60,6 @@ const Header: React.FC = () => {
 
     getWhiteboardName(whiteboardId);
   }, [pathname]);
-
-  function extractNumberFromPath(path: string): number | null {
-    const regex = /^\/whiteboard\/(\d+)$/; // Regex pattern to match "/whiteboard/{number}"
-    const match = path.match(regex); // Try to match the input string with the regex pattern
-
-    if (match && match[1]) {
-      // If there is a match and capturing group is present (number part)
-      return parseInt(match[1], 10); // Parse the captured number and return
-    } else {
-      // If no match was found, or capturing group is missing
-      return null;
-    }
-  }
-
-  useEffect(() => {
-    console.log(" --- €€€€€€whiteboardName", whiteboardName);
-  }, [whiteboardName]);
 
   useEffect(() => {
     if (window.innerWidth < mobileWidthThreshold) {

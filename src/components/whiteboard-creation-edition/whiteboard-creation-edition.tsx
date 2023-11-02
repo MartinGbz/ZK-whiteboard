@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   WhiteboardCreateSignedMessage,
@@ -36,6 +36,7 @@ import ErrorModal from "../error-modal/error-modal";
 import SuccessAnimation from "../success-animation/success-animation";
 import WhiteboardCreationEditionInput from "../whiteboard-creation-edition-input/whiteboard-creation-edition-input";
 import Button from "../button/button";
+import { useLoginContext } from "@/context/login-context";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -89,7 +90,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(
     isEdition ? true : false
   );
-  const [user, setUser] = useState<User | null>(null);
   const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
   const [isWhiteboardDataLoading, setIsWhiteboardDataLoading] =
     useState<boolean>(true);
@@ -103,6 +103,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   const pathname = usePathname();
+
+  const { user } = useLoginContext();
 
   useEffect(() => {
     const fetchWhiteboard = async (id: number, groups: Group[]) => {
@@ -345,14 +347,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     }
   }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
-  // useCallBack to avoid infinite loop in header component
-  const onChangeUser = useCallback((user: User | null) => {
-    setUser(user);
-  }, []);
-
   return (
     <div className="container">
-      <Header onChangeUser={onChangeUser} />
+      <Header />
       <div className="edition-container">
         <div className="edition-title">
           <div>

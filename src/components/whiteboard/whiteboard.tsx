@@ -33,6 +33,7 @@ import { Message as MessageType } from "@prisma/client";
 import ShareWhiteboard from "@/components/share-whiteboard/share-whiteboard";
 import axios from "axios";
 import ErrorModal from "@/components/error-modal/error-modal";
+import { useLoginContext } from "@/context/login-context";
 
 interface whiteboardProps {
   params: { id: number };
@@ -59,7 +60,6 @@ const Whiteboard = ({ params }: whiteboardProps) => {
     x: 0,
     y: 0,
   });
-  const [user, setUser] = useState<User | null>();
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
@@ -79,6 +79,8 @@ const Whiteboard = ({ params }: whiteboardProps) => {
 
   const router = useRouter();
   const pathname = usePathname();
+
+  const { user } = useLoginContext();
 
   const redirectToRoot = useCallback(() => {
     router.push(pathname);
@@ -298,10 +300,6 @@ const Whiteboard = ({ params }: whiteboardProps) => {
     setMessagePosition(initialPosition);
     setIsModalOpen((m) => !m);
   };
-
-  const onChangeUser = useCallback((user: User | null) => {
-    setUser(user);
-  }, []);
 
   return (
     <div className="whiteboard">
