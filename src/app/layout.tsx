@@ -1,5 +1,7 @@
+import { useLogin } from "@/hooks/useLogin";
 import "./globals.css";
 import { Inter } from "next/font/google";
+import { GlobalContextProvider } from "@/context/login-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,6 +17,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // const login = useLogin();
   return (
     <html lang="en">
       <head>
@@ -45,7 +48,9 @@ export default function RootLayout({
         />
         <meta name="twitter:url" content={process.env.WEBSITE_DOMAIN} />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <GlobalContextProvider>{children}</GlobalContextProvider>
+      </body>
     </html>
   );
 }
