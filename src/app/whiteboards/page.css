@@ -1,16 +1,6 @@
-.whiteboards_container {
-  position: relative;
-  display: flex;
-}
-
 .container {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
   height: 100%;
   width: 100%;
-  max-width: 10000px;
-  max-height: 7000px;
   background-color: white;
 }
 

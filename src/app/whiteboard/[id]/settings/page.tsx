@@ -9,9 +9,7 @@ interface pageProps {
 
 const page = ({ params }: pageProps) => {
   return (
-    <div>
-      <WhiteboardCreationEdition isEdition={true} whiteboardId={params.id} />
-    </div>
+    <WhiteboardCreationEdition isEdition={true} whiteboardId={params.id} />
   );
 };
 

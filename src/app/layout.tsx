@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { GlobalContextProvider } from "@/context/login-context";
+import Header from "@/components/header/header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,7 +38,12 @@ export default function RootLayout({
         <link rel="icon" href="./favicon.ico" />
       </head>
       <body className={inter.className}>
-        <GlobalContextProvider>{children}</GlobalContextProvider>
+        <GlobalContextProvider>
+          <div className="main-container">
+            <Header />
+            {children}
+          </div>
+        </GlobalContextProvider>
       </body>
     </html>
   );

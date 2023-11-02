@@ -303,7 +303,6 @@ const Whiteboard = ({ params }: whiteboardProps) => {
 
   return (
     <div className="whiteboard">
-      <Header />
       {messages && (
         <div
           className="messages_container"

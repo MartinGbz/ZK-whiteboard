@@ -348,8 +348,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
   return (
-    <div className="container">
-      <Header />
+    <div
+      style={{
+        backgroundColor: "white",
+        width: "100%",
+        height: "100%",
+      }}>
       <div className="edition-container">
         <div className="edition-title">
           <div>
@@ -477,13 +481,13 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             }}
           />
         )}
+        {isWhiteboardDataLoading && !isVerifying && (
+          <Loading text="Loading whiteboard" />
+        )}
+        {isVerifying && <Loading text="Checking the proof..." />}
+        {errorMessage && <ErrorModal text={errorMessage} />}
+        <SuccessAnimation text={successMessage} duration={0.5} />
       </div>
-      {isWhiteboardDataLoading && !isVerifying && (
-        <Loading text="Loading whiteboard" />
-      )}
-      {isVerifying && <Loading text="Checking the proof..." />}
-      {errorMessage && <ErrorModal text={errorMessage} />}
-      <SuccessAnimation text={successMessage} duration={0.5} />
     </div>
   );
 };

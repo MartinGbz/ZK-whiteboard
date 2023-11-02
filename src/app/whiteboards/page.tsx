@@ -130,63 +130,55 @@ export default function Home() {
   }, []);
 
   return (
-    <div
-      className="container"
-      style={{
-        width: "100%",
-      }}>
-      <Header />
-      <div className="whiteboards_container">
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "20px 20px 0px 20px",
-          }}>
-          <h1 className="title"> Whiteboards </h1>
-          <div className="create_whiteboard">
-            {(!user ||
-              user.createdWhiteboards.length >= MAX_WHITEBOARD_PER_USER) && (
-              <Tooltip
-                title={
-                  !user
-                    ? "Sign in to create a whiteboard"
-                    : "You have already created " +
-                      MAX_WHITEBOARD_PER_USER +
-                      " whiteboards"
-                }>
-                <span>
-                  <Button
-                    type="create"
-                    title="Create"
-                    onClick={() => {
-                      router.push("/create-whiteboard");
-                    }}
-                    fontSize="20px"
-                    disabled={true}
-                    style={{
-                      backgroundColor: greenColorDisabled,
-                      cursor: "default",
-                      filter: "brightness(1.1)",
-                    }}></Button>
-                </span>
-              </Tooltip>
-            )}
-            {user &&
-              user.createdWhiteboards.length < MAX_WHITEBOARD_PER_USER && (
+    <div className="whiteboards_container">
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "20px 20px 0px 20px",
+        }}>
+        <h1 className="title"> Whiteboards </h1>
+        <div className="create_whiteboard">
+          {(!user ||
+            user.createdWhiteboards.length >= MAX_WHITEBOARD_PER_USER) && (
+            <Tooltip
+              title={
+                !user
+                  ? "Sign in to create a whiteboard"
+                  : "You have already created " +
+                    MAX_WHITEBOARD_PER_USER +
+                    " whiteboards"
+              }>
+              <span>
                 <Button
                   type="create"
                   title="Create"
                   onClick={() => {
                     router.push("/create-whiteboard");
                   }}
-                  iconSize="30px"
-                  fontSize="20px"></Button>
-              )}
-          </div>
+                  fontSize="20px"
+                  disabled={true}
+                  style={{
+                    backgroundColor: greenColorDisabled,
+                    cursor: "default",
+                    filter: "brightness(1.1)",
+                  }}></Button>
+              </span>
+            </Tooltip>
+          )}
+          {user && user.createdWhiteboards.length < MAX_WHITEBOARD_PER_USER && (
+            <Button
+              type="create"
+              title="Create"
+              onClick={() => {
+                router.push("/create-whiteboard");
+              }}
+              iconSize="30px"
+              fontSize="20px"></Button>
+          )}
         </div>
       </div>
       <div
