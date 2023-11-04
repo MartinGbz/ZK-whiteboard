@@ -1,5 +1,5 @@
 "use client";
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { TextareaAutosize } from "@mui/base";
@@ -7,7 +7,6 @@ import { MAX_CHARACTERS, greenColor, redColor } from "@/configs/configs";
 
 interface MessageModalProps {
   style?: CSSProperties;
-  modalRef?: React.RefObject<HTMLDivElement>;
   containerRef?: React.RefObject<HTMLDivElement>;
   inputValue?: string;
   inputColorValue?: string;
@@ -22,7 +21,6 @@ interface MessageModalProps {
 
 const MessageModal: React.FC<MessageModalProps> = ({
   style,
-  modalRef,
   containerRef,
   inputValue,
   inputColorValue,
@@ -41,6 +39,8 @@ const MessageModal: React.FC<MessageModalProps> = ({
     useState("brightness(1)");
   const [cancelButtonBrightness, setCancelButtonBrightness] =
     useState("brightness(1)");
+
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const baseStyle: CSSProperties = {
     backgroundColor: "rgb(200 200 200 / 30%)",

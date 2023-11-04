@@ -62,10 +62,8 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
-  const [isWhiteboardAuthor, setIsWhiteboardAuthor] = useState<boolean>(false);
 
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
-  const messageModalRef = useRef<HTMLDivElement>(null);
   const containerMessageModalRef = useRef<HTMLDivElement>(null);
 
   const [currentURL, setCurrentURL] = useState("");
@@ -96,12 +94,6 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
 
     setIsUserMessageExists(isUserMessageExists);
   }, [whiteboard.id]);
-
-  useEffect(() => {
-    whiteboard?.authorVaultId === user?.vaultId
-      ? setIsWhiteboardAuthor(true)
-      : setIsWhiteboardAuthor(false);
-  }, [user, whiteboard]);
 
   useEffect(() => {
     if (whiteboard?.appId) {
@@ -313,7 +305,6 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
           )}
           {isModalOpen && (
             <MessageModal
-              modalRef={messageModalRef}
               containerRef={containerMessageModalRef}
               style={{
                 position: "absolute",
@@ -339,7 +330,7 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
       {whiteboard && (
         <ShareWhiteboard
           currentURL={currentURL}
-          isAuthor={isWhiteboardAuthor}
+          isAuthor={whiteboard.authorVaultId === user?.vaultId}
           whiteboardName={whiteboard.name}
         />
       )}
