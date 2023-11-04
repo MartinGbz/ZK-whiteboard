@@ -13,6 +13,8 @@ const SuccessAnimation: React.FC<SuccessProps> = ({ text, duration }) => {
         width: "100%",
         height: "100%",
         position: "absolute",
+        top: "0px",
+        left: "0px",
         pointerEvents: "none",
       }}>
       <div

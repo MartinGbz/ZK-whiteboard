@@ -13,7 +13,6 @@ interface WhiteboardCardProps {
   vaultId: string | null;
   whiteboard: WhiteboardIndex;
   index: number;
-  maxHeightsList: Array<number>;
   baseMaxHeight: number;
   maxMaxHeight: number;
 }
@@ -22,7 +21,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   vaultId,
   whiteboard,
   index,
-  maxHeightsList,
   baseMaxHeight,
   maxMaxHeight,
 }) => {
@@ -30,20 +28,14 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
 
   const [isHovering, setIsHovering] = useState<number | null>(null);
 
-  const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
   const [loginMouseOver, setLoginMouseOver] = useState<boolean>(false);
   const [settingsMouseOver, setSettingsMouseOver] = useState<boolean>(false);
   const padding = useRef<number>(10);
 
-  useEffect(() => {
-    setMaxHeights(maxHeightsList);
-  }, [maxHeightsList]);
+  const [maxHeight, setMaxHeight] = useState<number>(baseMaxHeight);
 
   const handleDivClick = (index: number) => {
-    const newMaxHeights = [...maxHeights];
-    newMaxHeights[index] =
-      maxHeights[index] === baseMaxHeight ? maxMaxHeight : baseMaxHeight;
-    setMaxHeights(newMaxHeights);
+    setMaxHeight(maxHeight === baseMaxHeight ? maxMaxHeight : baseMaxHeight);
   };
 
   const whiteboardClick = useCallback(
@@ -70,7 +62,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
       className="whiteboard-card"
       style={{
         padding: padding.current + "px",
-        maxHeight: maxHeights[index],
+        maxHeight: maxHeight,
       }}
       onMouseEnter={() => handleMouseEnter(whiteboard.id)}
       onMouseLeave={() => handleMouseLeave()}
@@ -91,13 +83,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             display: "flex",
             alignItems: "center",
           }}>
-          <div
-          // style={{
-          //   whiteSpace: "nowrap",
-          // }}
-          >
-            {whiteboard.name}
-          </div>
+          <div>{whiteboard.name}</div>
           {whiteboard.curated && (
             <div
               style={{

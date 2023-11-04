@@ -481,13 +481,13 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             }}
           />
         )}
-        {isWhiteboardDataLoading && !isVerifying && (
-          <Loading text="Loading whiteboard" />
-        )}
-        {isVerifying && <Loading text="Checking the proof..." />}
-        {errorMessage && <ErrorModal text={errorMessage} />}
-        <SuccessAnimation text={successMessage} duration={0.5} />
       </div>
+      {!errorMessage && isWhiteboardDataLoading && !isVerifying && (
+        <Loading text="Loading whiteboard" />
+      )}
+      {!errorMessage && isVerifying && <Loading text="Checking the proof..." />}
+      {errorMessage && <ErrorModal errorMessage={errorMessage} />}
+      <SuccessAnimation text={successMessage} duration={0.5} />
     </div>
   );
 };

@@ -386,7 +386,7 @@ const Whiteboard = ({ params }: whiteboardProps) => {
           whiteboardName={whiteboard.name}
         />
       )}
-      {errorMessage && <ErrorModal text={errorMessage} />}
+      {errorMessage && <ErrorModal errorMessage={errorMessage} />}
     </div>
   );
 };

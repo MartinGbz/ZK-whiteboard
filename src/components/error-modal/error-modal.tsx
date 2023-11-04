@@ -6,10 +6,11 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useRouter, usePathname } from "next/navigation";
 
 interface ErrorModalProps {
-  text: string;
+  errorMessage: string;
+  reset?: () => void;
 }
 
-const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
+const ErrorModal: React.FC<ErrorModalProps> = ({ errorMessage, reset }) => {
   const modalStyle: CSSProperties = {
     backgroundColor: "white",
     marginBottom: "10px",
@@ -46,6 +47,8 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
         width: "100%",
         height: "100%",
         position: "absolute",
+        top: "0px",
+        left: "0px",
         zIndex: MAX_Z_INDEX + 3,
       }}>
       <div style={modalStyle}>
@@ -87,7 +90,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
                 marginBottom: "25px",
                 fontFamily: "Inter-Regular",
               }}>
-              {text}
+              {errorMessage}
             </p>
             <div
               style={{
@@ -98,7 +101,12 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
                 border: "none",
                 alignSelf: "center",
                 fontSize: "17px",
-              }}>
+                cursor: reset ? "pointer" : "default",
+              }}
+              onClick={
+                // Attempt to recover by trying to re-render the segment
+                () => (reset ? reset() : null)
+              }>
               Please refresh the page: ⌘+R
             </div>
             <p
