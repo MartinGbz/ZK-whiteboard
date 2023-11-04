@@ -1,4 +1,4 @@
-import { getWhiteboards } from "@/lib/get-whiteboards";
+import { getWhiteboards } from "@/lib/whiteboards";
 import { Whiteboards } from "@/components/whiteboards/whiteboards";
 
 export default async function Home() {

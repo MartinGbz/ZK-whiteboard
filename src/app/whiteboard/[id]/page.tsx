@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 
 import Whiteboard from "@/components/whiteboard/whiteboard";
+import { getWhiteboard } from "@/lib/whiteboard";
+import { notFound } from "next/navigation";
 
 interface pageProps {
   params: { id: number };
@@ -39,8 +41,10 @@ export async function generateMetadata({
   };
 }
 
-const page = ({ params }: pageProps) => {
-  return <Whiteboard params={params} />;
+const page = async ({ params }: pageProps) => {
+  if (isNaN(params.id)) return notFound();
+  const whiteboard = await getWhiteboard(params.id);
+  return <Whiteboard whiteboard={whiteboard} />;
 };
 
 export default page;

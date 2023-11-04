@@ -46,9 +46,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ errorMessage, reset }) => {
         backgroundColor: "rgba(0, 0, 0, 0.3)",
         width: "100%",
         height: "100%",
-        position: "absolute",
-        top: "0px",
-        left: "0px",
+        position: "relative",
         zIndex: MAX_Z_INDEX + 3,
       }}>
       <div style={modalStyle}>

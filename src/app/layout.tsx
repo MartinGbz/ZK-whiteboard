@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { GlobalContextProvider } from "@/context/login-context";
 import Header from "@/components/header/header";
+import { ToastProvider } from "@/providers/toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,8 +42,9 @@ export default function RootLayout({
         <GlobalContextProvider>
           <div className="main-container">
             <Header />
-            {children}
+            <div className="children-container">{children}</div>
           </div>
+          <ToastProvider />
         </GlobalContextProvider>
       </body>
     </html>

@@ -6,7 +6,7 @@ import axios from "axios";
 
 export async function getWhiteboards() {
   // wait 5 seconds to test loading modal
-  // await new Promise((resolve) => setTimeout(resolve, 5000));
+  // await new Promise((resolve) => setTimeout(resolve, 100000));
   const whiteboards = await fetchWhiteboards();
   if (!whiteboards) return;
   const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =

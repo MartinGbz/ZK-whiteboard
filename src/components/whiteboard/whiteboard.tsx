@@ -30,11 +30,12 @@ import Loading from "@/components/loading-modal/loading-modal";
 import { Message as MessageType } from "@prisma/client";
 import ShareWhiteboard from "@/components/share-whiteboard/share-whiteboard";
 import axios from "axios";
-import ErrorModal from "@/components/error-modal/error-modal";
 import { useLoginContext } from "@/context/login-context";
 
+import { toast } from "react-hot-toast";
+
 interface whiteboardProps {
-  params: { id: number };
+  whiteboard: Whiteboard;
 }
 
 let sismoConnect: SismoConnectClient | null = null;
@@ -47,9 +48,7 @@ const API_ENDPOINTS = {
 
 const messageModalWidth = 275;
 
-const Whiteboard = ({ params }: whiteboardProps) => {
-  const [whiteboard, setWhiteboard] = useState<Whiteboard>();
-  const [messages, setMessages] = useState<MessageType[]>([]);
+const Whiteboard = ({ whiteboard }: whiteboardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageInputValue, setMessageInputValue] = useState("");
   const [messageInputColorValue, setMessageInputColorValue] =
@@ -63,7 +62,6 @@ const Whiteboard = ({ params }: whiteboardProps) => {
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [isUserMessageExists, setIsUserMessageExists] =
     useState<boolean>(false);
-  const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(false);
   const [isWhiteboardAuthor, setIsWhiteboardAuthor] = useState<boolean>(false);
 
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
@@ -73,12 +71,8 @@ const Whiteboard = ({ params }: whiteboardProps) => {
   const [currentURL, setCurrentURL] = useState("");
   const whiteboardVaultId = useRef<string | null>(null);
 
-  const [errorMessage, setErrorMessage] = useState<string>("");
-
   const router = useRouter();
   const pathname = usePathname();
-
-  const { user } = useLoginContext();
 
   const redirectToRoot = useCallback(() => {
     router.push(pathname);
@@ -87,6 +81,21 @@ const Whiteboard = ({ params }: whiteboardProps) => {
   useEffect(() => {
     setCurrentURL(`${window.location.origin}${pathname}`);
   }, [pathname]);
+
+  const { user } = useLoginContext();
+
+  useEffect(() => {
+    whiteboardVaultId.current = localStorage.getItem(
+      WHITEBOARD_VAULTID_VARNAME + whiteboard.id
+    );
+
+    const isUserMessageExists = whiteboard.messages.some(
+      (message: MessageType) =>
+        message.authorVaultId === whiteboardVaultId.current
+    );
+
+    setIsUserMessageExists(isUserMessageExists);
+  }, [whiteboard.id]);
 
   useEffect(() => {
     whiteboard?.authorVaultId === user?.vaultId
@@ -151,17 +160,10 @@ const Whiteboard = ({ params }: whiteboardProps) => {
         errorMessage = error.response.data.error
           ? `${errorMessage}: ${error.response.data.error}`
           : errorMessage;
-        setErrorMessage(errorMessage);
+        toast.error(errorMessage);
         return null;
       }
       return response.data as PostDeletionResponse;
-    };
-
-    const handleApiResponse = async (messages: MessageType[]) => {
-      setMessageInputValue("");
-      setMessageInputColorValue(defaultInputColor);
-      setIsModalOpen(false);
-      setMessages(messages);
     };
 
     const postMessage = async (message: SismoConnectResponse) => {
@@ -172,68 +174,28 @@ const Whiteboard = ({ params }: whiteboardProps) => {
       const response = await performApiRequest(url, message);
       if (response) {
         localStorage.setItem(
-          WHITEBOARD_VAULTID_VARNAME + params.id,
+          WHITEBOARD_VAULTID_VARNAME + whiteboard.id,
           response.vaultId
         );
         whiteboardVaultId.current = response.vaultId;
-        handleApiResponse(response.messages);
+        setMessageInputValue("");
+        setMessageInputColorValue(defaultInputColor);
+        setIsModalOpen(false);
       }
       setIsVerifying(false);
+      // no need to refresh the page to update the messages (because the root redirection do the job)
       redirectToRoot();
     };
-    if (sismoConnectResponseMessage?.signedMessage && params.id) {
+    if (sismoConnectResponseMessage?.signedMessage && whiteboard.id) {
       postMessage(sismoConnectResponseMessage);
     }
-  }, [redirectToRoot, sismoConnectResponseMessage, params.id]);
-
-  useEffect(() => {
-    if (messages) {
-      const isUserMessageExists = messages.some(
-        (message: MessageType) =>
-          message.authorVaultId === whiteboardVaultId.current
-      );
-      setIsUserMessageExists(isUserMessageExists);
-    }
-  }, [messages]);
+  }, [redirectToRoot, sismoConnectResponseMessage, whiteboard.id]);
 
   useEffect(() => {
     if (isModalOpen && messageInputRef.current) {
       messageInputRef.current.focus();
     }
   }, [isModalOpen, messagePosition]);
-
-  useEffect(() => {
-    whiteboardVaultId.current = localStorage.getItem(
-      WHITEBOARD_VAULTID_VARNAME + params.id
-    );
-
-    const fetchMessages = async () => {
-      setIsFetchingMessages(true);
-      try {
-        const response = await axios.post("/api/whiteboard", params.id, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const whiteboard: Whiteboard = response.data;
-        setWhiteboard(whiteboard);
-        if (whiteboard.messages) {
-          setMessages(whiteboard.messages);
-        }
-      } catch (error: any) {
-        console.error("API request error:", error);
-        const defaultErrorMessage =
-          "An error occured while fetching the messages of this whiteboard";
-        const errorMessage = error.response.data.error
-          ? `${defaultErrorMessage}: ${error.response.data.error}`
-          : defaultErrorMessage;
-        setErrorMessage(errorMessage);
-      }
-      setIsFetchingMessages(false);
-    };
-
-    fetchMessages();
-  }, [router, params.id]);
 
   const requestAddMessage = async () => {
     const sismoConnectSignedMessage: SignedMessage = {
@@ -243,7 +205,7 @@ const Whiteboard = ({ params }: whiteboardProps) => {
         positionX: messagePosition.x,
         positionY: messagePosition.y,
         color: messageInputColorValue.substring(1),
-        whiteboardId: params.id,
+        whiteboardId: whiteboard.id,
       },
     };
     const claims = whiteboard?.groupIds?.map((groupId) => ({
@@ -251,6 +213,7 @@ const Whiteboard = ({ params }: whiteboardProps) => {
     }));
     if (!sismoConnect) {
       console.error("Error with sismoConnect");
+      toast.error("Error with sismoConnect");
       return;
     }
     sismoConnect.request({
@@ -271,11 +234,12 @@ const Whiteboard = ({ params }: whiteboardProps) => {
         positionX: message.positionX,
         positionY: message.positionY,
         color: message.color,
-        whiteboardId: params.id,
+        whiteboardId: whiteboard.id,
       },
     };
     if (!sismoConnect) {
       console.error("Error with sismoConnect");
+      toast.error("Error with sismoConnect");
       return;
     }
     sismoConnect.request({
@@ -301,7 +265,7 @@ const Whiteboard = ({ params }: whiteboardProps) => {
 
   return (
     <div className="whiteboard">
-      {messages && (
+      {whiteboard.messages && whiteboardVaultId.current && (
         <div
           className="messages_container"
           ref={containerMessageModalRef}
@@ -310,22 +274,20 @@ const Whiteboard = ({ params }: whiteboardProps) => {
             position: "relative",
             overflow: "scroll",
           }}
-          onClick={(e) =>
-            !isUserMessageExists &&
-            !isFetchingMessages &&
-            startMessageCreation(e)
-          }>
-          {messages.map((message: MessageType) => (
+          onClick={(e) => !isUserMessageExists && startMessageCreation(e)}>
+          {whiteboard.messages.map((message: MessageType) => (
             <Message
               key={message.authorVaultId}
               message={message}
               appId={whiteboard?.appId ?? ""}
               vaultId={whiteboardVaultId.current ?? ""}
               onDelete={(message) => requestDeleteMessage(message)}
-              onError={setErrorMessage}
+              onError={(errorMessage) => {
+                throw new Error(errorMessage);
+              }}
             />
           ))}
-          {messages.length == 0 && !isFetchingMessages && (
+          {whiteboard.messages.length == 0 && (
             <div
               style={{
                 position: "absolute",
@@ -374,9 +336,6 @@ const Whiteboard = ({ params }: whiteboardProps) => {
         </div>
       )}
       {isVerifying && <Loading text="Checking the proof..." />}
-      {!isVerifying && isFetchingMessages && messages.length == 0 && (
-        <Loading text="Loading messages..." />
-      )}
       {whiteboard && (
         <ShareWhiteboard
           currentURL={currentURL}
@@ -384,7 +343,6 @@ const Whiteboard = ({ params }: whiteboardProps) => {
           whiteboardName={whiteboard.name}
         />
       )}
-      {errorMessage && <ErrorModal errorMessage={errorMessage} />}
     </div>
   );
 };
