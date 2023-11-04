@@ -1,20 +1,11 @@
-import { Whiteboard } from "@/types/whiteboard-types";
-import axios from "axios";
+import { getWhiteboardById } from "@/app/api/common";
 
 export const getWhiteboard = async (id: number) => {
   // wait 5 seconds to test loading modal
   // await new Promise((resolve) => setTimeout(resolve, 100000));
   try {
-    const response = await axios.post(
-      process.env.WEBSITE_DOMAIN + "/api/whiteboard",
-      id,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const whiteboard: Whiteboard = response.data;
+    const whiteboard = await getWhiteboardById(id);
+    if (!whiteboard) throw new Error("Whiteboard not found");
     return whiteboard;
   } catch (error: any) {
     console.error("API request error:", error);

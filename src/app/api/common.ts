@@ -6,7 +6,11 @@ import {
   SismoConnectServer,
   SismoConnectVerifiedResult,
 } from "@sismo-core/sismo-connect-server";
-import { OperationType, Whiteboard } from "@/types/whiteboard-types";
+import {
+  OperationType,
+  Whiteboard,
+  whiteboardWithMessageCount,
+} from "@/types/whiteboard-types";
 import { prisma } from "./db";
 import { NextResponse } from "next/server";
 
@@ -115,4 +119,66 @@ export async function post(
   } else {
     return NextResponse.json({ error: "No signed message" }, { status: 400 });
   }
+}
+
+export const getWhiteboards = async () => {
+  const whiteboardsWithMessagesCount: any = await prisma.$queryRaw`
+  SELECT
+    w.id,
+    w.name,
+    w.description,
+    w."groupIds",
+    w."appId",
+    w."authorVaultId",
+    w.curated,
+    w."createdAt",
+    w."updatedAt",
+    COUNT(m.id) as "messagesCount"
+  FROM
+    "Whiteboard" w
+  LEFT JOIN
+    "Message" m
+  ON
+    w.id = m."whiteboardId"
+  GROUP BY
+    w.id, w.name, w.description, w.curated, w."authorVaultId";
+`;
+
+  const whiteboardsWithCount: whiteboardWithMessageCount[] =
+    whiteboardsWithMessagesCount.map((whiteboard: any) => ({
+      ...whiteboard,
+      messagesCount: Number(whiteboard.messagesCount),
+    }));
+
+  const whiteboardsSorted = sortWhiteboards(whiteboardsWithCount);
+
+  return whiteboardsSorted;
+};
+
+function sortWhiteboards(
+  whiteboardsWithResolvedGroupIds: whiteboardWithMessageCount[]
+) {
+  // sort by curated, then by message count, then creation date (oldest first), and then by name
+  whiteboardsWithResolvedGroupIds.sort((a, b) => {
+    if (a.curated && !b.curated) {
+      return -1;
+    } else if (!a.curated && b.curated) {
+      return 1;
+    } else {
+      if (a.messagesCount > b.messagesCount) {
+        return -1;
+      } else if (a.messagesCount < b.messagesCount) {
+        return 1;
+      } else {
+        if (a.id < b.id) {
+          return -1;
+        } else if (a.id > b.id) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+    }
+  });
+  return whiteboardsWithResolvedGroupIds;
 }

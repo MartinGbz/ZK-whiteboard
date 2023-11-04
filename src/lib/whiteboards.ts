@@ -2,9 +2,9 @@ import {
   WhiteboardIndex,
   whiteboardWithMessageCount,
 } from "@/types/whiteboard-types";
-import axios from "axios";
+import { getWhiteboards } from "@/app/api/common";
 
-export async function getWhiteboards() {
+export async function getWhiteboardsFormatted() {
   // wait 5 seconds to test loading modal
   // await new Promise((resolve) => setTimeout(resolve, 100000));
   const whiteboards = await fetchWhiteboards();
@@ -17,13 +17,9 @@ export async function getWhiteboards() {
 }
 
 const fetchWhiteboards = async () => {
-  let response;
+  let whiteboards: whiteboardWithMessageCount[];
   try {
-    response = await axios.get(`${process.env.WEBSITE_DOMAIN}/api/whiteboard`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    whiteboards = await getWhiteboards();
   } catch (error: any) {
     console.error("API request error:", error);
     const defaultErrorMessage = "An error occured while fetching whiteboards";
@@ -32,7 +28,6 @@ const fetchWhiteboards = async () => {
       : defaultErrorMessage;
     throw new Error(errorMessage);
   }
-  const whiteboards: whiteboardWithMessageCount[] = await response.data;
   return whiteboards;
 };
 
