@@ -1,4 +1,4 @@
-"use client"; // Error components must be Client Components
+"use client";
 
 import ErrorModal from "@/components/error-modal/error-modal";
 import { useEffect } from "react";

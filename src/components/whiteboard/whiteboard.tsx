@@ -7,7 +7,6 @@ import {
   Position,
   SignedMessage,
   Whiteboard,
-  User,
   PostDeletionResponse,
   OperationType,
 } from "@/types/whiteboard-types";
@@ -28,7 +27,6 @@ import MessageModal from "@/components/message-modal/message-modal";
 import Message from "@/components/message/message";
 import { usePathname, useRouter } from "next/navigation";
 import Loading from "@/components/loading-modal/loading-modal";
-import Header from "@/components/header/header";
 import { Message as MessageType } from "@prisma/client";
 import ShareWhiteboard from "@/components/share-whiteboard/share-whiteboard";
 import axios from "axios";

@@ -27,13 +27,6 @@ export async function GET(): Promise<NextResponse> {
       w.id, w.name, w.description, w.curated, w."authorVaultId";
   `;
 
-  // return NextResponse.json(
-  //   {
-  //     error: "THIS IS A TEST ERROR",
-  //   },
-  //   { status: 400 }
-  // );
-
   const whiteboardsWithCount: WhiteboardIndex[] =
     whiteboardsWithMessagesCount.map((whiteboard: any) => ({
       ...whiteboard,

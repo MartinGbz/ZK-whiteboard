@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { WhiteboardIndex } from "@/types/whiteboard-types";
 import SettingsIcon from "@mui/icons-material/Settings";

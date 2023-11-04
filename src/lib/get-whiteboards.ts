@@ -19,8 +19,6 @@ export async function getWhiteboards() {
 const fetchWhiteboards = async () => {
   let response;
   try {
-    // wait 5 seconds to test loading modal
-    // await new Promise((resolve) => setTimeout(resolve, 100000));
     response = await axios.get(`${process.env.WEBSITE_DOMAIN}/api/whiteboard`, {
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +31,6 @@ const fetchWhiteboards = async () => {
       ? `${defaultErrorMessage}: ${error.response.data.error}`
       : defaultErrorMessage;
     throw new Error(errorMessage);
-    // return null;
   }
   const whiteboards: whiteboardWithMessageCount[] = await response.data;
   return whiteboards;

@@ -2,23 +2,14 @@
 
 import "./whiteboards.css";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/header/header";
-import {
-  User,
-  WhiteboardIndex,
-  whiteboardWithMessageCount,
-} from "@/types/whiteboard-types";
-import Loading from "@/components/loading-modal/loading-modal";
+import { WhiteboardIndex } from "@/types/whiteboard-types";
 import { MAX_WHITEBOARD_PER_USER, greenColorDisabled } from "@/configs/configs";
 import WhiteboardCard from "@/components/whiteboard-card/whiteboard-card";
 import { Tooltip } from "@mui/material";
-import ErrorModal from "@/components/error-modal/error-modal";
-import axios from "axios";
 import Button from "@/components/button/button";
 import { useLoginContext } from "@/context/login-context";
-import { getWhiteboards } from "@/utils/get-whiteboards";
 
 type WhiteboardsProps = {
   whiteboards: WhiteboardIndex[];
@@ -27,18 +18,9 @@ type WhiteboardsProps = {
 export const Whiteboards = ({ whiteboards }: WhiteboardsProps) => {
   const router = useRouter();
 
-  // const [whiteboards, setWhiteboards] = useState<WhiteboardIndex[]>([]);
-
-  // const [isFetchingWhiteboards, setIsFetchingWhiteboards] =
-  //   useState<boolean>(false);
-
   // icon size 30px =so> button 40px =so> div 60px (because padding 10px)
   const baseMaxHeight = 60;
   const maxMaxHeight = 200;
-
-  const maxHeights = Array(whiteboards.length).fill(baseMaxHeight);
-
-  // const [errorMessage, setErrorMessage] = useState<string>("");
 
   const { user } = useLoginContext();
 
@@ -100,18 +82,6 @@ export const Whiteboards = ({ whiteboards }: WhiteboardsProps) => {
           maxHeight: "700px",
           overflow: "auto",
         }}>
-        {/* {!isFetchingWhiteboards &&
-          whiteboards.map((whiteboard: WhiteboardIndex, index) => (
-            <WhiteboardCard
-              key={whiteboard.id}
-              vaultId={user?.vaultId ?? ""}
-              whiteboard={whiteboard}
-              index={index}
-              maxHeightsList={maxHeights}
-              baseMaxHeight={baseMaxHeight}
-              maxMaxHeight={maxMaxHeight}
-            />
-          ))} */}
         {whiteboards.map((whiteboard: WhiteboardIndex, index) => (
           <WhiteboardCard
             key={whiteboard.id}
@@ -123,10 +93,6 @@ export const Whiteboards = ({ whiteboards }: WhiteboardsProps) => {
           />
         ))}
       </div>
-      {/* {!errorMessage && whiteboards.length == 0 && isFetchingWhiteboards && (
-        <Loading text="Loading whiteboards..." />
-      )} */}
-      {/* {errorMessage && <ErrorModal errorMessage={errorMessage} />} */}
     </div>
   );
 };

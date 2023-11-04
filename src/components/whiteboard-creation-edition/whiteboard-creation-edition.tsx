@@ -4,10 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   WhiteboardCreateSignedMessage,
   WhiteboardEditSignedMessage,
-  User,
   OperationType,
 } from "@/types/whiteboard-types";
-import Header from "../header/header";
 
 import "./whiteboard-creation-edition.css";
 import { Whiteboard } from "@prisma/client";
