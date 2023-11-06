@@ -1,14 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   WhiteboardCreateSignedMessage,
   WhiteboardEditSignedMessage,
   OperationType,
+  Whiteboard,
 } from "@/types/whiteboard-types";
 
 import "./whiteboard-creation-edition.css";
-import { Whiteboard } from "@prisma/client";
+// import { Whiteboard } from "@prisma/client";
 import {
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
   MAX_CHARACTERS_WHITEBOARD_NAME,
@@ -35,6 +36,7 @@ import SuccessAnimation from "../success-animation/success-animation";
 import WhiteboardCreationEditionInput from "../whiteboard-creation-edition-input/whiteboard-creation-edition-input";
 import Button from "../button/button";
 import { useLoginContext } from "@/context/login-context";
+import { Group } from "@/lib/groups";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -45,37 +47,18 @@ const API_ENDPOINTS = {
   DELETE: "/delete",
 };
 
-interface Group {
-  id: string;
-  name: string;
-  timestamp: number;
-  description: string;
-  publicContacts: string[];
-  specs: string;
-  generatedBy: string;
-  valueType: string;
-  accountSource: string[];
-  tags: string[];
-  properties: {
-    accountsNumber: number;
-    tierDistribution: object;
-    minValue: string;
-    maxValue: string;
-  };
-  dataUrl: string;
-}
-
 interface WhiteboardCreationEditionProps {
   isEdition?: boolean;
-  whiteboardId?: number;
+  whiteboard?: Whiteboard;
+  groups: Group[];
 }
 
 const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   isEdition,
-  whiteboardId,
+  whiteboard,
+  groups,
 }) => {
   const router = useRouter();
-  const [groups, setGroups] = useState<Group[]>([]);
   const [whiteboardName, setWhiteboardName] = useState<string>("");
   const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(
     isEdition ? true : false
@@ -89,8 +72,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     isEdition ? true : false
   );
   const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
-  const [isWhiteboardDataLoading, setIsWhiteboardDataLoading] =
-    useState<boolean>(true);
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
@@ -105,73 +86,19 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   const { user } = useLoginContext();
 
   useEffect(() => {
-    const fetchWhiteboard = async (id: number, groups: Group[]) => {
-      let response;
-      try {
-        response = await axios.post("/api/whiteboard", id, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      } catch (error: any) {
-        console.error("API request error:", error);
-        const defaultErrorMessage =
-          "An error occured while fetching the whiteboard data";
-        const errorMessage = error.response.data.error
-          ? `${defaultErrorMessage}: ${error.response.data.error}`
-          : defaultErrorMessage;
-        setErrorMessage(errorMessage);
-        return null;
-      }
-      const whiteboard: Whiteboard = response.data;
-      setInitalWhiteboard(whiteboard);
-      setWhiteboardName(whiteboard?.name || "");
-      setWhiteboardDescription(whiteboard?.description || "");
-      setSelectedGroups(
-        groups.filter((group: Group) =>
-          whiteboard?.groupIds?.includes(group.id)
-        )
-      );
-      setIsWhiteboardDataLoading(false);
-    };
-
-    const fetchGroups = async () => {
-      setIsWhiteboardDataLoading(true);
-      let response;
-      try {
-        response = await axios.get("https://hub.sismo.io/groups/latests", {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      } catch (error: any) {
-        console.error("API request error:", error);
-        setErrorMessage("An error occured while fetching Sismo Data Groups");
-        return null;
-      }
-      const groups: Group[] = response.data.items;
-
-      setGroups(groups);
-
-      if (isEdition && whiteboardId) {
-        fetchWhiteboard(whiteboardId, groups);
-      } else {
-        setIsWhiteboardDataLoading(false);
-      }
-    };
-    fetchGroups();
-  }, [isEdition, whiteboardId]);
+    setInitalWhiteboard(whiteboard);
+    setWhiteboardName(whiteboard?.name || "");
+    setWhiteboardDescription(whiteboard?.description || "");
+    setSelectedGroups(
+      groups
+        ? groups.filter((group: Group) =>
+            whiteboard?.groupIds?.includes(group.id)
+          )
+        : []
+    );
+  }, [whiteboard]);
 
   function performAction(type: OperationType) {
-    if (
-      ![OperationType.POST, OperationType.EDIT, OperationType.DELETE].includes(
-        type
-      )
-    ) {
-      console.error("Invalid action type");
-      return;
-    }
-
     if (
       (type === OperationType.EDIT || type === OperationType.DELETE) &&
       !initalWhiteboard
@@ -345,6 +272,13 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     }
   }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
+  // function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  //   event.preventDefault();
+  //   const formData = new FormData(event.currentTarget);
+  //   console.log({ formData });
+  //   throw new Error("Function not implemented.");
+  // }
+
   return (
     <div
       style={{
@@ -365,10 +299,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 " max per user)"}
           </div>
         </div>
+        {/* <form onSubmit={handleSubmit}> */}
         <WhiteboardCreationEditionInput
           isEdition={isEdition}
           type="name"
-          title="Name"
+          label="Name"
           maxNumber={MAX_CHARACTERS_WHITEBOARD_NAME}
           warningMessage={MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
           inputOk={setWhiteboardNameOk}
@@ -378,7 +313,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         <WhiteboardCreationEditionInput
           isEdition={isEdition}
           type="description"
-          title="Description"
+          label="Description"
           maxNumber={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION}
           warningMessage={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
           inputOk={setWhiteboardDescriptionOk}
@@ -390,7 +325,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             <WhiteboardCreationEditionInput
               isEdition={isEdition}
               type="groups"
-              title="Group(s)"
+              label="Group(s)"
               maxNumber={MAX_WHITEBOARD_GROUPS}
               warningMessage={MAX_WHITEBOARD_GROUPS_MESSAGE}
               inputOk={setSelectedGroupsOk}
@@ -459,11 +394,13 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             if (!isEdition) performAction(OperationType.POST);
             if (isEdition) performAction(OperationType.EDIT);
           }}
-          disabled={isEdition ? disableValidationEdition : disableValidation}
+          // disabled={isEdition ? disableValidationEdition : disableValidation}
           type="validate"
           title={isEdition ? "Save" : "Create"}
           fontSize="15px"
           iconSpace="4px"></Button>
+        {/* <input type="submit" value="Submit" />
+        </form> */}
         {isEdition && (
           <Button
             className="create-edit-button"
@@ -480,9 +417,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           />
         )}
       </div>
-      {!errorMessage && isWhiteboardDataLoading && !isVerifying && (
-        <Loading text="Loading whiteboard" />
-      )}
       {!errorMessage && isVerifying && <Loading text="Checking the proof..." />}
       {errorMessage && <ErrorModal errorMessage={errorMessage} />}
       <SuccessAnimation text={successMessage} duration={0.5} />

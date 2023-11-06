@@ -9,7 +9,7 @@ import "./whiteboard-creation-edition-input.css";
 interface WhiteboardCreationEditionInputProps {
   isEdition?: boolean;
   type: string;
-  title: string;
+  label: string;
   maxNumber: number;
   warningMessage?: string;
   groups?: any;
@@ -23,7 +23,7 @@ const WhiteboardCreationEdition: React.FC<
 > = ({
   isEdition,
   type,
-  title,
+  label,
   maxNumber,
   warningMessage,
   groups,
@@ -52,7 +52,7 @@ const WhiteboardCreationEdition: React.FC<
 
   return (
     <div className="input-container">
-      <p className="form-labels"> {title} </p>
+      <p className="form-labels"> {label} </p>
       {type == "name" && (
         <input
           disabled={isEdition}
