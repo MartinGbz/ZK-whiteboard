@@ -47,12 +47,7 @@ export const GlobalContextProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem(ZKWHITEBOARD_VAULTID_VARNAME);
-    console.log("logout");
   };
-
-  useEffect(() => {
-    console.log("@@user", user);
-  }, [user]);
 
   const router = useRouter();
   const pathname = usePathname();

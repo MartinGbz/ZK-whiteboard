@@ -11,8 +11,6 @@ interface pageProps {
 }
 
 const page = async ({ params }: pageProps) => {
-  // fetchGroups();
-
   if (isNaN(params.id)) return notFound();
   const whiteboard = await getWhiteboard(params.id);
   const groups = await fetchGroups();

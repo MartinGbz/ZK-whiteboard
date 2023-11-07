@@ -1,5 +1,4 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 
 import { MIN_WHITEBOARD } from "@/configs/configs";
 import { Autocomplete, Chip, TextField, TextareaAutosize } from "@mui/material";
@@ -20,9 +19,6 @@ interface WhiteboardCreationEditionInputProps {
   maxNumber: number;
   warningMessage?: string;
   groups?: any;
-  // onChange: (data: any) => void;
-  // inputOk: (state: boolean) => void;
-  // value?: any;
   control?: Control<FieldValues, any>;
   register?: UseFormRegister<FieldValues>;
   errors: FieldErrors<FieldValues>;
@@ -37,33 +33,10 @@ const WhiteboardCreationEdition: React.FC<
   maxNumber,
   warningMessage,
   groups,
-  // onChange,
-  // inputOk,
-  // value,
   control,
   register,
   errors,
 }) => {
-  // console.log("errors", errors);
-  // const [inputDataOk, setInputDataOk] = useState<boolean>(false);
-  // const [inputDataChanged, setInputDataChanged] = useState<boolean>(false);
-
-  // function onInputChange(value: any) {
-  // if (value?.length > 0) {
-  //   setInputDataChanged(true);
-  // }
-  // if (value?.length > maxNumber || value?.length < MIN_WHITEBOARD) {
-  //   setInputDataOk(false);
-  //   inputOk(false);
-  // } else {
-  //   setInputDataOk(true);
-  //   inputOk(true);
-  // }
-  // onChange(value);
-  // }
-
-  // console.log("render");
-
   return (
     <div className="input-container">
       <p className="form-labels"> {label} </p>
@@ -82,10 +55,6 @@ const WhiteboardCreationEdition: React.FC<
             height: "40x",
             cursor: isEdition ? "not-allowed" : "text",
           }}
-          // onChange={(event) => {
-          //   onInputChange(event.target.value);
-          // }}
-          // value={value ? value : undefined}
         />
       )}
       {type == "description" && register && (
@@ -97,10 +66,6 @@ const WhiteboardCreationEdition: React.FC<
           })}
           name={type}
           className="whiteboard-creation-inputs"
-          // onChange={(event) => {
-          //   onInputChange(event.target.value);
-          // }}
-          // value={value ? value : ""}
         />
       )}
       {type == "groups" && (
@@ -114,10 +79,8 @@ const WhiteboardCreationEdition: React.FC<
           }}
           render={({ field }) => {
             const { onChange, value } = field;
-            // console.log("value", value);
             return (
               <Autocomplete
-                // componentName="groups"
                 disabled={isEdition}
                 className="inputs"
                 ListboxProps={{
@@ -173,18 +136,12 @@ const WhiteboardCreationEdition: React.FC<
                 }
                 onChange={(event, value) => {
                   onChange(value);
-                  // onInputChange(value);
-                  // console.log(value);
                 }}
               />
             );
           }}
         />
       )}
-      {/* {inputDataChanged && !inputDataOk && (
-        <div className="warning-message">{warningMessage}</div>
-      )} */}
-      {/* // test if errors is not empty */}
       {errors[type] && <div className="warning-message">{warningMessage}</div>}
     </div>
   );

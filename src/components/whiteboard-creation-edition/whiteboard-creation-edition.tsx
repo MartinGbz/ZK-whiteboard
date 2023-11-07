@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   WhiteboardCreateSignedMessage,
@@ -9,7 +9,6 @@ import {
 } from "@/types/whiteboard-types";
 
 import "./whiteboard-creation-edition.css";
-// import { Whiteboard } from "@prisma/client";
 import {
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
   MAX_CHARACTERS_WHITEBOARD_NAME,
@@ -31,13 +30,12 @@ import {
 } from "@sismo-core/sismo-connect-react";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import axios from "axios";
-import ErrorModal from "../error-modal/error-modal";
 import SuccessAnimation from "../success-animation/success-animation";
 import WhiteboardCreationEditionInput from "../whiteboard-creation-edition-input/whiteboard-creation-edition-input";
 import Button from "../button/button";
-import { useLoginContext } from "@/context/login-context";
 import { Group } from "@/lib/groups";
-import { FieldValues, useForm, Controller } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -60,27 +58,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   groups,
 }) => {
   const router = useRouter();
-  // const [whiteboardName, setWhiteboardName] = useState<string>("");
-  // const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(
-  //   isEdition ? true : false
-  // );
-  // const [whiteboardDescription, setWhiteboardDescription] =
-  //   useState<string>("");
-  // const [whiteboardDescriptionOk, setWhiteboardDescriptionOk] =
-  //   useState<boolean>(isEdition ? true : false);
-  // const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
-  // const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(
-  //   isEdition ? true : false
-  // );
-  const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
-  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
-    useState<SismoConnectResponse | null>(null);
-  const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  // const [disableValidation, setDisableValidation] = useState<boolean>(false);
-  // const [disableValidationEdition, setDisableValidationEdition] =
-  //   useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const pathname = usePathname();
 
   const {
     register,
@@ -89,6 +67,12 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     formState: { errors },
     reset,
   } = useForm();
+
+  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
+    useState<SismoConnectResponse | null>(null);
+
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
     if (!whiteboard) return;
@@ -101,27 +85,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     });
   }, [reset, whiteboard]);
 
-  const pathname = usePathname();
-
-  const { user } = useLoginContext();
-
-  useEffect(() => {
-    setInitalWhiteboard(whiteboard);
-    // setWhiteboardName(whiteboard?.name || "");
-    // setWhiteboardDescription(whiteboard?.description || "");
-    // setSelectedGroups(
-    // groups
-    //   ? groups.filter((group: Group) =>
-    //       whiteboard?.groupIds?.includes(group.id)
-    //     )
-    //   : []
-    // );
-  }, [whiteboard]);
-
-  // console.log(
-  //   groups.filter((group: Group) => whiteboard?.groupIds?.includes(group.id))
-  // );
-
   function performAction(
     type: OperationType,
     name?: string,
@@ -130,9 +93,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   ) {
     if (
       (type === OperationType.EDIT || type === OperationType.DELETE) &&
-      !initalWhiteboard
+      !whiteboard
     ) {
-      console.error("No initial whiteboard");
+      const errorMessage = "No whiteboard to edit";
+      console.error(errorMessage);
+      toast.error(errorMessage);
       return;
     }
 
@@ -140,7 +105,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     switch (type) {
       case OperationType.POST:
         if (!name || !description || !groups) {
-          console.error("Missing parameters");
+          const errorMessage = "Missing parameters";
+          console.error(errorMessage);
+          toast.error(errorMessage);
           return;
         }
         sismoConnectSignedMessage = {
@@ -154,13 +121,15 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         break;
       case OperationType.EDIT:
         if (!description) {
-          console.error("Missing description parameter");
+          const errorMessage = "Missing description";
+          console.error(errorMessage);
+          toast.error(errorMessage);
           return;
         }
         sismoConnectSignedMessage = {
           type: type,
           message: {
-            ...initalWhiteboard,
+            ...whiteboard,
             description: description,
           },
         } as WhiteboardEditSignedMessage;
@@ -168,16 +137,17 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       case OperationType.DELETE:
         sismoConnectSignedMessage = {
           type: type,
-          message: initalWhiteboard,
+          message: whiteboard,
         } as WhiteboardEditSignedMessage;
         break;
       default:
-        console.error("Invalid action type");
+        const errorMessage = "Invalid action type";
+        console.error(errorMessage);
+        toast.error(errorMessage);
         return;
     }
 
     if (!sismoConnectSignedMessage) {
-      console.error("No message");
       return;
     }
 
@@ -238,7 +208,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             const errorMessage = error.response.data.error
               ? `${defaultErrorMessage}: ${error.response.data.error}`
               : defaultErrorMessage;
-            setErrorMessage(errorMessage);
+            console.error(errorMessage);
+            toast.error(errorMessage);
             return false;
           }
         }
@@ -291,38 +262,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     }
   }, [pathname, router, sismoConnectResponseMessage]);
 
-  // useEffect(() => {
-  //   if (
-  //     whiteboardNameOk &&
-  //     whiteboardDescriptionOk &&
-  //     selectedGroupsOk &&
-  //     user
-  //   ) {
-  //     setDisableValidation(false);
-  //   } else {
-  //     setDisableValidation(true);
-  //   }
-  //   if (whiteboardDescriptionOk) {
-  //     setDisableValidationEdition(false);
-  //   } else {
-  //     setDisableValidationEdition(true);
-  //   }
-  // }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
-
-  // function handleSubmit(event: FormEvent<HTMLFormElement>) {
-  //   event.preventDefault();
-  //   console.log({ event });
-  //   const formData = new FormData(event.currentTarget);
-  //   console.log({ formData });
-  //   console.log(String(formData.get("test")));
-  //   console.log(String(formData.get("name")));
-  //   console.log(String(formData.get("description")));
-  //   console.log(String(formData.get("groups")));
-  //   // throw new Error("Function not implemented.");
-  // }
-
   const onSubmit = (formData: FieldValues) => {
-    console.log({ formData });
     if (isEdition) {
       performAction(OperationType.EDIT, undefined, formData.description);
     } else {
@@ -362,9 +302,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             label="Name"
             maxNumber={MAX_CHARACTERS_WHITEBOARD_NAME}
             warningMessage={MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
-            // inputOk={setWhiteboardNameOk}
-            // onChange={setWhiteboardName}
-            // value={whiteboard?.name || ""}
             register={register}
             errors={errors}
           />
@@ -374,9 +311,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             label="Description"
             maxNumber={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION}
             warningMessage={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
-            // inputOk={setWhiteboardDescriptionOk}
-            // onChange={setWhiteboardDescription}
-            // value={whiteboard?.description || ""}
             register={register}
             errors={errors}
           />
@@ -388,15 +322,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 label="Group(s)"
                 maxNumber={MAX_WHITEBOARD_GROUPS}
                 warningMessage={MAX_WHITEBOARD_GROUPS_MESSAGE}
-                // inputOk={setSelectedGroupsOk}
-                // onChange={setSelectedGroups}
-                // value={
-                //   groups
-                //     ? groups.filter((group: Group) =>
-                //         whiteboard?.groupIds?.includes(group.id)
-                //       )
-                //     : []
-                // }
                 groups={groups}
                 control={control}
                 errors={errors}
@@ -439,40 +364,27 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               </div>
             )}
           </div>
-          {/* <Button
-          style={{
-            backgroundColor:
-              (isEdition && disableValidationEdition) ||
-              (!isEdition && disableValidation)
-                ? greenColorDisabled
-                : greenColor,
-            cursor:
-              (isEdition && disableValidationEdition) ||
-              (!isEdition && disableValidation)
-                ? "default"
-                : "pointer",
-            pointerEvents:
-              (isEdition && disableValidationEdition) ||
-              (!isEdition && disableValidation)
-                ? "none"
-                : "auto",
-            marginTop: "20px",
-          }}
-          onClick={() => {
-            if (!isEdition) performAction(OperationType.POST);
-            if (isEdition) performAction(OperationType.EDIT);
-          }}
-          // disabled={isEdition ? disableValidationEdition : disableValidation}
-          type="validate"
-          title={isEdition ? "Save" : "Create"}
-          fontSize="15px"
-          iconSpace="4px"></Button> */}
-          <input type="submit" value="Submit" />
+          <Button
+            type="submit"
+            style={{
+              backgroundColor:
+                Object.keys(errors).length !== 0
+                  ? greenColorDisabled
+                  : greenColor,
+              cursor: Object.keys(errors).length !== 0 ? "default" : "pointer",
+              pointerEvents: Object.keys(errors).length !== 0 ? "none" : "auto",
+              marginTop: "20px",
+            }}
+            disabled={Object.keys(errors).length !== 0}
+            buttonType="validate"
+            title={isEdition ? "Save" : "Create"}
+            fontSize="15px"
+            iconSpace="4px"></Button>
         </form>
         {isEdition && (
           <Button
             className="create-edit-button"
-            type="delete"
+            buttonType="delete"
             title="Delete"
             onClick={() => {
               performAction(OperationType.DELETE);
@@ -485,8 +397,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           />
         )}
       </div>
-      {!errorMessage && isVerifying && <Loading text="Checking the proof..." />}
-      {errorMessage && <ErrorModal errorMessage={errorMessage} />}
+      {isVerifying && <Loading text="Checking the proof..." />}
       <SuccessAnimation text={successMessage} duration={0.5} />
     </div>
   );

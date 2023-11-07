@@ -49,7 +49,7 @@ export const Whiteboards = ({ whiteboards }: WhiteboardsProps) => {
               }>
               <span>
                 <Button
-                  type="create"
+                  buttonType="create"
                   title="Create"
                   onClick={() => {
                     router.push("/create-whiteboard");
@@ -66,7 +66,7 @@ export const Whiteboards = ({ whiteboards }: WhiteboardsProps) => {
           )}
           {user && user.createdWhiteboards.length < MAX_WHITEBOARD_PER_USER && (
             <Button
-              type="create"
+              buttonType="create"
               title="Create"
               onClick={() => {
                 router.push("/create-whiteboard");

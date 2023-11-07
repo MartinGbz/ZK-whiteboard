@@ -50,12 +50,11 @@ const Header = () => {
         const whiteboard: Whiteboard = response.data;
         setWhiteboardName(whiteboard.name);
       } catch (error) {
-        console.log("error", error);
+        console.error("error", error);
       }
     };
 
     const whiteboardId = extractNumberFromPath(pathname);
-    console.log("------- whiteboardId", whiteboardId);
     if (!whiteboardId) return;
 
     getWhiteboardName(whiteboardId);

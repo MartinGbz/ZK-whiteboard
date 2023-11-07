@@ -7,10 +7,11 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import { greenColor, redColor } from "@/configs/configs";
 
-interface WhiteboardCreationEditionInputProps {
-  type: string;
+interface ButtonProps {
+  type?: "button" | "submit" | "reset";
+  buttonType: string;
   title: string;
-  onClick: (e: any) => void;
+  onClick?: (e: any) => void;
   disabled?: boolean;
   style?: CSSProperties;
   fontSize?: string;
@@ -19,10 +20,9 @@ interface WhiteboardCreationEditionInputProps {
   className?: string;
 }
 
-const WhiteboardCreationEdition: React.FC<
-  WhiteboardCreationEditionInputProps
-> = ({
-  type,
+const Button = ({
+  type = "button",
+  buttonType,
   title,
   onClick,
   style,
@@ -31,17 +31,18 @@ const WhiteboardCreationEdition: React.FC<
   disabled,
   className,
   iconSize,
-}) => {
+}: ButtonProps) => {
   return (
     <button
+      type={type}
       className={"button-parent " + className}
       onClick={onClick}
       disabled={disabled}
       style={{
         backgroundColor:
-          type == "delete"
+          buttonType == "delete"
             ? redColor
-            : type == "validate" || type == "create"
+            : buttonType == "validate" || buttonType == "create"
             ? greenColor
             : "white",
         cursor: "pointer",
@@ -55,7 +56,7 @@ const WhiteboardCreationEdition: React.FC<
           alignItems: "center",
           justifyContent: "center",
         }}>
-        {type == "validate" && (
+        {buttonType == "validate" && (
           <CheckCircleOutlineIcon
             className="icon"
             style={{
@@ -64,7 +65,7 @@ const WhiteboardCreationEdition: React.FC<
             }}
           />
         )}
-        {type == "create" && (
+        {buttonType == "create" && (
           <AddIcon
             className="icon"
             style={{
@@ -73,7 +74,7 @@ const WhiteboardCreationEdition: React.FC<
             }}
           />
         )}
-        {type == "delete" && (
+        {buttonType == "delete" && (
           <DeleteOutlineIcon
             className="icon"
             style={{
@@ -88,4 +89,4 @@ const WhiteboardCreationEdition: React.FC<
   );
 };
 
-export default WhiteboardCreationEdition;
+export default Button;
