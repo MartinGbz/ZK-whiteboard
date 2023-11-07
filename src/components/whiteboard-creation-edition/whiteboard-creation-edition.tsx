@@ -37,6 +37,7 @@ import WhiteboardCreationEditionInput from "../whiteboard-creation-edition-input
 import Button from "../button/button";
 import { useLoginContext } from "@/context/login-context";
 import { Group } from "@/lib/groups";
+import { FieldValues, useForm, Controller } from "react-hook-form";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -59,27 +60,46 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   groups,
 }) => {
   const router = useRouter();
-  const [whiteboardName, setWhiteboardName] = useState<string>("");
-  const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(
-    isEdition ? true : false
-  );
-  const [whiteboardDescription, setWhiteboardDescription] =
-    useState<string>("");
-  const [whiteboardDescriptionOk, setWhiteboardDescriptionOk] =
-    useState<boolean>(isEdition ? true : false);
-  const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
-  const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(
-    isEdition ? true : false
-  );
+  // const [whiteboardName, setWhiteboardName] = useState<string>("");
+  // const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(
+  //   isEdition ? true : false
+  // );
+  // const [whiteboardDescription, setWhiteboardDescription] =
+  //   useState<string>("");
+  // const [whiteboardDescriptionOk, setWhiteboardDescriptionOk] =
+  //   useState<boolean>(isEdition ? true : false);
+  // const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
+  // const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(
+  //   isEdition ? true : false
+  // );
   const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  const [disableValidation, setDisableValidation] = useState<boolean>(false);
-  const [disableValidationEdition, setDisableValidationEdition] =
-    useState<boolean>(false);
+  // const [disableValidation, setDisableValidation] = useState<boolean>(false);
+  // const [disableValidationEdition, setDisableValidationEdition] =
+  //   useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  useEffect(() => {
+    if (!whiteboard) return;
+    reset({
+      name: whiteboard.name,
+      description: whiteboard.description,
+      groups: groups.filter((group: Group) =>
+        whiteboard?.groupIds?.includes(group.id)
+      ),
+    });
+  }, [reset, whiteboard]);
 
   const pathname = usePathname();
 
@@ -87,18 +107,27 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
 
   useEffect(() => {
     setInitalWhiteboard(whiteboard);
-    setWhiteboardName(whiteboard?.name || "");
-    setWhiteboardDescription(whiteboard?.description || "");
-    setSelectedGroups(
-      groups
-        ? groups.filter((group: Group) =>
-            whiteboard?.groupIds?.includes(group.id)
-          )
-        : []
-    );
+    // setWhiteboardName(whiteboard?.name || "");
+    // setWhiteboardDescription(whiteboard?.description || "");
+    // setSelectedGroups(
+    // groups
+    //   ? groups.filter((group: Group) =>
+    //       whiteboard?.groupIds?.includes(group.id)
+    //     )
+    //   : []
+    // );
   }, [whiteboard]);
 
-  function performAction(type: OperationType) {
+  // console.log(
+  //   groups.filter((group: Group) => whiteboard?.groupIds?.includes(group.id))
+  // );
+
+  function performAction(
+    type: OperationType,
+    name?: string,
+    description?: string,
+    groups?: Group[]
+  ) {
     if (
       (type === OperationType.EDIT || type === OperationType.DELETE) &&
       !initalWhiteboard
@@ -110,21 +139,29 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     let sismoConnectSignedMessage;
     switch (type) {
       case OperationType.POST:
+        if (!name || !description || !groups) {
+          console.error("Missing parameters");
+          return;
+        }
         sismoConnectSignedMessage = {
           type: type,
           message: {
-            name: whiteboardName,
-            description: whiteboardDescription,
-            groupIds: selectedGroups.map((group: Group) => group.id),
+            name: name,
+            description: description,
+            groupIds: groups?.map((group: Group) => group.id),
           },
         } as WhiteboardCreateSignedMessage;
         break;
       case OperationType.EDIT:
+        if (!description) {
+          console.error("Missing description parameter");
+          return;
+        }
         sismoConnectSignedMessage = {
           type: type,
           message: {
             ...initalWhiteboard,
-            description: whiteboardDescription,
+            description: description,
           },
         } as WhiteboardEditSignedMessage;
         break;
@@ -254,30 +291,49 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     }
   }, [pathname, router, sismoConnectResponseMessage]);
 
-  useEffect(() => {
-    if (
-      whiteboardNameOk &&
-      whiteboardDescriptionOk &&
-      selectedGroupsOk &&
-      user
-    ) {
-      setDisableValidation(false);
-    } else {
-      setDisableValidation(true);
-    }
-    if (whiteboardDescriptionOk) {
-      setDisableValidationEdition(false);
-    } else {
-      setDisableValidationEdition(true);
-    }
-  }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
+  // useEffect(() => {
+  //   if (
+  //     whiteboardNameOk &&
+  //     whiteboardDescriptionOk &&
+  //     selectedGroupsOk &&
+  //     user
+  //   ) {
+  //     setDisableValidation(false);
+  //   } else {
+  //     setDisableValidation(true);
+  //   }
+  //   if (whiteboardDescriptionOk) {
+  //     setDisableValidationEdition(false);
+  //   } else {
+  //     setDisableValidationEdition(true);
+  //   }
+  // }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
 
   // function handleSubmit(event: FormEvent<HTMLFormElement>) {
   //   event.preventDefault();
+  //   console.log({ event });
   //   const formData = new FormData(event.currentTarget);
   //   console.log({ formData });
-  //   throw new Error("Function not implemented.");
+  //   console.log(String(formData.get("test")));
+  //   console.log(String(formData.get("name")));
+  //   console.log(String(formData.get("description")));
+  //   console.log(String(formData.get("groups")));
+  //   // throw new Error("Function not implemented.");
   // }
+
+  const onSubmit = (formData: FieldValues) => {
+    console.log({ formData });
+    if (isEdition) {
+      performAction(OperationType.EDIT, undefined, formData.description);
+    } else {
+      performAction(
+        OperationType.POST,
+        formData.name,
+        formData.description,
+        formData.groups
+      );
+    }
+  };
 
   return (
     <div
@@ -299,79 +355,91 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 " max per user)"}
           </div>
         </div>
-        {/* <form onSubmit={handleSubmit}> */}
-        <WhiteboardCreationEditionInput
-          isEdition={isEdition}
-          type="name"
-          label="Name"
-          maxNumber={MAX_CHARACTERS_WHITEBOARD_NAME}
-          warningMessage={MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
-          inputOk={setWhiteboardNameOk}
-          onChange={setWhiteboardName}
-          value={whiteboardName}
-        />
-        <WhiteboardCreationEditionInput
-          isEdition={isEdition}
-          type="description"
-          label="Description"
-          maxNumber={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION}
-          warningMessage={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
-          inputOk={setWhiteboardDescriptionOk}
-          onChange={setWhiteboardDescription}
-          value={whiteboardDescription}
-        />
-        <div className="groups-input-container">
-          <div>
-            <WhiteboardCreationEditionInput
-              isEdition={isEdition}
-              type="groups"
-              label="Group(s)"
-              maxNumber={MAX_WHITEBOARD_GROUPS}
-              warningMessage={MAX_WHITEBOARD_GROUPS_MESSAGE}
-              inputOk={setSelectedGroupsOk}
-              onChange={setSelectedGroups}
-              value={selectedGroups}
-              groups={groups}
-            />
-            <a
-              style={{
-                fontSize: "11px",
-                color: "grey",
-                textDecoration: "underline",
-              }}
-              target="_blank"
-              href="https://docs.sismo.io/sismo-docs/data-groups/data-groups-and-creation">
-              What are Groups?
-            </a>
-          </div>
-          {!isEdition && (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <WhiteboardCreationEditionInput
+            isEdition={isEdition}
+            type="name"
+            label="Name"
+            maxNumber={MAX_CHARACTERS_WHITEBOARD_NAME}
+            warningMessage={MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
+            // inputOk={setWhiteboardNameOk}
+            // onChange={setWhiteboardName}
+            // value={whiteboard?.name || ""}
+            register={register}
+            errors={errors}
+          />
+          <WhiteboardCreationEditionInput
+            isEdition={isEdition}
+            type="description"
+            label="Description"
+            maxNumber={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION}
+            warningMessage={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
+            // inputOk={setWhiteboardDescriptionOk}
+            // onChange={setWhiteboardDescription}
+            // value={whiteboard?.description || ""}
+            register={register}
+            errors={errors}
+          />
+          <div className="groups-input-container">
             <div>
-              <p
+              <WhiteboardCreationEditionInput
+                isEdition={isEdition}
+                type="groups"
+                label="Group(s)"
+                maxNumber={MAX_WHITEBOARD_GROUPS}
+                warningMessage={MAX_WHITEBOARD_GROUPS_MESSAGE}
+                // inputOk={setSelectedGroupsOk}
+                // onChange={setSelectedGroups}
+                // value={
+                //   groups
+                //     ? groups.filter((group: Group) =>
+                //         whiteboard?.groupIds?.includes(group.id)
+                //       )
+                //     : []
+                // }
+                groups={groups}
+                control={control}
+                errors={errors}
+              />
+              <a
                 style={{
-                  fontSize: "12px",
-                  color: "black",
-                  backgroundColor: "#e9e9e9",
-                }}>
-                No groups fit your needs? Create one here!
-              </p>
-              <a target="_blank" href="https://factory.sismo.io/create-group">
-                <div
-                  className="create-group-button"
-                  style={{
-                    backgroundColor: purpleColor,
-                  }}>
-                  <OpenInNewIcon
-                    sx={{
-                      fontSize: "15px",
-                    }}
-                  />{" "}
-                  Create a group
-                </div>
+                  fontSize: "11px",
+                  color: "grey",
+                  textDecoration: "underline",
+                }}
+                target="_blank"
+                href="https://docs.sismo.io/sismo-docs/data-groups/data-groups-and-creation">
+                What are Groups?
               </a>
             </div>
-          )}
-        </div>
-        <Button
+            {!isEdition && (
+              <div>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "black",
+                    backgroundColor: "#e9e9e9",
+                  }}>
+                  No groups fit your needs? Create one here!
+                </p>
+                <a target="_blank" href="https://factory.sismo.io/create-group">
+                  <div
+                    className="create-group-button"
+                    style={{
+                      backgroundColor: purpleColor,
+                    }}>
+                    <OpenInNewIcon
+                      sx={{
+                        fontSize: "15px",
+                      }}
+                    />{" "}
+                    Create a group
+                  </div>
+                </a>
+              </div>
+            )}
+          </div>
+          {/* <Button
           style={{
             backgroundColor:
               (isEdition && disableValidationEdition) ||
@@ -398,9 +466,9 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           type="validate"
           title={isEdition ? "Save" : "Create"}
           fontSize="15px"
-          iconSpace="4px"></Button>
-        {/* <input type="submit" value="Submit" />
-        </form> */}
+          iconSpace="4px"></Button> */}
+          <input type="submit" value="Submit" />
+        </form>
         {isEdition && (
           <Button
             className="create-edit-button"
