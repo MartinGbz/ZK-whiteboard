@@ -149,7 +149,7 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
         let errorMessage = type
           ? `An error occured while ${type} your message`
           : "An error occured while deleting or posting your message";
-        errorMessage = error.response.data.error
+        errorMessage = error?.response?.data?.error
           ? `${errorMessage}: ${error.response.data.error}`
           : errorMessage;
         toast.error(errorMessage);

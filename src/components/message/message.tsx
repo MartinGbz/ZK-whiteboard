@@ -117,7 +117,7 @@ const Message: React.FC<MessageProps> = ({
       } catch (error: any) {
         const defaultErrorMessage =
           "An error occured while fetching the messages reactions";
-        const errorMessage = error.response.data.error
+        const errorMessage = error?.response?.data?.error
           ? `${defaultErrorMessage}: ${error.response.data.error}`
           : defaultErrorMessage;
         onError && onError(errorMessage);
@@ -200,7 +200,7 @@ const Message: React.FC<MessageProps> = ({
       } catch (error: any) {
         const defaultErrorMessage =
           "An error occured while posting your reaction";
-        const errorMessage = error.response.data.error
+        const errorMessage = error?.response?.data?.error
           ? `${defaultErrorMessage}: ${error.response.data.error}`
           : defaultErrorMessage;
         onError && onError(errorMessage);

@@ -5,8 +5,6 @@ import {
 import { getWhiteboards } from "@/app/api/common";
 
 export async function getWhiteboardsFormatted() {
-  // wait 5 seconds to test loading modal
-  // await new Promise((resolve) => setTimeout(resolve, 100000));
   const whiteboards = await fetchWhiteboards();
   if (!whiteboards) return;
   const whiteboardsWithResolvedGroupIds: WhiteboardIndex[] =
@@ -23,7 +21,7 @@ const fetchWhiteboards = async () => {
   } catch (error: any) {
     console.error("API request error:", error);
     const defaultErrorMessage = "An error occured while fetching whiteboards";
-    const errorMessage = error.response.data.error
+    const errorMessage = error?.response?.data?.error
       ? `${defaultErrorMessage}: ${error.response.data.error}`
       : defaultErrorMessage;
     throw new Error(errorMessage);

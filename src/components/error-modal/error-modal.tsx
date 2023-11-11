@@ -5,6 +5,8 @@ import { MAX_Z_INDEX, redColor } from "@/configs/configs";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useRouter, usePathname } from "next/navigation";
 
+import RefreshIcon from "@mui/icons-material/Refresh";
+
 interface ErrorModalProps {
   errorMessage: string;
   reset?: () => void;
@@ -105,7 +107,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ errorMessage, reset }) => {
                 // Attempt to recover by trying to re-render the segment
                 () => (reset ? reset() : null)
               }>
-              Please refresh the page: ⌘+R
+              <RefreshIcon /> Refresh the page
             </div>
             <p
               style={{
@@ -119,6 +121,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ errorMessage, reset }) => {
                 style={{
                   textDecoration: "underline",
                 }}
+                target="_blank"
                 href="https://twitter.com/0xMartinGbz">
                 0xMartinGbz
               </a>

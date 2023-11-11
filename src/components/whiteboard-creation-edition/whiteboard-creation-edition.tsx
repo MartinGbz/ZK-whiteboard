@@ -205,7 +205,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           if (i === retryMax - 1) {
             console.error("API request error:", error);
             const defaultErrorMessage = "An error occured";
-            const errorMessage = error.response.data.error
+            const errorMessage = error?.response?.data?.error
               ? `${defaultErrorMessage}: ${error.response.data.error}`
               : defaultErrorMessage;
             console.error(errorMessage);
