@@ -131,6 +131,7 @@ export const getWhiteboards = async () => {
     w."appId",
     w."authorVaultId",
     w.curated,
+    w."minLevel",
     w."createdAt",
     w."updatedAt",
     COUNT(m.id) as "messagesCount"

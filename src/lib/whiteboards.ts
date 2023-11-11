@@ -47,6 +47,7 @@ async function convertWhiteboardIdsToNames(
         appId: whiteboard.appId,
         authorVaultId: whiteboard.authorVaultId,
         curated: whiteboard.curated,
+        minLevel: whiteboard.minLevel,
         createdAt: whiteboard.createdAt,
         updatedAt: whiteboard.updatedAt,
         groupNames: resolvedGroupNames,

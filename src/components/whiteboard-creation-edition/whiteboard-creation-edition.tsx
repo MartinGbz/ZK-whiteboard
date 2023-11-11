@@ -69,10 +69,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     reset,
   } = useForm();
 
-  useEffect(() => {
-    console.log({ errors });
-  }, [errors]);
-
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
 
@@ -272,12 +268,10 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   }, [pathname, router, sismoConnectResponseMessage]);
 
   const onSubmit = (formData: FieldValues) => {
-    console.log({ formData });
     const formDataValidated = { ...formData };
     if (!formDataValidated.minLevel) {
       formDataValidated.minLevel = 0;
     }
-    console.log({ formDataValidated });
     if (isEdition) {
       performAction(
         OperationType.EDIT,

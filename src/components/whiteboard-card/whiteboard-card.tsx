@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { WhiteboardIndex } from "@/types/whiteboard-types";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -254,6 +254,15 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             {index < whiteboard.groupNames.length - 1 && ", "}
           </span>
         ))}
+        <div>
+          <span
+            style={{
+              color: "black",
+            }}>
+            {"Minimum level: "}
+          </span>
+          {whiteboard.minLevel}
+        </div>
       </div>
     </div>
   );

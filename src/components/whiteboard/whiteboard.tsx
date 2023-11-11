@@ -84,10 +84,6 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
   const { user } = useLoginContext();
 
   useEffect(() => {
-    console.log(isModalOpen);
-  }, [isModalOpen]);
-
-  useEffect(() => {
     whiteboardVaultId.current = localStorage.getItem(
       WHITEBOARD_VAULTID_VARNAME + whiteboard.id
     );
@@ -97,18 +93,10 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
         message.authorVaultId === whiteboardVaultId.current
     );
 
-    console.log("---isUserMessageExists", isUserMessageExists);
-    console.log("---whiteboard.messages", whiteboard.messages);
-    console.log("---whiteboard.messages", whiteboardVaultId.current);
-
     setIsUserMessageExists(isUserMessageExists);
-
-    console.log("whiteboardVaultId.current", whiteboardVaultId.current);
   }, [whiteboard]);
 
   useEffect(() => {
-    console.log("whiteboard", whiteboard);
-    console.log("whiteboard.messages.length", whiteboard.messages.length);
     if (whiteboard?.appId) {
       localStorage.setItem(CURRENT_APPID_VARNAME, whiteboard.appId);
       sismoConnect = SismoConnect({
@@ -283,7 +271,6 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
           }}
           onClick={(e) => {
             !isUserMessageExists && startMessageCreation(e);
-            console.log("isUserMessageExists", isUserMessageExists);
           }}>
           {whiteboardVaultId.current &&
             whiteboard.messages.map((message: MessageType) => (

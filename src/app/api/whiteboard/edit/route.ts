@@ -17,7 +17,6 @@ async function saveWhiteboard(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
-  console.log("saveWhiteboard");
   if (
     signedMessage.message.description.length >
     MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
@@ -46,7 +45,6 @@ async function saveWhiteboardToDB(
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
   try {
-    console.log("saveWhiteboardToDB");
     const whiteboardId = parseInt(signedMessage.message.id.toString());
 
     if (!whiteboardId) {
@@ -64,8 +62,6 @@ async function saveWhiteboardToDB(
       },
     });
 
-    console.log("existingWhiteboard", existingWhiteboard);
-
     if (existingWhiteboard?.authorVaultId !== vaultId) {
       return NextResponse.json(
         {
@@ -74,9 +70,6 @@ async function saveWhiteboardToDB(
         { status: 401 }
       );
     }
-
-    console.log("BEFORE editedWhiteboard");
-    console.log(signedMessage.message.minLevel);
 
     try {
       const editedWhiteboard = await prisma.whiteboard.update({
@@ -88,10 +81,8 @@ async function saveWhiteboardToDB(
           minLevel: Number(signedMessage.message.minLevel),
         },
       });
-      console.log("editedWhiteboard", editedWhiteboard);
       return NextResponse.json(editedWhiteboard, { status: 200 });
     } catch (error: any) {
-      console.log("error", error);
       return NextResponse.json(
         {
           error: "Error while editing the whiteboard",
