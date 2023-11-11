@@ -1,5 +1,9 @@
 import { SignedMessage, Whiteboard } from "@/types/whiteboard-types";
-import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
+import {
+  Claim,
+  ClaimType,
+  SismoConnectResponse,
+} from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import { MAX_CHARACTERS } from "@/configs/configs";
@@ -37,19 +41,26 @@ async function addMessage(
       { status: 403 }
     );
   }
-  const claims = whiteboard?.groupIds?.map((groupId) => ({
+  const claims: Claim[] = whiteboard?.groupIds?.map((groupId) => ({
     groupId: groupId,
+    claimType: ClaimType.GTE,
+    value: whiteboard?.minLevel,
   }));
-  const vaultId = await verifyResponse(
-    sismoConnectResponse,
-    whiteboard.appId,
-    claims
-  );
-
-  if (vaultId) {
+  try {
+    const vaultId = await verifyResponse(
+      sismoConnectResponse,
+      whiteboard.appId,
+      claims
+    );
+    if (!vaultId) {
+      return NextResponse.json(
+        { error: "ZK Proof incorrect 1" },
+        { status: 401 }
+      );
+    }
     const response = await addMessageToDB(vaultId, signedMessage);
     return response;
-  } else {
+  } catch (error) {
     return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
 }

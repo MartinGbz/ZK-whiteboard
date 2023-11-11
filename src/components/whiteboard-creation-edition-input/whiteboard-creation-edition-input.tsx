@@ -14,7 +14,8 @@ import "./whiteboard-creation-edition-input.css";
 
 interface WhiteboardCreationEditionInputProps {
   isEdition?: boolean;
-  type: string;
+  type: "text" | "textareaAutosize" | "autocomplete";
+  name: string;
   label: string;
   maxNumber: number;
   warningMessage?: string;
@@ -29,6 +30,7 @@ const WhiteboardCreationEdition: React.FC<
 > = ({
   isEdition,
   type,
+  name,
   label,
   maxNumber,
   warningMessage,
@@ -39,17 +41,16 @@ const WhiteboardCreationEdition: React.FC<
 }) => {
   return (
     <div className="input-container">
-      <p className="form-labels"> {label} </p>
-      {type == "name" && register && (
+      <label className="form-labels"> {label} </label>
+      {type == "text" && register && (
         <input
-          {...register(type, {
+          {...register(name, {
             required: isEdition ? false : true,
             minLength: MIN_WHITEBOARD,
             maxLength: maxNumber,
           })}
           disabled={isEdition}
           type="text"
-          name={type}
           className="whiteboard-creation-inputs"
           style={{
             height: "40x",
@@ -57,20 +58,19 @@ const WhiteboardCreationEdition: React.FC<
           }}
         />
       )}
-      {type == "description" && register && (
+      {type == "textareaAutosize" && register && (
         <TextareaAutosize
-          {...register(type, {
+          {...register(name, {
             required: true,
             minLength: MIN_WHITEBOARD,
             maxLength: maxNumber,
           })}
-          name={type}
           className="whiteboard-creation-inputs"
         />
       )}
-      {type == "groups" && (
+      {type == "autocomplete" && (
         <Controller
-          name="groups"
+          name={name}
           control={control}
           rules={{
             required: isEdition ? false : true,
@@ -93,7 +93,6 @@ const WhiteboardCreationEdition: React.FC<
                 noOptionsText={"No groups found"}
                 renderInput={(params) => (
                   <TextField
-                    name={type}
                     {...params}
                     InputProps={{
                       ...params.InputProps,
@@ -142,7 +141,7 @@ const WhiteboardCreationEdition: React.FC<
           }}
         />
       )}
-      {errors[type] && <div className="warning-message">{warningMessage}</div>}
+      {errors[name] && <div className="warning-message">{warningMessage}</div>}
     </div>
   );
 };

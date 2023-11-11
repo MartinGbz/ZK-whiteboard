@@ -13,6 +13,7 @@ import {
 
 import {
   AuthType,
+  ClaimType,
   SismoConnect,
   SismoConnectClient,
   SismoConnectResponse,
@@ -83,6 +84,10 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
   const { user } = useLoginContext();
 
   useEffect(() => {
+    console.log(isModalOpen);
+  }, [isModalOpen]);
+
+  useEffect(() => {
     whiteboardVaultId.current = localStorage.getItem(
       WHITEBOARD_VAULTID_VARNAME + whiteboard.id
     );
@@ -92,10 +97,18 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
         message.authorVaultId === whiteboardVaultId.current
     );
 
+    console.log("---isUserMessageExists", isUserMessageExists);
+    console.log("---whiteboard.messages", whiteboard.messages);
+    console.log("---whiteboard.messages", whiteboardVaultId.current);
+
     setIsUserMessageExists(isUserMessageExists);
-  }, [whiteboard.id]);
+
+    console.log("whiteboardVaultId.current", whiteboardVaultId.current);
+  }, [whiteboard]);
 
   useEffect(() => {
+    console.log("whiteboard", whiteboard);
+    console.log("whiteboard.messages.length", whiteboard.messages.length);
     if (whiteboard?.appId) {
       localStorage.setItem(CURRENT_APPID_VARNAME, whiteboard.appId);
       sismoConnect = SismoConnect({
@@ -147,7 +160,7 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
           ? (JSON.parse(message.signedMessage) as SignedMessage).type
           : null;
         let errorMessage = type
-          ? `An error occured while ${type} your message`
+          ? `An error occured while ${type}ing your message`
           : "An error occured while deleting or posting your message";
         errorMessage = error?.response?.data?.error
           ? `${errorMessage}: ${error.response.data.error}`
@@ -202,6 +215,8 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
     };
     const claims = whiteboard?.groupIds?.map((groupId) => ({
       groupId: groupId,
+      claimType: ClaimType.GTE,
+      value: whiteboard.minLevel,
     }));
     if (!sismoConnect) {
       console.error("Error with sismoConnect");
@@ -257,7 +272,7 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
 
   return (
     <div className="whiteboard">
-      {whiteboard.messages && whiteboardVaultId.current && (
+      {whiteboard.messages && (
         <div
           className="messages_container"
           ref={containerMessageModalRef}
@@ -266,19 +281,23 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
             position: "relative",
             overflow: "scroll",
           }}
-          onClick={(e) => !isUserMessageExists && startMessageCreation(e)}>
-          {whiteboard.messages.map((message: MessageType) => (
-            <Message
-              key={message.authorVaultId}
-              message={message}
-              appId={whiteboard?.appId ?? ""}
-              vaultId={whiteboardVaultId.current ?? ""}
-              onDelete={(message) => requestDeleteMessage(message)}
-              onError={(errorMessage) => {
-                throw new Error(errorMessage);
-              }}
-            />
-          ))}
+          onClick={(e) => {
+            !isUserMessageExists && startMessageCreation(e);
+            console.log("isUserMessageExists", isUserMessageExists);
+          }}>
+          {whiteboardVaultId.current &&
+            whiteboard.messages.map((message: MessageType) => (
+              <Message
+                key={message.authorVaultId}
+                message={message}
+                appId={whiteboard?.appId ?? ""}
+                vaultId={whiteboardVaultId.current}
+                onDelete={(message) => requestDeleteMessage(message)}
+                onError={(errorMessage) => {
+                  toast.error(errorMessage);
+                }}
+              />
+            ))}
           {whiteboard.messages.length == 0 && (
             <div
               style={{

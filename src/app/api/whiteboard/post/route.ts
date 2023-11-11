@@ -108,6 +108,7 @@ async function saveWhiteboardToDB(
       name: signedMessage.message.name,
       description: signedMessage.message.description,
       groupIds: signedMessage.message.groupIds,
+      minLevel: signedMessage.message.minLevel,
       curated: false,
       author: {
         connect: { vaultId: vaultId },

@@ -17,8 +17,10 @@ async function saveWhiteboard(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
+  console.log("saveWhiteboard");
   if (
-    signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
+    signedMessage.message.description.length >
+    MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
   ) {
     return NextResponse.json(
       {
@@ -44,6 +46,7 @@ async function saveWhiteboardToDB(
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
   try {
+    console.log("saveWhiteboardToDB");
     const whiteboardId = parseInt(signedMessage.message.id.toString());
 
     if (!whiteboardId) {
@@ -61,6 +64,8 @@ async function saveWhiteboardToDB(
       },
     });
 
+    console.log("existingWhiteboard", existingWhiteboard);
+
     if (existingWhiteboard?.authorVaultId !== vaultId) {
       return NextResponse.json(
         {
@@ -70,15 +75,30 @@ async function saveWhiteboardToDB(
       );
     }
 
-    const editedWhiteboard = await prisma.whiteboard.update({
-      where: {
-        id: whiteboardId,
-      },
-      data: {
-        description: signedMessage.message.description,
-      },
-    });
-    return NextResponse.json(editedWhiteboard, { status: 200 });
+    console.log("BEFORE editedWhiteboard");
+    console.log(signedMessage.message.minLevel);
+
+    try {
+      const editedWhiteboard = await prisma.whiteboard.update({
+        where: {
+          id: whiteboardId,
+        },
+        data: {
+          description: signedMessage.message.description,
+          minLevel: Number(signedMessage.message.minLevel),
+        },
+      });
+      console.log("editedWhiteboard", editedWhiteboard);
+      return NextResponse.json(editedWhiteboard, { status: 200 });
+    } catch (error: any) {
+      console.log("error", error);
+      return NextResponse.json(
+        {
+          error: "Error while editing the whiteboard",
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
   }

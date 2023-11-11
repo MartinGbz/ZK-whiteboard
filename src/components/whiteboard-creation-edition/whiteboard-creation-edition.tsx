@@ -36,6 +36,7 @@ import Button from "../button/button";
 import { Group } from "@/lib/groups";
 import { FieldValues, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import Checkbox from "@mui/material/Checkbox";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
@@ -68,6 +69,10 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     reset,
   } = useForm();
 
+  useEffect(() => {
+    console.log({ errors });
+  }, [errors]);
+
   const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
     useState<SismoConnectResponse | null>(null);
 
@@ -82,6 +87,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       groups: groups.filter((group: Group) =>
         whiteboard?.groupIds?.includes(group.id)
       ),
+      minLevel: whiteboard.minLevel,
     });
   }, [reset, whiteboard]);
 
@@ -89,7 +95,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     type: OperationType,
     name?: string,
     description?: string,
-    groups?: Group[]
+    groups?: Group[],
+    minLevel?: number
   ) {
     if (
       (type === OperationType.EDIT || type === OperationType.DELETE) &&
@@ -116,6 +123,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             name: name,
             description: description,
             groupIds: groups?.map((group: Group) => group.id),
+            minLevel: minLevel,
           },
         } as WhiteboardCreateSignedMessage;
         break;
@@ -131,6 +139,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           message: {
             ...whiteboard,
             description: description,
+            minLevel: minLevel,
           },
         } as WhiteboardEditSignedMessage;
         break;
@@ -263,14 +272,27 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   }, [pathname, router, sismoConnectResponseMessage]);
 
   const onSubmit = (formData: FieldValues) => {
+    console.log({ formData });
+    const formDataValidated = { ...formData };
+    if (!formDataValidated.minLevel) {
+      formDataValidated.minLevel = 0;
+    }
+    console.log({ formDataValidated });
     if (isEdition) {
-      performAction(OperationType.EDIT, undefined, formData.description);
+      performAction(
+        OperationType.EDIT,
+        undefined,
+        formDataValidated.description,
+        undefined,
+        formDataValidated.minLevel
+      );
     } else {
       performAction(
         OperationType.POST,
-        formData.name,
-        formData.description,
-        formData.groups
+        formDataValidated.name,
+        formDataValidated.description,
+        formDataValidated.groups,
+        formDataValidated.minLevel
       );
     }
   };
@@ -298,7 +320,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         <form onSubmit={handleSubmit(onSubmit)}>
           <WhiteboardCreationEditionInput
             isEdition={isEdition}
-            type="name"
+            type="textareaAutosize"
+            name="name"
             label="Name"
             maxNumber={MAX_CHARACTERS_WHITEBOARD_NAME}
             warningMessage={MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
@@ -307,7 +330,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           />
           <WhiteboardCreationEditionInput
             isEdition={isEdition}
-            type="description"
+            type="textareaAutosize"
+            name="description"
             label="Description"
             maxNumber={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION}
             warningMessage={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
@@ -318,7 +342,8 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
             <div>
               <WhiteboardCreationEditionInput
                 isEdition={isEdition}
-                type="groups"
+                type="autocomplete"
+                name="groups"
                 label="Group(s)"
                 maxNumber={MAX_WHITEBOARD_GROUPS}
                 warningMessage={MAX_WHITEBOARD_GROUPS_MESSAGE}
@@ -363,6 +388,35 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
                 </a>
               </div>
             )}
+          </div>
+          {/* <div className="input-container">
+            <label className="form-labels"> Maximum messages per level </label>
+            <Checkbox
+              style={{
+                padding: "0px",
+              }}
+              {...register("messages-level")}
+            />
+          </div> */}
+          <div className="input-container">
+            <label className="form-labels"> Minimum level: </label>
+            <input
+              className="whiteboard-creation-inputs"
+              type="number"
+              min="0"
+              step="1"
+              defaultValue={0}
+              {...register("minLevel", {
+                required: false,
+              })}
+            />
+            <p
+              style={{
+                fontSize: "12px",
+                color: "black",
+              }}>
+              No groups fit your needs? Create one here!
+            </p>
           </div>
           <Button
             type="submit"
