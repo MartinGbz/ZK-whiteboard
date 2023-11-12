@@ -12,6 +12,7 @@ import {
   MAX_WHITEBOARD_GROUPS,
   MAX_WHITEBOARD_GROUPS_MESSAGE,
   MAX_WHITEBOARD_PER_USER,
+  MIN_WHITEBOARD,
   sismoConnectConfig,
 } from "@/configs/configs";
 import { getAppId } from "./utils";
@@ -24,7 +25,10 @@ async function saveWhiteboard(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: WhiteboardCreateSignedMessage
 ): Promise<NextResponse> {
-  if (signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_NAME) {
+  if (
+    signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_NAME &&
+    signedMessage.message.name.length < MIN_WHITEBOARD
+  ) {
     return NextResponse.json(
       {
         error: MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE,
@@ -33,7 +37,9 @@ async function saveWhiteboard(
     );
   }
   if (
-    signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
+    signedMessage.message.description.length >
+      MAX_CHARACTERS_WHITEBOARD_DESCRIPTION &&
+    signedMessage.message.description.length < MIN_WHITEBOARD
   ) {
     return NextResponse.json(
       {
@@ -108,7 +114,10 @@ async function saveWhiteboardToDB(
       name: signedMessage.message.name,
       description: signedMessage.message.description,
       groupIds: signedMessage.message.groupIds,
-      minLevel: signedMessage.message.minLevel,
+      minLevel:
+        Number(signedMessage.message.minLevel) > 0
+          ? Number(signedMessage.message.minLevel)
+          : 1,
       curated: false,
       author: {
         connect: { vaultId: vaultId },

@@ -186,6 +186,7 @@ const Whiteboard = ({ whiteboard, whiteboardVaultId }: whiteboardProps) => {
       redirectToRoot();
     };
     if (sismoConnectResponseMessage?.signedMessage && whiteboard.id) {
+      console.log("sismoConnectResponseMessage", sismoConnectResponseMessage);
       postMessage(sismoConnectResponseMessage);
     }
   }, [redirectToRoot, sismoConnectResponseMessage, whiteboard.id]);

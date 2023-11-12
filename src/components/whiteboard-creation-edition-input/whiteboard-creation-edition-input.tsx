@@ -73,8 +73,7 @@ const WhiteboardCreationEdition: React.FC<
           name={name}
           control={control}
           rules={{
-            required: isEdition ? false : true,
-            minLength: MIN_WHITEBOARD,
+            required: false,
             maxLength: maxNumber,
           }}
           render={({ field }) => {

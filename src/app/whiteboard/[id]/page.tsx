@@ -1,8 +1,7 @@
 import { Metadata } from "next";
 
-import Whiteboard from "@/components/whiteboard/whiteboard";
 import { getWhiteboard } from "@/lib/whiteboard";
-import { notFound, usePathname } from "next/navigation";
+import { notFound } from "next/navigation";
 import WhiteboardPage from "@/components/whiteboard-page/whiteboard-page";
 
 interface pageProps {

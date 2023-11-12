@@ -47,6 +47,9 @@ async function addMessage(
     value: whiteboard?.minLevel,
   }));
   try {
+    console.log("whiteboard.appId", whiteboard.appId);
+    console.log("claims", claims);
+    console.log("sismoConnectResponse", sismoConnectResponse);
     const vaultId = await verifyResponse(
       sismoConnectResponse,
       whiteboard.appId,
@@ -54,7 +57,7 @@ async function addMessage(
     );
     if (!vaultId) {
       return NextResponse.json(
-        { error: "ZK Proof incorrect 1" },
+        { error: "ZK Proof incorrect" },
         { status: 401 }
       );
     }

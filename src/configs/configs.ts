@@ -32,7 +32,7 @@ export const MAX_WHITEBOARD_GROUPS = 10;
 
 export const MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE = `Your whiteboard name should be ${MIN_WHITEBOARD} to ${MAX_CHARACTERS_WHITEBOARD_NAME} characters long`;
 export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE = `Your description should be ${MIN_WHITEBOARD} to ${MAX_CHARACTERS_WHITEBOARD_DESCRIPTION} characters long`;
-export const MAX_WHITEBOARD_GROUPS_MESSAGE = `Please select between ${MIN_WHITEBOARD} to ${MAX_WHITEBOARD_GROUPS} groups.`;
+export const MAX_WHITEBOARD_GROUPS_MESSAGE = `Please select between 0 to ${MAX_WHITEBOARD_GROUPS} groups.`;
 
 export const preWrittenPostXSlug = "http://twitter.com/intent/tweet?text=";
 export const preWrittenPostLensSlug = "https://lenster.xyz/?text=";

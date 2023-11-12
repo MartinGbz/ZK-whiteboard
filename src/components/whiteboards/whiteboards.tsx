@@ -55,6 +55,7 @@ export const Whiteboards = ({ whiteboards }: WhiteboardsProps) => {
                     router.push("/create-whiteboard");
                   }}
                   fontSize="20px"
+                  iconSize="30px"
                   disabled={true}
                   style={{
                     backgroundColor: greenColorDisabled,

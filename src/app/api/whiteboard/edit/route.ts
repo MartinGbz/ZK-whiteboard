@@ -5,6 +5,7 @@ import { prisma } from "../../db";
 import {
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
+  MIN_WHITEBOARD,
   sismoConnectConfig,
 } from "@/configs/configs";
 import { post, verifyResponse, verifyResponseMessage } from "../../common";
@@ -19,7 +20,8 @@ async function saveWhiteboard(
 ): Promise<NextResponse> {
   if (
     signedMessage.message.description.length >
-    MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
+      MAX_CHARACTERS_WHITEBOARD_DESCRIPTION &&
+    signedMessage.message.description.length < MIN_WHITEBOARD
   ) {
     return NextResponse.json(
       {
@@ -78,14 +80,17 @@ async function saveWhiteboardToDB(
         },
         data: {
           description: signedMessage.message.description,
-          minLevel: Number(signedMessage.message.minLevel),
+          minLevel:
+            Number(signedMessage.message.minLevel) > 0
+              ? Number(signedMessage.message.minLevel)
+              : 1,
         },
       });
       return NextResponse.json(editedWhiteboard, { status: 200 });
     } catch (error: any) {
       return NextResponse.json(
         {
-          error: "Error while editing the whiteboard",
+          error: "Error while editing the whiteboard 222",
         },
         { status: 500 }
       );

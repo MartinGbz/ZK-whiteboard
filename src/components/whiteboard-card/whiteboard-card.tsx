@@ -229,40 +229,44 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
           </span>{" "}
           {whiteboard.description}
         </div>
-        <div
-          style={{
-            color: "black",
-          }}>
-          {" "}
-          Group names:{" "}
-        </div>
-        {whiteboard.groupNames.map((groupName: string, index) => (
-          <span key={groupName}>
-            <a
+        {whiteboard.groupNames.length > 0 && (
+          <>
+            <div
               style={{
-                textDecoration: "underline",
-              }}
-              target="_blank"
-              href={
-                "https://factory.sismo.io/groups-explorer?search=" + groupName
-              }
-              onClick={(e) => {
-                e.stopPropagation();
+                color: "black",
               }}>
-              {groupName}
-            </a>
-            {index < whiteboard.groupNames.length - 1 && ", "}
-          </span>
-        ))}
-        <div>
-          <span
-            style={{
-              color: "black",
-            }}>
-            {"Minimum level: "}
-          </span>
-          {whiteboard.minLevel}
-        </div>
+              <span>Group names:</span>
+            </div>
+            {whiteboard.groupNames.map((groupName: string, index) => (
+              <span key={groupName}>
+                <a
+                  style={{
+                    textDecoration: "underline",
+                  }}
+                  target="_blank"
+                  href={
+                    "https://factory.sismo.io/groups-explorer?search=" +
+                    groupName
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}>
+                  {groupName}
+                </a>
+                {index < whiteboard.groupNames.length - 1 && ", "}
+              </span>
+            ))}
+            <div>
+              <span
+                style={{
+                  color: "black",
+                }}>
+                {"Minimum level: "}
+              </span>
+              {whiteboard.minLevel}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

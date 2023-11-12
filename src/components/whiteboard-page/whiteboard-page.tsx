@@ -56,7 +56,7 @@ const WhiteboardPage = ({ whiteboard }: whiteboardProps) => {
       // if we are in the whiteboard connexion process
       const responseMessage: SismoConnectResponse | null =
         sismoConnect.getResponse();
-      if (responseMessage) {
+      if (responseMessage && !responseMessage.signedMessage) {
         loginToWhiteboard(responseMessage);
         return;
       }
