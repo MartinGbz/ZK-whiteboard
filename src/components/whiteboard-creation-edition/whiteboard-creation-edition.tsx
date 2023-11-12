@@ -383,15 +383,6 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
               </div>
             )}
           </div>
-          {/* <div className="input-container">
-            <label className="form-labels"> Maximum messages per level </label>
-            <Checkbox
-              style={{
-                padding: "0px",
-              }}
-              {...register("messages-level")}
-            />
-          </div> */}
           <div className="input-container">
             <label className="form-labels"> Minimum level: </label>
             <input
