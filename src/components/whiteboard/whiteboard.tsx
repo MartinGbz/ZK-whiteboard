@@ -69,9 +69,6 @@ const Whiteboard = ({ whiteboard, whiteboardVaultId }: whiteboardProps) => {
   const containerMessageModalRef = useRef<HTMLDivElement>(null);
 
   const [currentURL, setCurrentURL] = useState("");
-  // const [whiteboardVaultId, setWhiteboardVaultId] = useState<string | null>(
-  //   null
-  // );
 
   const router = useRouter();
   const pathname = usePathname();
@@ -87,20 +84,12 @@ const Whiteboard = ({ whiteboard, whiteboardVaultId }: whiteboardProps) => {
   const { user } = useLoginContext();
 
   useEffect(() => {
-    // setWhiteboardVaultId(
-    //   localStorage.getItem(WHITEBOARD_VAULTID_VARNAME + whiteboard.id)
-    // );
-
     const isUserMessageExists = whiteboard.messages.some(
       (message: MessageType) => message.authorVaultId === whiteboardVaultId
     );
 
     setIsUserMessageExists(isUserMessageExists);
   }, [whiteboard]);
-
-  useEffect(() => {
-    console.log("whiteboardVaultId", whiteboardVaultId);
-  }, [whiteboardVaultId]);
 
   useEffect(() => {
     if (whiteboard?.appId) {
@@ -186,7 +175,6 @@ const Whiteboard = ({ whiteboard, whiteboardVaultId }: whiteboardProps) => {
       redirectToRoot();
     };
     if (sismoConnectResponseMessage?.signedMessage && whiteboard.id) {
-      console.log("sismoConnectResponseMessage", sismoConnectResponseMessage);
       postMessage(sismoConnectResponseMessage);
     }
   }, [redirectToRoot, sismoConnectResponseMessage, whiteboard.id]);

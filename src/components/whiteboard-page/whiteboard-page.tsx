@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Whiteboard as WhiteboardType } from "@/types/whiteboard-types";
 
 import {
@@ -11,7 +11,7 @@ import {
 } from "@sismo-core/sismo-connect-react";
 import Whiteboard from "../whiteboard/whiteboard";
 import { WHITEBOARD_VAULTID_VARNAME } from "@/configs/configs";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface whiteboardProps {
   whiteboard: WhiteboardType;
@@ -24,6 +24,11 @@ const WhiteboardPage = ({ whiteboard }: whiteboardProps) => {
     null
   );
   const router = useRouter();
+  const pathname = usePathname();
+
+  const redirectToRoot = useCallback(() => {
+    router.push(pathname);
+  }, [router, pathname]);
 
   useEffect(() => {
     const loginToWhiteboard = async (
@@ -36,13 +41,12 @@ const WhiteboardPage = ({ whiteboard }: whiteboardProps) => {
           "Content-Type": "application/json",
         },
       }).then((res) => res.json());
-      console.log(response);
       setWhiteboardVaultId(response.vaultId);
       localStorage.setItem(
         WHITEBOARD_VAULTID_VARNAME + whiteboard.id,
         response.vaultId
       );
-      router.push("/whiteboard/" + whiteboard.id);
+      redirectToRoot();
     };
 
     if (whiteboard?.id && whiteboard?.appId) {
@@ -74,7 +78,7 @@ const WhiteboardPage = ({ whiteboard }: whiteboardProps) => {
         });
       }
     }
-  }, [whiteboard]);
+  }, [redirectToRoot, whiteboard]);
 
   return (
     whiteboardVaultId && (
