@@ -265,7 +265,8 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
           className="messages_container"
           ref={containerMessageModalRef}
           style={{
-            cursor: isModalOpen ? "default" : "pointer",
+            cursor:
+              !isModalOpen && !isUserMessageExists ? "pointer" : "default",
             position: "relative",
             overflow: "scroll",
           }}
@@ -296,7 +297,6 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                cursor: "pointer",
                 width: "max-content",
               }}>
               <div
