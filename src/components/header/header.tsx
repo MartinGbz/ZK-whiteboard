@@ -111,10 +111,10 @@ const Header = () => {
         <Home
           style={{
             gridColumn: 1,
-            justifySelf: "start",
-            alignSelf: "center",
             cursor: "pointer",
             color: "white",
+            justifySelf: "start",
+            alignSelf: "center",
           }}
           fontSize="medium"
           onClick={() => router.push("/")}
@@ -125,9 +125,9 @@ const Header = () => {
           textAlign: "center",
           alignSelf: "center",
           gridColumn: 2,
-          width: "max-content",
           display: "inline-flex",
           fontSize: titleFontSize,
+          width: "max-content",
         }}>
         <Title
           text="ZK-whiteboard"
@@ -139,17 +139,19 @@ const Header = () => {
             router.push("/");
           }}
         />
-        {whiteboardName && whiteboardNameCropped && (
-          <div
-            style={{
-              color: "gray",
-              alignSelf: "center",
-              marginLeft: "5px",
-            }}>
-            {" "}
-            / {whiteboardNameCropped}
-          </div>
-        )}
+        {whiteboardNameCropped &&
+          pathname !== "/" &&
+          pathname !== "/whiteboards" && (
+            <div
+              style={{
+                color: "gray",
+                alignSelf: "center",
+                marginLeft: "5px",
+              }}>
+              {" "}
+              / {whiteboardNameCropped}
+            </div>
+          )}
       </div>
       {!user && !isLoging && (
         <button className="login login-button" onClick={login}>
@@ -163,7 +165,12 @@ const Header = () => {
         </button>
       )}
       {user && !isLoging && (
-        <div className="login">
+        <div
+          className="login"
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}>
           <span title={user.vaultId} className="user_id">
             {userAddressCropped}
           </span>
