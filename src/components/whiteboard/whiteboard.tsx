@@ -37,6 +37,7 @@ import { toast } from "react-hot-toast";
 
 interface whiteboardProps {
   whiteboard: Whiteboard;
+  whiteboardVaultId: string;
 }
 
 let sismoConnect: SismoConnectClient | null = null;
@@ -49,7 +50,7 @@ const API_ENDPOINTS = {
 
 const messageModalWidth = 275;
 
-const Whiteboard = ({ whiteboard }: whiteboardProps) => {
+const Whiteboard = ({ whiteboard, whiteboardVaultId }: whiteboardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageInputValue, setMessageInputValue] = useState("");
   const [messageInputColorValue, setMessageInputColorValue] =
@@ -68,7 +69,9 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
   const containerMessageModalRef = useRef<HTMLDivElement>(null);
 
   const [currentURL, setCurrentURL] = useState("");
-  const whiteboardVaultId = useRef<string | null>(null);
+  // const [whiteboardVaultId, setWhiteboardVaultId] = useState<string | null>(
+  //   null
+  // );
 
   const router = useRouter();
   const pathname = usePathname();
@@ -84,17 +87,20 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
   const { user } = useLoginContext();
 
   useEffect(() => {
-    whiteboardVaultId.current = localStorage.getItem(
-      WHITEBOARD_VAULTID_VARNAME + whiteboard.id
-    );
+    // setWhiteboardVaultId(
+    //   localStorage.getItem(WHITEBOARD_VAULTID_VARNAME + whiteboard.id)
+    // );
 
     const isUserMessageExists = whiteboard.messages.some(
-      (message: MessageType) =>
-        message.authorVaultId === whiteboardVaultId.current
+      (message: MessageType) => message.authorVaultId === whiteboardVaultId
     );
 
     setIsUserMessageExists(isUserMessageExists);
   }, [whiteboard]);
+
+  useEffect(() => {
+    console.log("whiteboardVaultId", whiteboardVaultId);
+  }, [whiteboardVaultId]);
 
   useEffect(() => {
     if (whiteboard?.appId) {
@@ -170,7 +176,7 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
           WHITEBOARD_VAULTID_VARNAME + whiteboard.id,
           response.vaultId
         );
-        whiteboardVaultId.current = response.vaultId;
+        // setWhiteboardVaultId(response.vaultId);
         setMessageInputValue("");
         setMessageInputColorValue(defaultInputColor);
         setIsModalOpen(false);
@@ -273,19 +279,18 @@ const Whiteboard = ({ whiteboard }: whiteboardProps) => {
           onClick={(e) => {
             !isUserMessageExists && startMessageCreation(e);
           }}>
-          {whiteboardVaultId.current &&
-            whiteboard.messages.map((message: MessageType) => (
-              <Message
-                key={message.authorVaultId}
-                message={message}
-                appId={whiteboard?.appId ?? ""}
-                vaultId={whiteboardVaultId.current}
-                onDelete={(message) => requestDeleteMessage(message)}
-                onError={(errorMessage) => {
-                  toast.error(errorMessage);
-                }}
-              />
-            ))}
+          {whiteboard.messages.map((message: MessageType) => (
+            <Message
+              key={message.authorVaultId}
+              message={message}
+              appId={whiteboard?.appId ?? ""}
+              vaultId={whiteboardVaultId}
+              onDelete={(message) => requestDeleteMessage(message)}
+              onError={(errorMessage) => {
+                toast.error(errorMessage);
+              }}
+            />
+          ))}
           {whiteboard.messages.length == 0 && (
             <div
               style={{
