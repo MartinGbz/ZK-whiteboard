@@ -14,7 +14,11 @@ export const metadata = {
     title: "ZK-whiteboard",
     description: "Express yourself freely & anonymously",
     type: "website",
-    image: process.env.WEBSITE_DOMAIN + "/api/og/default",
+    images: [
+      {
+        url: process.env.WEBSITE_DOMAIN + "/api/og/default",
+      },
+    ],
     url: process.env.WEBSITE_DOMAIN,
     site_name: "zk-whiteboard",
   },
@@ -22,7 +26,7 @@ export const metadata = {
     title: "ZK-whiteboard",
     description: "Express yourself freely & anonymously",
     creator: "@0xMartinGbz",
-    image: process.env.WEBSITE_DOMAIN + "/api/og/default",
+    images: [process.env.WEBSITE_DOMAIN + "/api/og/default"],
     url: process.env.WEBSITE_DOMAIN,
   },
   metadataBase: new URL(process.env.WEBSITE_DOMAIN ?? "http://localhost:3000"),
