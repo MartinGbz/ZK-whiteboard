@@ -85,7 +85,7 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
       ),
       minLevel: whiteboard.minLevel,
     });
-  }, [reset, whiteboard]);
+  }, [groups, reset, whiteboard]);
 
   function performAction(
     type: OperationType,

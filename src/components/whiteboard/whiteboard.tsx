@@ -89,7 +89,7 @@ const Whiteboard = ({ whiteboard, whiteboardVaultId }: whiteboardProps) => {
     );
 
     setIsUserMessageExists(isUserMessageExists);
-  }, [whiteboard]);
+  }, [whiteboard, whiteboardVaultId]);
 
   useEffect(() => {
     if (whiteboard?.appId) {

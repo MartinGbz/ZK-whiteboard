@@ -105,7 +105,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
       setX(newX);
       setY(newY);
     }
-  }, [modalRef, initialPositionX, initialPositionY]);
+  }, [modalRef, initialPositionX, initialPositionY, containerRef]);
 
   const textAreaOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {
