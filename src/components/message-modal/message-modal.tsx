@@ -136,7 +136,13 @@ const MessageModal: React.FC<MessageModalProps> = ({
   };
 
   return (
-    <div className="message-modal" ref={modalRef} style={combinedStyle}>
+    <div
+      className="message-modal"
+      ref={modalRef}
+      style={combinedStyle}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}>
       <span
         style={{
           alignSelf: "center",
