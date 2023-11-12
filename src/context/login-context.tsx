@@ -38,7 +38,11 @@ const LoginContext = createContext<ContextProps>({
   logout: (): void => {},
 });
 
-export const GlobalContextProvider = ({ children }) => {
+export const GlobalContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoging, setIsLoging] = useState<boolean>(true);
   const login = async () => {
