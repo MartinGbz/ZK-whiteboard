@@ -1,5 +1,5 @@
 "use client";
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { TextareaAutosize } from "@mui/base";
@@ -7,7 +7,7 @@ import { MAX_CHARACTERS, greenColor, redColor } from "@/configs/configs";
 
 interface MessageModalProps {
   style?: CSSProperties;
-  modalRef?: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement>;
   inputValue?: string;
   inputColorValue?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -21,7 +21,7 @@ interface MessageModalProps {
 
 const MessageModal: React.FC<MessageModalProps> = ({
   style,
-  modalRef,
+  containerRef,
   inputValue,
   inputColorValue,
   onChange,
@@ -32,25 +32,24 @@ const MessageModal: React.FC<MessageModalProps> = ({
   initialPositionX,
   initialPositionY,
 }) => {
-  const [x, setX] = useState(0);
-  const [y, setY] = useState(0);
+  const [x, setX] = useState(-1000);
+  const [y, setY] = useState(-1000);
   const [maxCharacters, setMaxCharacters] = useState(false);
   const [saveButtonBrightness, setSaveButtonBrightness] =
     useState("brightness(1)");
   const [cancelButtonBrightness, setCancelButtonBrightness] =
     useState("brightness(1)");
 
+  const modalRef = useRef<HTMLDivElement>(null);
+
   const baseStyle: CSSProperties = {
     backgroundColor: "rgb(200 200 200 / 30%)",
     backdropFilter: "blur(15px)",
     padding: "15px",
-    border: "1px solid transparent",
     borderRadius: "10px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    height: "fit-content",
-    width: "300px",
     boxShadow: "5px 5px 35px 1px grey",
     color: "black",
     position: "fixed",
@@ -82,25 +81,31 @@ const MessageModal: React.FC<MessageModalProps> = ({
   const combinedStyle: CSSProperties = { ...baseStyle, ...style };
 
   useEffect(() => {
-    if (modalRef?.current) {
+    if (modalRef?.current && containerRef?.current) {
       const divRect = modalRef.current.getBoundingClientRect();
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
+      const containerRect = containerRef.current.getBoundingClientRect();
 
-      let newX = initialPositionX;
-      let newY = initialPositionY;
+      let newX = initialPositionX - divRect.width / 2;
+      let newY = initialPositionY - divRect.height / 2;
 
-      if (divRect.width + initialPositionX > windowWidth) {
-        newX = windowWidth - divRect.width;
+      if (divRect.width / 2 + initialPositionX > containerRect.width) {
+        newX = containerRect.width - divRect.width;
       }
-      if (divRect.height + initialPositionY > windowHeight) {
-        newY = windowHeight - divRect.height;
+      if (initialPositionX - divRect.width / 2 < 0) {
+        newX = 0;
+      }
+      if (divRect.height / 2 + initialPositionY > containerRect.height) {
+        // need to add 8px (I don't know where this gap comes from)
+        newY = containerRect.height - divRect.height - 8;
+      }
+      if (initialPositionY - divRect.height / 2 < 0) {
+        newY = 0;
       }
 
       setX(newX);
       setY(newY);
     }
-  }, [modalRef, initialPositionX, initialPositionY]);
+  }, [modalRef, initialPositionX, initialPositionY, containerRef]);
 
   const textAreaOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {
@@ -131,7 +136,13 @@ const MessageModal: React.FC<MessageModalProps> = ({
   };
 
   return (
-    <div className="message-modal" ref={modalRef} style={combinedStyle}>
+    <div
+      className="message-modal"
+      ref={modalRef}
+      style={combinedStyle}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}>
       <span
         style={{
           alignSelf: "center",
@@ -196,7 +207,14 @@ const MessageModal: React.FC<MessageModalProps> = ({
           justifyContent: "space-evenly",
         }}>
         <button
-          onClick={onClickCancel ? (e) => onClickCancel() : undefined}
+          onClick={
+            onClickCancel
+              ? (e) => {
+                  e.stopPropagation();
+                  onClickCancel();
+                }
+              : undefined
+          }
           onMouseEnter={() => setCancelButtonBrightness("brightness(1.05)")}
           onMouseLeave={() => setCancelButtonBrightness("brightness(1)")}
           style={{ ...cancelButtonStyle, ...buttonStyle }}
@@ -210,7 +228,14 @@ const MessageModal: React.FC<MessageModalProps> = ({
           Cancel
         </button>
         <button
-          onClick={onClickSave ? () => onClickSave() : undefined}
+          onClick={
+            onClickSave
+              ? (e) => {
+                  e.stopPropagation();
+                  onClickSave();
+                }
+              : undefined
+          }
           onMouseEnter={() => setSaveButtonBrightness("brightness(1.05)")}
           onMouseLeave={() => setSaveButtonBrightness("brightness(1)")}
           style={{ ...saveButtonStyle, ...buttonStyle }}

@@ -38,6 +38,8 @@ const Loading: React.FC<LoadingProps> = ({ text }) => {
         width: "100%",
         height: "100%",
         position: "absolute",
+        top: 0,
+        left: 0,
         zIndex: MAX_Z_INDEX + 3,
       }}>
       <div style={loadingStyle}>

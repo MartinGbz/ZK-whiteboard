@@ -5,11 +5,14 @@ import { MAX_Z_INDEX, redColor } from "@/configs/configs";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useRouter, usePathname } from "next/navigation";
 
+import RefreshIcon from "@mui/icons-material/Refresh";
+
 interface ErrorModalProps {
-  text: string;
+  errorMessage: string;
+  reset?: () => void;
 }
 
-const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
+const ErrorModal: React.FC<ErrorModalProps> = ({ errorMessage, reset }) => {
   const modalStyle: CSSProperties = {
     backgroundColor: "white",
     marginBottom: "10px",
@@ -45,7 +48,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
         backgroundColor: "rgba(0, 0, 0, 0.3)",
         width: "100%",
         height: "100%",
-        position: "absolute",
+        position: "relative",
         zIndex: MAX_Z_INDEX + 3,
       }}>
       <div style={modalStyle}>
@@ -87,7 +90,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
                 marginBottom: "25px",
                 fontFamily: "Inter-Regular",
               }}>
-              {text}
+              {errorMessage}
             </p>
             <div
               style={{
@@ -98,8 +101,13 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
                 border: "none",
                 alignSelf: "center",
                 fontSize: "17px",
-              }}>
-              Please refresh the page: ⌘+R
+                cursor: reset ? "pointer" : "default",
+              }}
+              onClick={
+                // Attempt to recover by trying to re-render the segment
+                () => (reset ? reset() : null)
+              }>
+              <RefreshIcon /> Refresh the page
             </div>
             <p
               style={{
@@ -113,6 +121,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ text }) => {
                 style={{
                   textDecoration: "underline",
                 }}
+                target="_blank"
                 href="https://twitter.com/0xMartinGbz">
                 0xMartinGbz
               </a>

@@ -1,46 +1,27 @@
-import {
-  WhiteboardOperationType,
-  WhiteboardEditSignedMessage,
-} from "@/types/whiteboard-types";
-import {
-  SismoConnect,
-  SismoConnectResponse,
-} from "@sismo-core/sismo-connect-server";
+import { WhiteboardEditSignedMessage } from "@/types/whiteboard-types";
+import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import {
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE,
+  MIN_WHITEBOARD,
   sismoConnectConfig,
 } from "@/configs/configs";
-import { verifyResponseMessage } from "../../common";
+import { post, verifyResponse, verifyResponseMessage } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {
-  const sismoConnectResponse: SismoConnectResponse = await req.json();
-  if (sismoConnectResponse.signedMessage) {
-    const signedMessage = JSON.parse(
-      sismoConnectResponse.signedMessage
-    ) as WhiteboardEditSignedMessage;
-    if (signedMessage.type === WhiteboardOperationType.EDIT) {
-      return await saveWhiteboard(sismoConnectResponse, signedMessage);
-    } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type provided" }, { status: 400 });
-    } else {
-      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
-    }
-  } else {
-    return NextResponse.json({ error: "No signed message" }, { status: 400 });
-  }
+  return await post(req, undefined, undefined, saveWhiteboard);
 }
-
-const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 async function saveWhiteboard(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
   if (
-    signedMessage.message.name.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION
+    signedMessage.message.description.length >
+      MAX_CHARACTERS_WHITEBOARD_DESCRIPTION &&
+    signedMessage.message.description.length < MIN_WHITEBOARD
   ) {
     return NextResponse.json(
       {
@@ -49,9 +30,9 @@ async function saveWhiteboard(
       { status: 403 }
     );
   }
-  const vaultId = await verifyResponseMessage(
-    sismoConnect,
-    sismoConnectResponse
+  const vaultId = await verifyResponse(
+    sismoConnectResponse,
+    sismoConnectConfig.appId
   );
   if (vaultId) {
     const allMessagesInDB = await saveWhiteboardToDB(vaultId, signedMessage);
@@ -92,15 +73,28 @@ async function saveWhiteboardToDB(
       );
     }
 
-    const editedWhiteboard = await prisma.whiteboard.update({
-      where: {
-        id: whiteboardId,
-      },
-      data: {
-        description: signedMessage.message.description,
-      },
-    });
-    return NextResponse.json(editedWhiteboard, { status: 200 });
+    try {
+      const editedWhiteboard = await prisma.whiteboard.update({
+        where: {
+          id: whiteboardId,
+        },
+        data: {
+          description: signedMessage.message.description,
+          minLevel:
+            Number(signedMessage.message.minLevel) > 0
+              ? Number(signedMessage.message.minLevel)
+              : 1,
+        },
+      });
+      return NextResponse.json(editedWhiteboard, { status: 200 });
+    } catch (error: any) {
+      return NextResponse.json(
+        {
+          error: "Error while editing the whiteboard 222",
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
   }

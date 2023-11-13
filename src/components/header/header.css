@@ -1,15 +1,19 @@
 .header {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 6fr 1fr;
+  width: 100%;
   padding: 10px;
   background-color: #000000;
   justify-items: center;
+  height: 60px;
+  min-height: 60px;
+  max-height: 60px;
 }
 
 .login {
   grid-column: 3;
-  width: max-content;
   justify-self: end;
+  width: max-content;
   color: white;
   align-self: center;
 }
@@ -24,5 +28,24 @@
 .logout_button {
   font-size: 15px;
   font-weight: bold;
-  color: "black";
+}
+
+.login-button {
+  height: 40px;
+  border-radius: 5px;
+  background-color: gray;
+  color: white;
+  align-self: center;
+  font-size: 15px;
+  justify-content: end;
+  width: fit-content;
+  padding: 10px;
+  display: flex;
+}
+
+.login-button-text {
+  margin-right: 5px;
+  @media (max-width: 800px) {
+    display: none;
+  }
 }

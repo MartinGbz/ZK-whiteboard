@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { prisma } from "../db";
-import { getWhiteboardById } from "../common";
+import { getWhiteboards, getWhiteboardById } from "../common";
 
 export async function GET(): Promise<NextResponse> {
-  const whiteboards = await prisma.whiteboard.findMany();
+  const whiteboards = await getWhiteboards();
   return NextResponse.json(whiteboards, { status: 200 });
 }
 

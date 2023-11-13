@@ -1,43 +1,21 @@
-import {
-  WhiteboardOperationType,
-  WhiteboardEditSignedMessage,
-} from "@/types/whiteboard-types";
-import {
-  SismoConnect,
-  SismoConnectResponse,
-} from "@sismo-core/sismo-connect-server";
+import { WhiteboardEditSignedMessage } from "@/types/whiteboard-types";
+import { SismoConnectResponse } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import { sismoConnectConfig } from "@/configs/configs";
-import { verifyResponseMessage } from "../../common";
+import { post, verifyResponse } from "../../common";
 
 export async function POST(req: Request): Promise<NextResponse> {
-  const sismoConnectResponse: SismoConnectResponse = await req.json();
-  if (sismoConnectResponse.signedMessage) {
-    const signedMessage = JSON.parse(
-      sismoConnectResponse.signedMessage
-    ) as WhiteboardEditSignedMessage;
-    if (signedMessage.type === WhiteboardOperationType.DELETE) {
-      return await deleteWhiteboard(sismoConnectResponse, signedMessage);
-    } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type provided" }, { status: 400 });
-    } else {
-      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
-    }
-  } else {
-    return NextResponse.json({ error: "No signed message" }, { status: 400 });
-  }
+  return await post(req, undefined, deleteWhiteboard);
 }
-
-const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 async function deleteWhiteboard(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: WhiteboardEditSignedMessage
 ): Promise<NextResponse> {
-  const vaultId = await verifyResponseMessage(
-    sismoConnect,
-    sismoConnectResponse
+  const vaultId = await verifyResponse(
+    sismoConnectResponse,
+    sismoConnectConfig.appId
   );
   if (vaultId) {
     const allMessagesInDB = await deleteWhiteboardInDB(vaultId, signedMessage);

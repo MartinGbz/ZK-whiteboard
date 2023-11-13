@@ -1,69 +1,37 @@
+import { SignedMessage, Whiteboard } from "@/types/whiteboard-types";
 import {
-  MessageOperationType,
-  SignedMessage,
-  Whiteboard,
-} from "@/types/whiteboard-types";
-import {
-  AuthType,
-  SismoConnect,
+  Claim,
+  ClaimType,
   SismoConnectResponse,
-  SismoConnectServer,
-  SismoConnectVerifiedResult,
 } from "@sismo-core/sismo-connect-server";
 import { NextResponse } from "next/server";
 import { prisma } from "../../db";
 import { MAX_CHARACTERS } from "@/configs/configs";
-import { getWhiteboardById } from "../../common";
+import { getWhiteboardById, post, verifyResponse } from "../../common";
 
 let whiteboard: Whiteboard | null = null;
-let sismoConnect: SismoConnectServer | null = null;
 
 export async function POST(req: Request): Promise<NextResponse> {
-  const sismoConnectResponse: SismoConnectResponse = await req.json();
-  if (sismoConnectResponse.signedMessage) {
-    const signedMessage = JSON.parse(
-      sismoConnectResponse.signedMessage
-    ) as SignedMessage;
-    whiteboard = await getWhiteboardById(signedMessage.message.whiteboardId);
-    if (!whiteboard) {
-      return NextResponse.json(
-        { error: "Whiteboard not found" },
-        { status: 404 }
-      );
-    }
-    if (!whiteboard.appId) {
-      return NextResponse.json(
-        { error: "Whiteboard appId not found" },
-        { status: 404 }
-      );
-    }
-    sismoConnect = SismoConnect({
-      config: {
-        appId: sismoConnectResponse.appId,
-      },
-    });
-    if (!sismoConnect) {
-      return NextResponse.json(
-        { error: "SismoConnect not defined" },
-        { status: 500 }
-      );
-    }
-    if (signedMessage.type === MessageOperationType.POST) {
-      return await addMessage(sismoConnectResponse, signedMessage);
-    } else if (!signedMessage.type) {
-      return NextResponse.json({ error: "No type provided" }, { status: 400 });
-    } else {
-      return NextResponse.json({ error: "Wrong API route" }, { status: 400 });
-    }
-  } else {
-    return NextResponse.json({ error: "No signed message" }, { status: 400 });
-  }
+  return await post(req, addMessage);
 }
 
 async function addMessage(
   sismoConnectResponse: SismoConnectResponse,
   signedMessage: SignedMessage
 ): Promise<NextResponse> {
+  whiteboard = await getWhiteboardById(signedMessage.message.whiteboardId);
+  if (!whiteboard) {
+    return NextResponse.json(
+      { error: "Whiteboard not found" },
+      { status: 404 }
+    );
+  }
+  if (!whiteboard.appId) {
+    return NextResponse.json(
+      { error: "Whiteboard appId not found" },
+      { status: 404 }
+    );
+  }
   if (signedMessage.message.text.length > MAX_CHARACTERS) {
     return NextResponse.json(
       {
@@ -73,20 +41,26 @@ async function addMessage(
       { status: 403 }
     );
   }
-  if (!sismoConnect) {
-    return NextResponse.json(
-      { error: "SismoConnect not defined" },
-      { status: 500 }
+  const claims: Claim[] = whiteboard?.groupIds?.map((groupId) => ({
+    groupId: groupId,
+    claimType: ClaimType.GTE,
+    value: whiteboard?.minLevel,
+  }));
+  try {
+    const vaultId = await verifyResponse(
+      sismoConnectResponse,
+      whiteboard.appId,
+      claims
     );
-  }
-  const vaultId = await verifyResponseAddMessage(
-    sismoConnectResponse,
-    sismoConnect
-  );
-  if (vaultId) {
+    if (!vaultId) {
+      return NextResponse.json(
+        { error: "ZK Proof incorrect" },
+        { status: 401 }
+      );
+    }
     const response = await addMessageToDB(vaultId, signedMessage);
     return response;
-  } else {
+  } catch (error) {
     return NextResponse.json({ error: "ZK Proof incorrect" }, { status: 401 });
   }
 }
@@ -139,29 +113,5 @@ async function addMessageToDB(
     }
   } catch (error) {
     return NextResponse.json(error);
-  }
-}
-
-async function verifyResponseAddMessage(
-  sismoConnectResponse: SismoConnectResponse,
-  sismoConnect: SismoConnectServer
-): Promise<string | undefined> {
-  const message = sismoConnectResponse.signedMessage
-    ? sismoConnectResponse.signedMessage
-    : "";
-  if (sismoConnectResponse.signedMessage) {
-    const claims = whiteboard?.groupIds?.map((groupId) => ({
-      groupId: groupId,
-    }));
-    const result: SismoConnectVerifiedResult = await sismoConnect.verify(
-      sismoConnectResponse,
-      {
-        auths: [{ authType: AuthType.VAULT }],
-        claims: claims,
-        signature: { message: message },
-      }
-    );
-    const vaultId = result.getUserId(AuthType.VAULT);
-    return vaultId;
   }
 }

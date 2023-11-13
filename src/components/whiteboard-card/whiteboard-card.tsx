@@ -7,11 +7,12 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import LoginIcon from "@mui/icons-material/Login";
 import { Tooltip } from "@mui/material";
 
+import "./whiteboard-card.css";
+
 interface WhiteboardCardProps {
   vaultId: string | null;
   whiteboard: WhiteboardIndex;
   index: number;
-  maxHeightsList: Array<number>;
   baseMaxHeight: number;
   maxMaxHeight: number;
 }
@@ -20,7 +21,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
   vaultId,
   whiteboard,
   index,
-  maxHeightsList,
   baseMaxHeight,
   maxMaxHeight,
 }) => {
@@ -28,20 +28,14 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
 
   const [isHovering, setIsHovering] = useState<number | null>(null);
 
-  const [maxHeights, setMaxHeights] = useState<Array<number>>([]);
   const [loginMouseOver, setLoginMouseOver] = useState<boolean>(false);
   const [settingsMouseOver, setSettingsMouseOver] = useState<boolean>(false);
   const padding = useRef<number>(10);
 
-  useEffect(() => {
-    setMaxHeights(maxHeightsList);
-  }, [maxHeightsList]);
+  const [maxHeight, setMaxHeight] = useState<number>(baseMaxHeight);
 
   const handleDivClick = (index: number) => {
-    const newMaxHeights = [...maxHeights];
-    newMaxHeights[index] =
-      maxHeights[index] === baseMaxHeight ? maxMaxHeight : baseMaxHeight;
-    setMaxHeights(newMaxHeights);
+    setMaxHeight(maxHeight === baseMaxHeight ? maxMaxHeight : baseMaxHeight);
   };
 
   const whiteboardClick = useCallback(
@@ -65,23 +59,10 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
 
   return (
     <div
-      className="whiteboard-item"
+      className="whiteboard-card"
       style={{
-        position: "relative",
         padding: padding.current + "px",
-        marginBottom: "15px",
-        cursor: "pointer",
-        fontSize: "15px",
-        display: "flex",
-        flexDirection: "column",
-        overflowY: "hidden",
-        maxHeight: maxHeights[index],
-        transition: "max-height 0.7s ease",
-
-        color: "black",
-        borderRadius: "10px",
-        backgroundColor: "lightgrey",
-        boxShadow: "rgba(0, 0, 0, 0.25) 3px 3px 5px 1px",
+        maxHeight: maxHeight,
       }}
       onMouseEnter={() => handleMouseEnter(whiteboard.id)}
       onMouseLeave={() => handleMouseLeave()}
@@ -91,14 +72,14 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
       <div
         style={{
           marginBottom: "15px",
-          fontSize: "15px",
+          fontSize: whiteboard.name.length > 25 ? "10px" : "15px",
           display: "grid",
+          gridAutoColumns: "minmax(0, 1fr)",
         }}>
-        {" "}
         <div
           style={{
             gridRow: 1,
-            gridColumn: 1,
+            gridColumn: "1 / 5",
             display: "flex",
             alignItems: "center",
           }}>
@@ -122,7 +103,7 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
             color: "gray",
             fontSize: "10px",
             gridRow: 2,
-            gridColumn: 1,
+            gridColumn: "1 / 3",
           }}>
           <div
             title={whiteboard.authorVaultId}
@@ -130,14 +111,31 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
               width: "fit-content",
             }}>
             {whiteboard.authorVaultId !== vaultId
-              ? "from:" + whiteboard.authorVaultId.substring(0, 7) + "..."
+              ? "from: " + whiteboard.authorVaultId.substring(0, 7) + "..."
               : "from: You"}
           </div>
         </div>
         <div
           style={{
+            color: "gray",
+            fontSize: "10px",
+            gridRow: 2,
+            gridColumn: "3 / 5",
+            display: "flex",
+            justifySelf: "start",
+          }}>
+          <div
+            title={whiteboard.authorVaultId}
+            style={{
+              width: "fit-content",
+            }}>
+            {whiteboard.messagesCount + " messages"}
+          </div>
+        </div>
+        <div
+          style={{
             gridRow: "1 / 3",
-            gridColumn: "2",
+            gridColumn: "6",
             justifySelf: "end",
             display: "flex",
           }}>
@@ -221,8 +219,6 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
         style={{
           color: "gray",
           fontSize: "12px",
-          gridRow: 3,
-          gridColumn: 3,
         }}>
         <div>
           <span
@@ -233,31 +229,44 @@ const WhiteboardCard: React.FC<WhiteboardCardProps> = ({
           </span>{" "}
           {whiteboard.description}
         </div>
-        <div
-          style={{
-            color: "black",
-          }}>
-          {" "}
-          Group names:{" "}
-        </div>
-        {whiteboard.groupNames.map((groupName: string, index) => (
-          <span key={groupName}>
-            <a
+        {whiteboard.groupNames.length > 0 && (
+          <>
+            <div
               style={{
-                textDecoration: "underline",
-              }}
-              target="_blank"
-              href={
-                "https://factory.sismo.io/groups-explorer?search=" + groupName
-              }
-              onClick={(e) => {
-                e.stopPropagation();
+                color: "black",
               }}>
-              {groupName}
-            </a>
-            {index < whiteboard.groupNames.length - 1 && ", "}
-          </span>
-        ))}
+              <span>Group names:</span>
+            </div>
+            {whiteboard.groupNames.map((groupName: string, index) => (
+              <span key={groupName}>
+                <a
+                  style={{
+                    textDecoration: "underline",
+                  }}
+                  target="_blank"
+                  href={
+                    "https://factory.sismo.io/groups-explorer?search=" +
+                    groupName
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}>
+                  {groupName}
+                </a>
+                {index < whiteboard.groupNames.length - 1 && ", "}
+              </span>
+            ))}
+            <div>
+              <span
+                style={{
+                  color: "black",
+                }}>
+                {"Minimum level: "}
+              </span>
+              {whiteboard.minLevel}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,10 @@ export const ZKWHITEBOARD_VAULTID_VARNAME = "zkWhiteboardVaultId";
 export const WHITEBOARD_VAULTID_VARNAME = "vaultId-whiteboard-";
 export const CURRENT_APPID_VARNAME = "currentAppId";
 
+export const reactionsType = ["👍", "💜", "👌"];
+
+export const mobileWidthThreshold = 800;
+
 export const MAX_Z_INDEX = 1000;
 export const TRANSPARENCY = "E6";
 
@@ -22,13 +26,13 @@ export const blueColor = "#82a5ff";
 export const MIN_WHITEBOARD = 1;
 export const MAX_WHITEBOARD_PER_USER = 5;
 export const MAX_CHARACTERS = 100;
-export const MAX_CHARACTERS_WHITEBOARD_NAME = 50;
+export const MAX_CHARACTERS_WHITEBOARD_NAME = 30;
 export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION = 300;
 export const MAX_WHITEBOARD_GROUPS = 10;
 
 export const MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE = `Your whiteboard name should be ${MIN_WHITEBOARD} to ${MAX_CHARACTERS_WHITEBOARD_NAME} characters long`;
 export const MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE = `Your description should be ${MIN_WHITEBOARD} to ${MAX_CHARACTERS_WHITEBOARD_DESCRIPTION} characters long`;
-export const MAX_WHITEBOARD_GROUPS_MESSAGE = `Please select between ${MIN_WHITEBOARD} to ${MAX_WHITEBOARD_GROUPS} groups.`;
+export const MAX_WHITEBOARD_GROUPS_MESSAGE = `Please select between 0 to ${MAX_WHITEBOARD_GROUPS} groups.`;
 
 export const preWrittenPostXSlug = "http://twitter.com/intent/tweet?text=";
 export const preWrittenPostLensSlug = "https://lenster.xyz/?text=";

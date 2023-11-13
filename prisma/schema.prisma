@@ -17,6 +17,8 @@ model Message {
   color         String
   whiteboard    Whiteboard @relation(fields: [whiteboardId], references: [id])
   whiteboardId  Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
 }
 
 model Whiteboard {
@@ -29,9 +31,23 @@ model Whiteboard {
   authorVaultId String
   messages      Message[]
   curated       Boolean
+  minLevel      Int       @default(1)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
 }
 
 model User {
   vaultId            String       @id
   createdWhiteboards Whiteboard[]
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  type      String
+  messageId Int
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([messageId, userId])
 }

@@ -30,7 +30,7 @@ const ShareWhiteboard: React.FC<ShareWhiteboard> = ({
 }) => {
   const [shareMessageAuthor, setShareMessageAuthor] = useState("");
   const [shareMessageDefault, setShareMessageDefault] = useState("");
-  const [isHovering, setIsHovering] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
     setShareMessageDefault(
@@ -136,9 +136,10 @@ const ShareWhiteboard: React.FC<ShareWhiteboard> = ({
         },
       }}
       icon={<ShareIcon />}
-      onMouseOver={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-      open={isHovering}>
+      onMouseOver={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onClick={() => setOpen(!open)}
+      open={open}>
       {actions.map((action) => (
         <SpeedDialAction
           key={action.name}

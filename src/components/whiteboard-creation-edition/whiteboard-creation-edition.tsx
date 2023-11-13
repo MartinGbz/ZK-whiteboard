@@ -1,18 +1,14 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  WhiteboardOperationType,
   WhiteboardCreateSignedMessage,
   WhiteboardEditSignedMessage,
-  User,
+  OperationType,
+  Whiteboard,
 } from "@/types/whiteboard-types";
-import Header from "../header/header";
 
 import "./whiteboard-creation-edition.css";
-import { Autocomplete, Chip, TextField } from "@mui/material";
-import { TextareaAutosize } from "@mui/base";
-import { Whiteboard } from "@prisma/client";
 import {
   MAX_CHARACTERS_WHITEBOARD_DESCRIPTION,
   MAX_CHARACTERS_WHITEBOARD_NAME,
@@ -25,8 +21,6 @@ import {
   MAX_WHITEBOARD_GROUPS,
   greenColorDisabled,
   MAX_WHITEBOARD_PER_USER,
-  MIN_WHITEBOARD,
-  redColor,
 } from "@/configs/configs";
 import Loading from "../loading-modal/loading-modal";
 import {
@@ -36,194 +30,132 @@ import {
 } from "@sismo-core/sismo-connect-react";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import axios from "axios";
-import ErrorModal from "../error-modal/error-modal";
 import SuccessAnimation from "../success-animation/success-animation";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WhiteboardCreationEditionInput from "../whiteboard-creation-edition-input/whiteboard-creation-edition-input";
+import Button from "../button/button";
+import { Group } from "@/lib/groups";
+import { FieldValues, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import Checkbox from "@mui/material/Checkbox";
 
 const sismoConnect = SismoConnect({ config: sismoConnectConfig });
 
 const API_BASE_URL = "/api/whiteboard";
 const API_ENDPOINTS = {
-  CREATE: "/create",
+  POST: "/post",
   EDIT: "/edit",
   DELETE: "/delete",
 };
 
-interface Group {
-  id: string;
-  name: string;
-  timestamp: number;
-  description: string;
-  publicContacts: string[];
-  specs: string;
-  generatedBy: string;
-  valueType: string;
-  accountSource: string[];
-  tags: string[];
-  properties: {
-    accountsNumber: number;
-    tierDistribution: object;
-    minValue: string;
-    maxValue: string;
-  };
-  dataUrl: string;
-}
-
 interface WhiteboardCreationEditionProps {
   isEdition?: boolean;
-  whiteboardId?: number;
+  whiteboard?: Whiteboard;
+  groups: Group[];
 }
 
 const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
   isEdition,
-  whiteboardId,
+  whiteboard,
+  groups,
 }) => {
   const router = useRouter();
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [whiteboardName, setWhiteboardName] = useState<string>("");
-  const [whiteboardNameOk, setWhiteboardNameOk] = useState<boolean>(false);
-  const [whiteboardNameChanged, setWhiteboardNameChanged] =
-    useState<boolean>(false);
-  const [whiteboardDescription, setWhiteboardDescription] =
-    useState<string>("");
-  const [whiteboardDescriptionOk, setWhiteboardDescriptionOk] =
-    useState<boolean>(false);
-  const [whiteboardDescriptionChanged, setWhiteboardDescriptionChanged] =
-    useState<boolean>(false);
-  const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
-  const [selectedGroupsOk, setSelectedGroupsOk] = useState<boolean>(false);
-  const [selectedGroupsChanged, setSelectedGroupsChanged] =
-    useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [initalWhiteboard, setInitalWhiteboard] = useState<Whiteboard>();
-  const [isWhiteboardDataLoading, setIsWhiteboardDataLoading] =
-    useState<boolean>(true);
-  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
-    useState<SismoConnectResponse | null>(null);
-  const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  const [disableValidation, setDisableValidation] = useState<boolean>(false);
-  const [disableValidationEdition, setDisableValidationEdition] =
-    useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
-
   const pathname = usePathname();
 
-  useEffect(() => {
-    const fetchGroups = async () => {
-      setIsWhiteboardDataLoading(true);
-      let response;
-      try {
-        response = await axios.get("https://hub.sismo.io/groups/latests", {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      } catch (error: any) {
-        console.error("API request error:", error);
-        setErrorMessage("An error occured while fetching Sismo Data Groups");
-        return null;
-      }
-      const groups: Group[] = response.data.items;
-      setGroups(groups);
-      if (!isEdition) {
-        setIsWhiteboardDataLoading(false);
-      }
-    };
-    fetchGroups();
-  }, [isEdition]);
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  const [sismoConnectResponseMessage, setSismoConnectResponseMessage] =
+    useState<SismoConnectResponse | null>(null);
+
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
-    const fetchWhiteboard = async (id: number) => {
-      let response;
-      try {
-        response = await axios.post("/api/whiteboard", id, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      } catch (error: any) {
-        console.error("API request error:", error);
-        const defaultErrorMessage =
-          "An error occured while fetching the whiteboard data";
-        const errorMessage = error.response.data.error
-          ? `${defaultErrorMessage}: ${error.response.data.error}`
-          : defaultErrorMessage;
-        setErrorMessage(errorMessage);
-        return null;
-      }
-      const whiteboard: Whiteboard = response.data;
-      setInitalWhiteboard(whiteboard);
-      setWhiteboardName(whiteboard?.name || "");
-      setWhiteboardDescription(whiteboard?.description || "");
-      setSelectedGroups(
-        groups.filter((group: Group) =>
-          whiteboard?.groupIds?.includes(group.id)
-        )
-      );
-      setIsWhiteboardDataLoading(false);
-    };
-    // !isVerifying && !successMessage to avoid fetching data when the user is verifying the proof and will exit the page
+    if (!whiteboard) return;
+    reset({
+      name: whiteboard.name,
+      description: whiteboard.description,
+      groups: groups.filter((group: Group) =>
+        whiteboard?.groupIds?.includes(group.id)
+      ),
+      minLevel: whiteboard.minLevel,
+    });
+  }, [groups, reset, whiteboard]);
+
+  function performAction(
+    type: OperationType,
+    name?: string,
+    description?: string,
+    groups?: Group[],
+    minLevel?: number
+  ) {
     if (
-      isEdition &&
-      whiteboardId &&
-      groups &&
-      !isVerifying &&
-      !successMessage
+      (type === OperationType.EDIT || type === OperationType.DELETE) &&
+      !whiteboard
     ) {
-      fetchWhiteboard(whiteboardId);
-    }
-  }, [groups, isEdition, isVerifying, successMessage, whiteboardId]);
-
-  async function createWhiteboard() {
-    const sismoConnectSignedMessage: WhiteboardCreateSignedMessage = {
-      type: WhiteboardOperationType.CREATE,
-      message: {
-        name: whiteboardName,
-        description: whiteboardDescription,
-        groupIds: selectedGroups.map((group: Group) => group.id),
-      },
-    };
-    sismoConnect.request({
-      namespace: "main",
-      auth: { authType: AuthType.VAULT },
-      signature: {
-        message: JSON.stringify(sismoConnectSignedMessage),
-      },
-    });
-  }
-
-  async function saveWhiteboard() {
-    if (!initalWhiteboard) {
-      console.error("No initial whiteboard");
+      const errorMessage = "No whiteboard to edit";
+      console.error(errorMessage);
+      toast.error(errorMessage);
       return;
     }
-    const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
-      type: WhiteboardOperationType.EDIT,
-      message: {
-        ...initalWhiteboard,
-        description: whiteboardDescription,
-      },
-    };
-    sismoConnect.request({
-      namespace: "main",
-      auth: { authType: AuthType.VAULT },
-      signature: {
-        message: JSON.stringify(sismoConnectSignedMessage),
-      },
-    });
-  }
 
-  async function deleteWhiteboard() {
-    if (!initalWhiteboard) {
-      console.error("No initial whiteboard");
+    let sismoConnectSignedMessage;
+    switch (type) {
+      case OperationType.POST:
+        if (!name || !description || !groups) {
+          const errorMessage = "Missing parameters";
+          console.error(errorMessage);
+          toast.error(errorMessage);
+          return;
+        }
+        sismoConnectSignedMessage = {
+          type: type,
+          message: {
+            name: name,
+            description: description,
+            groupIds: groups?.map((group: Group) => group.id),
+            minLevel: minLevel,
+          },
+        } as WhiteboardCreateSignedMessage;
+        break;
+      case OperationType.EDIT:
+        if (!description) {
+          const errorMessage = "Missing description";
+          console.error(errorMessage);
+          toast.error(errorMessage);
+          return;
+        }
+        sismoConnectSignedMessage = {
+          type: type,
+          message: {
+            ...whiteboard,
+            description: description,
+            minLevel: minLevel,
+          },
+        } as WhiteboardEditSignedMessage;
+        break;
+      case OperationType.DELETE:
+        sismoConnectSignedMessage = {
+          type: type,
+          message: whiteboard,
+        } as WhiteboardEditSignedMessage;
+        break;
+      default:
+        const errorMessage = "Invalid action type";
+        console.error(errorMessage);
+        toast.error(errorMessage);
+        return;
+    }
+
+    if (!sismoConnectSignedMessage) {
       return;
     }
-    const sismoConnectSignedMessage: WhiteboardEditSignedMessage = {
-      type: WhiteboardOperationType.DELETE,
-      message: initalWhiteboard,
-    };
+
     sismoConnect.request({
       namespace: "main",
       auth: { authType: AuthType.VAULT },
@@ -253,11 +185,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         ? (JSON.parse(message.signedMessage) as WhiteboardCreateSignedMessage)
         : null;
 
-      if (signedMessage?.type === WhiteboardOperationType.CREATE) {
-        url += API_ENDPOINTS.CREATE;
-      } else if (signedMessage?.type === WhiteboardOperationType.EDIT) {
+      if (signedMessage?.type === OperationType.POST) {
+        url += API_ENDPOINTS.POST;
+      } else if (signedMessage?.type === OperationType.EDIT) {
         url += API_ENDPOINTS.EDIT;
-      } else if (signedMessage?.type === WhiteboardOperationType.DELETE) {
+      } else if (signedMessage?.type === OperationType.DELETE) {
         url += API_ENDPOINTS.DELETE;
       }
 
@@ -278,10 +210,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
           if (i === retryMax - 1) {
             console.error("API request error:", error);
             const defaultErrorMessage = "An error occured";
-            const errorMessage = error.response.data.error
+            const errorMessage = error?.response?.data?.error
               ? `${defaultErrorMessage}: ${error.response.data.error}`
               : defaultErrorMessage;
-            setErrorMessage(errorMessage);
+            console.error(errorMessage);
+            toast.error(errorMessage);
             return false;
           }
         }
@@ -315,11 +248,11 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
         const mess = message.signedMessage
           ? JSON.parse(message.signedMessage)
           : null;
-        if (mess.type === WhiteboardOperationType.CREATE) {
+        if (mess.type === OperationType.POST) {
           setSuccessMessage("Whiteboard created!");
-        } else if (mess.type === WhiteboardOperationType.EDIT) {
+        } else if (mess.type === OperationType.EDIT) {
           setSuccessMessage("Whiteboard edited!");
-        } else if (mess.type === WhiteboardOperationType.DELETE) {
+        } else if (mess.type === OperationType.DELETE) {
           setSuccessMessage("Whiteboard deleted!");
         } else {
           setSuccessMessage("Success");
@@ -334,341 +267,179 @@ const WhiteboardCreationEdition: React.FC<WhiteboardCreationEditionProps> = ({
     }
   }, [pathname, router, sismoConnectResponseMessage]);
 
-  useEffect(() => {
-    if (whiteboardName) {
-      setWhiteboardNameChanged(true);
+  const onSubmit = (formData: FieldValues) => {
+    const formDataValidated = { ...formData };
+    if (!formDataValidated.minLevel) {
+      formDataValidated.minLevel = 1;
     }
-    if (whiteboardDescription) {
-      setWhiteboardDescriptionChanged(true);
+    if (!formDataValidated.groups) {
+      formDataValidated.groups = [];
     }
-    if (selectedGroups.length > 0) {
-      setSelectedGroupsChanged(true);
-    }
-
-    if (
-      whiteboardName.length > MAX_CHARACTERS_WHITEBOARD_NAME ||
-      whiteboardName.length < MIN_WHITEBOARD
-    ) {
-      setWhiteboardNameOk(false);
+    if (isEdition) {
+      performAction(
+        OperationType.EDIT,
+        undefined,
+        formDataValidated.description,
+        undefined,
+        formDataValidated.minLevel
+      );
     } else {
-      setWhiteboardNameOk(true);
+      performAction(
+        OperationType.POST,
+        formDataValidated.name,
+        formDataValidated.description,
+        formDataValidated.groups,
+        formDataValidated.minLevel
+      );
     }
-
-    if (
-      whiteboardDescription.length > MAX_CHARACTERS_WHITEBOARD_DESCRIPTION ||
-      whiteboardDescription.length < MIN_WHITEBOARD
-    ) {
-      setWhiteboardDescriptionOk(false);
-    } else {
-      setWhiteboardDescriptionOk(true);
-    }
-
-    if (
-      selectedGroups.length > MAX_WHITEBOARD_GROUPS ||
-      selectedGroups.length < MIN_WHITEBOARD
-    ) {
-      setSelectedGroupsOk(false);
-    } else {
-      setSelectedGroupsOk(true);
-    }
-  }, [whiteboardName, whiteboardDescription, selectedGroups]);
-
-  useEffect(() => {
-    if (
-      whiteboardNameOk &&
-      whiteboardDescriptionOk &&
-      selectedGroupsOk &&
-      user
-    ) {
-      setDisableValidation(false);
-    } else {
-      setDisableValidation(true);
-    }
-    if (whiteboardNameOk && whiteboardDescriptionOk) {
-      setDisableValidationEdition(false);
-    } else {
-      setDisableValidationEdition(true);
-    }
-  }, [whiteboardNameOk, whiteboardDescriptionOk, selectedGroupsOk, user]);
+  };
 
   return (
-    <div className="container">
-      <Header onChangeUser={(user) => setUser(user)} />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          margin: "10px",
-          width: "fit-content",
-        }}>
-        <div
-          style={{
-            color: "black",
-            fontSize: "20px",
-          }}>
-          <span>
+    <div
+      style={{
+        backgroundColor: "white",
+        width: "100%",
+        height: "100%",
+      }}>
+      <div className="edition-container">
+        <div className="edition-title">
+          <div>
             {isEdition ? "Edit a whiteboard" : "Create a new whiteboard"}
-          </span>
-          <span
-            style={{
-              color: "grey",
-              fontSize: "11px",
-            }}>
+          </div>
+          <div>
             {isEdition
               ? " (You can only edit the description for now)"
               : " (Currently only " +
                 MAX_WHITEBOARD_PER_USER +
                 " max per user)"}
-          </span>
+          </div>
         </div>
-        <p className="form-labels"> Name </p>
-        <input
-          disabled={isEdition}
-          type="text"
-          className="whiteboard-creation-inputs"
-          style={{
-            padding: "10px",
-            height: "40x",
-            fontSize: "14px",
-            cursor: isEdition ? "not-allowed" : "default",
-          }}
-          onChange={(event) => {
-            setWhiteboardName(event.target.value);
-          }}
-          value={whiteboardName}
-        />
-        {whiteboardNameChanged && !whiteboardNameOk && (
-          <div className="warning-message">
-            {MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
-          </div>
-        )}
-        <p className="form-labels"> Description </p>
-        <TextareaAutosize
-          className="whiteboard-creation-inputs"
-          style={{
-            fontSize: "14px",
-            paddingBottom: "10px",
-            paddingTop: "10px",
-            paddingLeft: "10px",
-            paddingRight: "10px",
-          }}
-          onChange={(event) => {
-            setWhiteboardDescription(event.target.value);
-          }}
-          value={whiteboardDescription}
-        />
-        {whiteboardDescriptionChanged && !whiteboardDescriptionOk && (
-          <div className="warning-message">
-            {MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
-          </div>
-        )}
-        <p className="form-labels"> Group(s) </p>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}>
-            <Autocomplete
-              disabled={isEdition}
-              className="inputs"
-              ListboxProps={{
-                style: {
-                  fontSize: "14px",
-                  backgroundColor: "#e9e9e9",
-                  cursor: isEdition ? "not-allowed" : "default",
-                },
-              }}
-              noOptionsText={"No groups found"}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: {
-                      borderRadius: "5px",
-                      backgroundColor: "#e9e9e9",
-                      width: "300px",
-                      fontSize: "14px",
-                      paddingBottom: "10px",
-                      paddingTop: "10px",
-                      paddingLeft: "10px",
-                      paddingRight: "10px",
-                    },
-                  }}
-                />
-              )}
-              options={groups}
-              multiple={true}
-              size="small"
-              getOptionLabel={(option) => option.name}
-              renderOption={(props, option) => (
-                <li
-                  style={{
-                    backgroundColor: "#e9e9e9",
-                  }}
-                  {...props}
-                  key={option.id}>
-                  {option.name}
-                </li>
-              )}
-              value={selectedGroups}
-              renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => (
-                  <Chip
-                    style={{
-                      fontSize: "12px",
-                    }}
-                    {...getTagProps({ index })}
-                    key={option.id}
-                    label={option.name}
-                  />
-                ))
-              }
-              onChange={(event, value) => {
-                setSelectedGroups(value);
-              }}
-            />
-            {!isEdition && selectedGroupsChanged && !selectedGroupsOk && (
-              <div className="warning-message">
-                {MAX_WHITEBOARD_GROUPS_MESSAGE}
-              </div>
-            )}
-            <a
-              style={{
-                fontSize: "11px",
-                color: "grey",
-                textDecoration: "underline",
-              }}
-              target="_blank"
-              href="https://docs.sismo.io/sismo-docs/data-groups/data-groups-and-creation">
-              What are Groups?
-            </a>
-          </div>
-          {!isEdition && (
-            <div
-              style={{
-                marginLeft: "20px",
-              }}>
-              <p
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <WhiteboardCreationEditionInput
+            isEdition={isEdition}
+            type="textareaAutosize"
+            name="name"
+            label="Name"
+            maxNumber={MAX_CHARACTERS_WHITEBOARD_NAME}
+            warningMessage={MAX_CHARACTERS_WHITEBOARD_NAME_MESSAGE}
+            register={register}
+            errors={errors}
+          />
+          <WhiteboardCreationEditionInput
+            isEdition={isEdition}
+            type="textareaAutosize"
+            name="description"
+            label="Description"
+            maxNumber={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION}
+            warningMessage={MAX_CHARACTERS_WHITEBOARD_DESCRIPTION_MESSAGE}
+            register={register}
+            errors={errors}
+          />
+          <div className="groups-input-container">
+            <div>
+              <WhiteboardCreationEditionInput
+                isEdition={isEdition}
+                type="autocomplete"
+                name="groups"
+                label="Group(s)"
+                maxNumber={MAX_WHITEBOARD_GROUPS}
+                warningMessage={MAX_WHITEBOARD_GROUPS_MESSAGE}
+                groups={groups}
+                control={control}
+                errors={errors}
+              />
+              <a
                 style={{
-                  fontSize: "12px",
-                  color: "black",
-                  backgroundColor: "#e9e9e9",
-                }}>
-                No groups fit your needs? Create one here!
-              </p>
-              <a target="_blank" href="https://factory.sismo.io/create-group">
-                <div
-                  className="create-group-button"
-                  style={{
-                    fontSize: "12px",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    backgroundColor: purpleColor,
-                    cursor: "pointer",
-                    width: "fit-content",
-                    color: "black",
-                    marginTop: "5px",
-                    boxShadow: "rgba(0, 0, 0, 0.25) 0px 1px 2px",
-                  }}>
-                  <OpenInNewIcon
-                    sx={{
-                      fontSize: "15px",
-                    }}
-                  />{" "}
-                  Create a group
-                </div>
+                  fontSize: "11px",
+                  color: "grey",
+                  textDecoration: "underline",
+                }}
+                target="_blank"
+                href="https://docs.sismo.io/sismo-docs/data-groups/data-groups-and-creation">
+                What are Groups?
               </a>
             </div>
-          )}
-        </div>
-        <button
-          className="create-edit-button validate-button"
-          style={{
-            backgroundColor:
-              (isEdition && disableValidationEdition) ||
-              (!isEdition && disableValidation)
-                ? greenColorDisabled
-                : greenColor,
-            cursor:
-              (isEdition && disableValidationEdition) ||
-              (!isEdition && disableValidation)
-                ? "default"
-                : "pointer",
-            pointerEvents:
-              (isEdition && disableValidationEdition) ||
-              (!isEdition && disableValidation)
-                ? "none"
-                : "auto",
-            alignSelf: "start",
-            marginTop: "20px",
-            fontSize: "18px",
-
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onClick={() => {
-            if (!isEdition) createWhiteboard();
-            if (isEdition) saveWhiteboard();
-          }}
-          disabled={isEdition ? disableValidationEdition : disableValidation}>
-          <CheckCircleIcon
+            {!isEdition && (
+              <div>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "black",
+                    backgroundColor: "#e9e9e9",
+                  }}>
+                  No groups fit your needs? Create one here!
+                </p>
+                <a target="_blank" href="https://factory.sismo.io/create-group">
+                  <div
+                    className="create-group-button"
+                    style={{
+                      backgroundColor: purpleColor,
+                    }}>
+                    <OpenInNewIcon
+                      sx={{
+                        fontSize: "15px",
+                      }}
+                    />{" "}
+                    Create a group
+                  </div>
+                </a>
+              </div>
+            )}
+          </div>
+          <div className="input-container">
+            <label className="form-labels"> Minimum level: </label>
+            <input
+              className="whiteboard-creation-inputs"
+              type="number"
+              min="1"
+              step="1"
+              defaultValue={1}
+              {...register("minLevel", {
+                required: false,
+              })}
+            />
+            <p
+              style={{
+                fontSize: "12px",
+                color: "black",
+              }}>
+              No groups fit your needs? Create one here!
+            </p>
+          </div>
+          <Button
+            type="submit"
             style={{
-              fontSize: "18px",
-              marginRight: "2px",
+              backgroundColor:
+                Object.keys(errors).length !== 0
+                  ? greenColorDisabled
+                  : greenColor,
+              cursor: Object.keys(errors).length !== 0 ? "default" : "pointer",
+              pointerEvents: Object.keys(errors).length !== 0 ? "none" : "auto",
+              marginTop: "20px",
+            }}
+            disabled={Object.keys(errors).length !== 0}
+            buttonType="validate"
+            title={isEdition ? "Save" : "Create"}
+            fontSize="15px"
+            iconSpace="4px"></Button>
+        </form>
+        {isEdition && (
+          <Button
+            className="create-edit-button"
+            buttonType="delete"
+            title="Delete"
+            onClick={() => {
+              performAction(OperationType.DELETE);
+            }}
+            fontSize="15px"
+            style={{
+              alignSelf: "end",
+              marginTop: "20px",
             }}
           />
-          {!isEdition && "Create"}
-          {isEdition && "Save"}
-        </button>
-        {isEdition && (
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "flex-end",
-            }}>
-            <button
-              className="create-edit-button validate-button"
-              style={{
-                backgroundColor: redColor,
-                cursor: "pointer",
-                pointerEvents: "auto",
-                alignSelf: "start",
-                marginTop: "20px",
-                fontSize: "15px",
-
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              onClick={() => {
-                deleteWhiteboard();
-              }}>
-              <DeleteIcon
-                style={{
-                  fontSize: "15px",
-                  marginRight: "2px",
-                }}
-              />{" "}
-              Delete
-            </button>
-          </div>
         )}
       </div>
-      {isWhiteboardDataLoading && !isVerifying && (
-        <Loading text="Loading whiteboard" />
-      )}
       {isVerifying && <Loading text="Checking the proof..." />}
-      {errorMessage && <ErrorModal text={errorMessage} />}
       <SuccessAnimation text={successMessage} duration={0.5} />
     </div>
   );
